@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <template id="assets_backend"
+              name="base_gtin Assets"
+              inherit_id="web.assets_backend"
+              >
+        <xpath expr="." position="inside">
+            <script type="application/javascript"
+                    src="/base_gtin/static/src/js/barcode_parser.js"
+                    />
+        </xpath>
+    </template>
+
+
+</odoo>
