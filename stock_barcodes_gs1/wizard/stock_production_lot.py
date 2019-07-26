@@ -12,7 +12,7 @@ class WizStockBarcodesNewLot(models.TransientModel):
 
     def on_barcode_scanned(self, barcode):
         if len(barcode) <= 14:
-            return super().process_barcode(barcode)
+            return super().on_barcode_scanned(barcode)
         self.clean_values()
         barcode_decoded = self._decode_barcode(barcode)
         package_barcode = barcode_decoded.get('01', False)

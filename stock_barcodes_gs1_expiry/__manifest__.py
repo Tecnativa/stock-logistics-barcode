@@ -11,7 +11,7 @@
     "license": "AGPL-3",
     "category": "Extra Tools",
     "depends": [
-        'base_gs1_barcode',
+        'stock_barcodes_gs1',
         'product_expiry',
     ],
     "data": [
