@@ -28,9 +28,10 @@ class WizStockBarcodesRead(models.TransientModel):
         self.lot_id = lot
 
     def process_barcode(self, barcode):
-        if len(barcode) <= 14:
+        try:
+            barcode_decoded = self.env['gs1_barcode'].decode(barcode)
+        except Exception:
             return super().process_barcode(barcode)
-        barcode_decoded = self.env['gs1_barcode'].decode(barcode)
         package_barcode = barcode_decoded.get('01', False)
         product_barcode = barcode_decoded.get('02', False)
         lot_barcode = barcode_decoded.get('10', False)
