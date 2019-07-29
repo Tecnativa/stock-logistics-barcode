@@ -6,8 +6,8 @@ from odoo.addons import decimal_precision as dp
 
 
 class WizStockBarcodesReadInventory(models.TransientModel):
-    _inherit = 'wiz.stock.barcodes.read'
     _name = 'wiz.stock.barcodes.read.inventory'
+    _inherit = 'wiz.stock.barcodes.read'
     _description = 'Wizard to read barcode on inventory'
 
     inventory_id = fields.Many2one(
@@ -32,8 +32,6 @@ class WizStockBarcodesReadInventory(models.TransientModel):
         }
 
     def _add_inventory_line(self):
-        if not self.product_qty:
-            return
         StockInventoryLine = self.env['stock.inventory.line']
         line = first(StockInventoryLine.search([
             ('inventory_id', '=', self.inventory_id.id),
@@ -50,11 +48,16 @@ class WizStockBarcodesReadInventory(models.TransientModel):
         self.inventory_product_qty = line.product_qty
 
     def action_done(self):
-        self._add_inventory_line()
+        result = super().action_done()
+        if result:
+            self._add_inventory_line()
+        return result
 
     def action_manual_entry(self):
-        super().action_manual_entry()
-        self._add_inventory_line()
+        result = super().action_manual_entry()
+        if result:
+            self.action_done()
+        return result
 
     def reset_qty(self):
         super().reset_qty()

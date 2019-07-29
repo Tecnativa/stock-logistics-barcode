@@ -41,22 +41,25 @@ class WizStockBarcodesRead(models.TransientModel):
                 self._barcode_domain(product_barcode))
             if product:
                 if len(product) > 1:
-                    return self._get_messagge_info(
-                        'danger', _('More than one product found'))
+                    self._set_messagge_info(
+                        'more_match', _('More than one product found'))
+                    return False
                 self.action_product_scaned_post(product)
         if package_barcode:
             packaging = self.env['product.packaging'].search(
                 self._barcode_domain(package_barcode))
             if packaging:
                 if len(packaging) > 1:
-                    return self._get_messagge_info(
-                        'danger', _('More than one package found'))
+                    self._set_messagge_info(
+                        'more_match', _('More than one package found'))
+                    return False
                 self.action_packaging_scaned_post(packaging)
         if lot_barcode and self.product_id.tracking != 'none':
             self.process_lot(barcode_decoded)
         if product_qty:
             self.product_qty = product_qty
         if not self.product_id and not self.packaging_id and not self.lot_id:
-            return self._get_messagge_info('danger', _('Barcode no found'))
+            self._set_messagge_info('not_found', _('Barcode no found'))
+            return False
         self.action_done()
-        return self._get_messagge_info('success', _('Barcode read correctly'))
+        return self._set_messagge_info('success', _('Barcode read correctly'))

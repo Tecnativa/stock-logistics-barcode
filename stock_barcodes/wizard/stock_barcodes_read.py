@@ -5,9 +5,11 @@ from odoo.addons import decimal_precision as dp
 
 
 class WizStockBarcodesRead(models.TransientModel):
-    _inherit = 'barcodes.barcode_events_mixin'
     _name = 'wiz.stock.barcodes.read'
+    _inherit = 'barcodes.barcode_events_mixin'
     _description = 'Wizard to read barcode'
+    # To prevent remove the record wizard until 2 days old
+    _transient_max_hours = 48
 
     barcode = fields.Char()
     res_model_id = fields.Many2one(
@@ -39,14 +41,20 @@ class WizStockBarcodesRead(models.TransientModel):
         string='Product Qty',
         digits=dp.get_precision('Product Unit of Measure'),
     )
-    force_input_qty = fields.Boolean(
-        string='Force input quantities',
+    manual_entry = fields.Boolean(
+        string='Manual entry data',
     )
     scan_log_ids = fields.Many2many(
         comodel_name='stock.barcodes.read.log',
         compute='_compute_scan_log_ids',
     )
-    message_info = fields.Html(readonly=True)
+    message_type = fields.Selection([
+        ('info', 'Barcode read with additional info'),
+        ('not_found', 'No barcode found'),
+        ('more_match', 'More than one matches found'),
+        ('success', 'Barcode read successfully'),
+    ], readonly=True)
+    message = fields.Char(readonly=True)
 
     @api.onchange('location_id')
     def onchange_location_id(self):
@@ -63,79 +71,83 @@ class WizStockBarcodesRead(models.TransientModel):
             (rec.id, _('Read barcode (%s)') % rec.env.user.name)
             for rec in self]
 
-    def _get_messagge_info(self, type, messagge):
-        return {
-            'message_type': type,
-            'message_info': messagge,
-        }
+    def _set_messagge_info(self, type, messagge):
+        self.message_type = type
+        self.message = '%s (%s)' % (messagge, self.barcode)
 
     def process_barcode(self, barcode):
-        message = self._get_messagge_info(
-            'success', _('Barcode read correctly'))
+        self._set_messagge_info('success', _('Barcode read correctly'))
         domain = self._barcode_domain(barcode)
         product = self.env['product.product'].search(domain)
         if product:
             if len(product) > 1:
-                return self._get_messagge_info(
-                    'danger', _('More than one product found'))
+                self._set_messagge_info(
+                    'more_match', _('More than one product found'))
+                return
             self.action_product_scaned_post(product)
             self.action_done()
-            return message
+            return
         packaging = self.env['product.packaging'].search(domain)
         if packaging:
             if len(packaging) > 1:
-                return self._get_messagge_info(
-                    'danger', _('More than one package found'))
+                self._set_messagge_info(
+                    'more_match', _('More than one package found'))
+                return
             self.action_packaging_scaned_post(packaging)
             self.action_done()
-            return message
+            return
         lot = self.env['stock.production.lot'].search([
             ('name', '=', barcode),
             ('product_id', '=', self.product_id.id),
         ])
         if lot:
             self.lot_id = lot
-            return message
+            return
         location = self.env['stock.location'].search(domain)
         if location:
             self.location_id = location
-            return message
-        return self._get_messagge_info('danger', _('Barcode not found'))
+            return
+        self._set_messagge_info('not_found', _('Barcode not found'))
 
     def _barcode_domain(self, barcode):
         return [('barcode', '=', barcode)]
 
     def on_barcode_scanned(self, barcode):
-        self.packaging_id = False
-        self.product_id = False
-        self.lot_id = False
         self.barcode = barcode
         self.reset_qty()
-        message = self.process_barcode(barcode)
-        self.message_info = "<div class='alert alert-%(message_type)s'>" \
-                            "%(message_info)s" \
-                            "</div>" % message
-        self._add_read_log()
+        self.process_barcode(barcode)
 
     def action_done(self):
-        pass
+        if self.product_id.tracking != 'none' and not self.lot_id:
+            self._set_messagge_info('info', _('Waiting for input lot'))
+            return False
+        if not self.product_qty:
+            self._set_messagge_info('info', _('Waiting quantities'))
+            return False
+        if self.manual_entry:
+            self._set_messagge_info('success', _('Manual entry OK'))
+        self._add_read_log()
+        return True
 
     def action_product_scaned_post(self, product):
         self.packaging_id = False
+        if self.product_id != product:
+            self.lot_id = False
         self.product_id = product
-        self.product_qty = 0.0 if self.force_input_qty else 1.0
+        self.product_qty = 0.0 if self.manual_entry else 1.0
 
     def action_packaging_scaned_post(self, packaging):
         self.packaging_id = packaging
+        if self.product_id != packaging.product_id:
+            self.lot_id = False
         self.product_id = packaging.product_id
-        self.packaging_qty = 0.0 if self.force_input_qty else 1.0
+        self.packaging_qty = 0.0 if self.manual_entry else 1.0
         self.product_qty = packaging.qty * self.packaging_qty
 
     def action_clean_lot(self):
         self.lot_id = False
 
     def action_manual_entry(self):
-        self._add_read_log()
         return True
 
     def _prepare_scan_log_values(self):
@@ -147,7 +159,7 @@ class WizStockBarcodesRead(models.TransientModel):
             'lot_id': self.lot_id.id,
             'packaging_qty': self.packaging_qty,
             'product_qty': self.product_qty,
-            'force_input_qty': self.force_input_qty,
+            'manual_entry': self.manual_entry,
             'res_model_id': self.res_model_id.id,
             'res_id': self.res_id,
         }

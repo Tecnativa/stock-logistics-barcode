@@ -39,6 +39,6 @@ class StockBarcodesReadLog(models.Model):
         string='Quantity',
         digits=dp.get_precision('Product Unit of Measure'),
     )
-    force_input_qty = fields.Boolean(
-        string='Force input quantities',
+    manual_entry = fields.Boolean(
+        string='Manual entry',
     )
