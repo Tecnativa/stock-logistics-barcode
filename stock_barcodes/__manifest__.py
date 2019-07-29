@@ -15,7 +15,7 @@
     ],
     "data": [
         'security/ir.model.access.csv',
-        # 'views/assets.xml',
+        'views/assets.xml',
         'views/stock_inventory_views.xml',
         'wizard/stock_production_lot_views.xml',
         'wizard/stock_barcodes_read_views.xml',
