@@ -52,7 +52,7 @@ class WizStockBarcodesRead(models.TransientModel):
         ('info', 'Barcode read with additional info'),
         ('not_found', 'No barcode found'),
         ('more_match', 'More than one matches found'),
-        ('success', 'Barcode read successfully'),
+        ('success', 'Barcode read correctly'),
     ], readonly=True)
     message = fields.Char(readonly=True)
 
@@ -65,11 +65,6 @@ class WizStockBarcodesRead(models.TransientModel):
     def onchange_packaging_qty(self):
         if self.packaging_id:
             self.product_qty = self.packaging_qty * self.packaging_id.qty
-
-    def name_get(self):
-        return [
-            (rec.id, _('Read barcode (%s)') % rec.env.user.name)
-            for rec in self]
 
     def _set_messagge_info(self, type, messagge):
         self.message_type = type
@@ -117,15 +112,17 @@ class WizStockBarcodesRead(models.TransientModel):
         self.reset_qty()
         self.process_barcode(barcode)
 
-    def action_done(self):
-        if self.product_id.tracking != 'none' and not self.lot_id:
-            self._set_messagge_info('info', _('Waiting for input lot'))
-            return False
+    def check_done_conditions(self):
         if not self.product_qty:
             self._set_messagge_info('info', _('Waiting quantities'))
             return False
         if self.manual_entry:
             self._set_messagge_info('success', _('Manual entry OK'))
+        return True
+
+    def action_done(self):
+        if not self.check_done_conditions():
+            return False
         self._add_read_log()
         return True
 
@@ -166,8 +163,8 @@ class WizStockBarcodesRead(models.TransientModel):
 
     def _add_read_log(self):
         if self.product_qty:
-            self.env['stock.barcodes.read.log'].create(
-                self._prepare_scan_log_values())
+            vals = self._prepare_scan_log_values()
+            self.env['stock.barcodes.read.log'].create(vals)
 
     @api.depends('_barcode_scanned')
     def _compute_scan_log_ids(self):
@@ -184,4 +181,4 @@ class WizStockBarcodesRead(models.TransientModel):
         self.packaging_qty = 0
 
     def action_remove_last_scan(self):
-        pass
+        return True

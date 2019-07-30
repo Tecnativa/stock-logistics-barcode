@@ -11,7 +11,6 @@
                     icon="fa-barcode"
                     type="object"
                     help="List view of lines"
-                    groups="base.group_no_one"
                     states="confirm">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_text">Scan barcodes</span>

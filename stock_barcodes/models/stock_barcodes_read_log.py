@@ -18,6 +18,7 @@ class StockBarcodesReadLog(models.Model):
     product_id = fields.Many2one(
         comodel_name='product.product',
         string='Product',
+        index=True,
     )
     lot_id = fields.Many2one(
         comodel_name='stock.production.lot',

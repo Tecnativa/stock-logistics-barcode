@@ -1,6 +1,6 @@
 # Copyright 2019 Sergio Teruel <sergio.teruel@tecnativa.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import fields, models
+from odoo import _, fields, models
 from odoo.fields import first
 from odoo.addons import decimal_precision as dp
 
@@ -46,6 +46,12 @@ class WizStockBarcodesReadInventory(models.TransientModel):
         else:
             line = StockInventoryLine.create(self._prepare_inventory_line())
         self.inventory_product_qty = line.product_qty
+
+    def check_done_conditions(self):
+        if self.product_id.tracking != 'none' and not self.lot_id:
+            self._set_messagge_info('info', _('Waiting for input lot'))
+            return False
+        return super().check_done_conditions()
 
     def action_done(self):
         result = super().action_done()

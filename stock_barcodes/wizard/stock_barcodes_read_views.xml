@@ -77,6 +77,10 @@
         </field>
     </record>
 
+    <!--
+     Open wizard in current target option to avoid that the wizard is
+     closed after any button click,
+    -->
     <record model="ir.actions.act_window" id="action_stock_barcodes_read">
         <field name="res_model">wiz.stock.barcodes.read</field>
         <field name="name">Barcodes Read</field>

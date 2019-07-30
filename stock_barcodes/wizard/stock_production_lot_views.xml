@@ -8,9 +8,9 @@
             <form string="Lot">
                 <sheet>
                     <group>
-                        <div class="alert alert-info" role="alert">
-                            <p>1 - Scan product barcode</p>
-                            <p>2 - Scan product lot barcode</p>
+                        <div class="alert alert-info text-center" role="alert">
+                            <p>1 - Scan or input product barcode</p>
+                            <p>2 - Scan or input product lot barcode</p>
                         </div>
                     </group>
                     <group>

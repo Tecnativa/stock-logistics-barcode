@@ -38,4 +38,5 @@ class WizStockBarcodesNewLot(models.TransientModel):
         }
 
     def confirm(self):
-        self.env['stock.production.lot'].create(self._prepare_lot_values())
+        return self.env['stock.production.lot'].create(
+            self._prepare_lot_values())
