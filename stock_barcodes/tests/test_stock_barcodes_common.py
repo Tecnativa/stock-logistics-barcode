@@ -1,14 +1,78 @@
 # Copyright 2108-2019 Sergio Teruel <sergio.teruel@tecnativa.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo.addons.stock_barcodes.tests.test_stock_barcodes_common import\
-    TestStockBarcodesCommon
+
+from odoo.tests.common import SavepointCase
 
 
-class TestStockBarcodes(TestStockBarcodesCommon):
+class TestStockBarcodesCommon(SavepointCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        # Active group_stock_packaging and group_production_lot for user
+        group_stock_packaging = cls.env.ref('product.group_stock_packaging')
+        group_production_lot = cls.env.ref('stock.group_production_lot')
+        cls.env.user.groups_id = [
+            (4, group_stock_packaging.id),
+            (4, group_production_lot.id),
+        ]
+        # models
+        cls.StockLocation = cls.env['stock.location']
+        cls.StockInventory = cls.env['stock.inventory']
+        cls.Product = cls.env['product.product']
+        cls.ProductPackaging = cls.env['product.packaging']
+        cls.WizScanRead = cls.env['wiz.stock.barcodes.read']
+        cls.StockProductionLot = cls.env['stock.production.lot']
+
+        # warehouse and locations
+        cls.warehouse = cls.env.ref('stock.warehouse0')
+        cls.stock_location = cls.env.ref('stock.stock_location_stock')
+        cls.location_1 = cls.StockLocation.create({
+            'name': 'Test location 1',
+            'usage': 'internal',
+            'location_id': cls.stock_location.id,
+            'barcode': '8411322222568',
+        })
+        cls.location_2 = cls.StockLocation.create({
+            'name': 'Test location 2',
+            'usage': 'internal',
+            'location_id': cls.stock_location.id,
+            'barcode': '8470001809032'
+        })
+
+        # products
+        cls.product_wo_tracking = cls.Product.create({
+            'name': 'Product test wo lot tracking',
+            'type': 'product',
+            'tracking': 'none',
+            'barcode': '8480000723208',
+            'packaging_ids': [(0, 0, {
+                'name': 'Box 10 Units',
+                'qty': 10.0,
+                'barcode': '5099206074439',
+            })],
+        })
+        cls.product_tracking = cls.Product.create({
+            'name': 'Product test with lot tracking',
+            'type': 'product',
+            'tracking': 'lot',
+            'barcode': '8433281006850',
+            'packaging_ids': [(0, 0, {
+                'name': 'Box 5 Units',
+                'qty': 5.0,
+                'barcode': '5420008510489',
+            })],
+        })
+        cls.lot_1 = cls.StockProductionLot.create({
+            'name': '8411822222568',
+            'product_id': cls.product_tracking.id,
+        })
+        cls.wiz_scan = cls.WizScanRead.new()
+
+    def action_barcode_scanned(self, wizard, barcode):
+        wizard._barcode_scanned = barcode
+        wizard._on_barcode_scanned()
 
     def test_wizard_scan_location(self):
         self.action_barcode_scanned(self.wiz_scan, '8411322222568')
@@ -67,8 +131,9 @@ class TestStockBarcodes(TestStockBarcodesCommon):
 
     def test_wizard_scan_not_found(self):
         self.action_barcode_scanned(self.wiz_scan, '84118xxx22568')
-        self.assertEqual(self.wiz_scan.message,
-                         'Barcode: 84118xxx22568 (Barcode not found)')
+        self.assertEqual(
+            self.wiz_scan.message,
+            'Barcode: 84118xxx22568 (Barcode not found)')
 
     def test_wizard_remove_last_scan(self):
         self.assertTrue(self.wiz_scan.action_undo_last_scan())

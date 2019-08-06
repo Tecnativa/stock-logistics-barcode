@@ -1,15 +1,16 @@
 # Copyright 2108-2019 Sergio Teruel <sergio.teruel@tecnativa.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo.addons.stock_barcodes.tests.test_stock_barcodes import\
-    TestStockBarcodes
+from odoo.addons.stock_barcodes.tests.test_stock_barcodes_common import\
+    TestStockBarcodesCommon
 
 
-class TestStockBarcodesNewLot(TestStockBarcodes):
+class TestStockBarcodesNewLot(TestStockBarcodesCommon):
 
-    def setUp(self):
-        super().setUp()
-        self.ScanReadLot = self.env['wiz.stock.barcodes.new.lot']
-        self.wiz_scan_lot = self.ScanReadLot.new()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.ScanReadLot = cls.env['wiz.stock.barcodes.new.lot']
+        cls.wiz_scan_lot = cls.ScanReadLot.new()
 
     def test_new_lot(self):
         self.action_barcode_scanned(self.wiz_scan_lot, '8433281006850')

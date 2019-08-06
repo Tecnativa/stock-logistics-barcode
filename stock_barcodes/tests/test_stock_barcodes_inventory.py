@@ -1,23 +1,24 @@
 # Copyright 2108-2019 Sergio Teruel <sergio.teruel@tecnativa.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo.addons.stock_barcodes.tests.test_stock_barcodes import\
-    TestStockBarcodes
+from odoo.addons.stock_barcodes.tests.test_stock_barcodes_common import\
+    TestStockBarcodesCommon
 
 
-class TestStockBarcodesInventory(TestStockBarcodes):
+class TestStockBarcodesInventory(TestStockBarcodesCommon):
 
-    def setUp(self):
-        super().setUp()
-        self.ScanReadInventory = self.env['wiz.stock.barcodes.read.inventory']
-        self.stock_inventory_model = self.env.ref(
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.ScanReadInventory = cls.env['wiz.stock.barcodes.read.inventory']
+        cls.stock_inventory_model = cls.env.ref(
             'stock.model_stock_inventory')
-        self.inventory = self.StockInventory.create({
+        cls.inventory = cls.StockInventory.create({
             'name': 'Test Inventory',
             'filter': 'partial',
-            'location_id': self.stock_location.id,
+            'location_id': cls.stock_location.id,
         })
-        vals = self.inventory.action_barcode_scan()
-        self.wiz_scan_inventory = self.ScanReadInventory.with_context(
+        vals = cls.inventory.action_barcode_scan()
+        cls.wiz_scan_inventory = cls.ScanReadInventory.with_context(
             vals['context']
         ).create({})
 
