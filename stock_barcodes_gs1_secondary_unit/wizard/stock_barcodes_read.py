@@ -42,14 +42,20 @@ class WizStockBarcodesRead(models.AbstractModel):
         self.secondary_uom_qty = 0
         return res
 
-    def process_barcode_read_package(self, barcode, domain):
-        secondary_uom = self.env["product.secondary.unit"].search(domain)
-        if secondary_uom:
+    def process_barcode_package(self, package_barcode, processed):
+        secondary_uom = self.env["product.secondary.unit"].search(
+            self._barcode_domain(package_barcode)
+        )
+        if not secondary_uom:
+            self._set_messagge_info(
+                "not_found", _("Barcode for product secondary uom not found")
+            )
+            return False
+        else:
             if len(secondary_uom) > 1:
                 self._set_messagge_info(
-                    "more_match", _("More than one secondary unit found")
+                    "more_match", _("More than one secondary uom found")
                 )
-                return True
+                return False
+            processed = True
             self.action_secondary_uom_scaned_post(secondary_uom)
-            self.action_done()
-            return True

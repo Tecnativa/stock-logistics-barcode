@@ -8,7 +8,7 @@ from odoo.addons.stock_barcodes_gs1.tests.test_stock_barcodes_gs1 import (
 )
 
 
-class TestStockBarcodesGS1Expiry(TestStockBarcodesGS1):
+class TestStockBarcodesGS1SecondaryUnit(TestStockBarcodesGS1):
     def setUp(self):
         super().setUp()
         # Barcode with expiry data
