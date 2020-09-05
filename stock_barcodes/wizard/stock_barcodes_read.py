@@ -61,25 +61,10 @@ class WizStockBarcodesRead(models.AbstractModel):
     def process_barcode(self, barcode):
         self._set_messagge_info("success", _("Barcode read correctly"))
         domain = self._barcode_domain(barcode)
-        product = self.env["product.product"].search(domain)
-        if product:
-            if len(product) > 1:
-                self._set_messagge_info("more_match", _("More than one product found"))
-                return
-            self.action_product_scaned_post(product)
-            self.action_done()
+        if self.process_barcode_read_product(barcode, domain):
             return
-        if self.env.user.has_group("product.group_stock_packaging"):
-            packaging = self.env["product.packaging"].search(domain)
-            if packaging:
-                if len(packaging) > 1:
-                    self._set_messagge_info(
-                        "more_match", _("More than one package found")
-                    )
-                    return
-                self.action_packaging_scaned_post(packaging)
-                self.action_done()
-                return
+        if self.process_barcode_read_package(barcode, domain):
+            return
         if self.env.user.has_group("stock.group_production_lot"):
             lot_domain = [("name", "=", barcode)]
             if self.product_id:
@@ -97,6 +82,30 @@ class WizStockBarcodesRead(models.AbstractModel):
             self._set_messagge_info("info", _("Waiting product"))
             return
         self._set_messagge_info("not_found", _("Barcode not found"))
+
+    def process_barcode_read_product(self, barcode, domain):
+        product = self.env["product.product"].search(domain)
+        if product:
+            if len(product) > 1:
+                self._set_messagge_info("more_match", _("More than one product found"))
+                return True
+            self.action_product_scaned_post(product)
+            self.action_done()
+            return True
+
+    def process_barcode_read_package(self, barcode, domain):
+        if not self.env.user.has_group("product.group_stock_packaging"):
+            return False
+        packaging = self.env["product.packaging"].search(domain)
+        if packaging:
+            if len(packaging) > 1:
+                self._set_messagge_info(
+                    "more_match", _("More than one package found")
+                )
+                return True
+            self.action_packaging_scaned_post(packaging)
+            self.action_done()
+            return True
 
     def _barcode_domain(self, barcode):
         return [("barcode", "=", barcode)]
