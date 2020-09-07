@@ -7,6 +7,7 @@ class ProductSecondaryUnit(models.Model):
     _inherit = "product.secondary.unit"
 
     barcode = fields.Char(
-        string='Barcode', copy=False,
+        string="Barcode",
+        copy=False,
         help="International Article Number used for product identification.",
     )

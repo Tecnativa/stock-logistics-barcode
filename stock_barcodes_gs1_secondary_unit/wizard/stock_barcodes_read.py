@@ -7,17 +7,17 @@ class WizStockBarcodesRead(models.AbstractModel):
     _inherit = "wiz.stock.barcodes.read"
 
     product_tmpl_id = fields.Many2one(
-        comodel_name='product.template',
-        related='product_id.product_tmpl_id',
+        comodel_name="product.template", related="product_id.product_tmpl_id",
     )
     secondary_uom_id = fields.Many2one(
-        comodel_name="product.secondary.unit",
-        string="Secondary uom",
+        comodel_name="product.secondary.unit", string="Secondary uom",
     )
-    secondary_uom_qty = fields.Float(string="Secondary UOM Qty", digits="Product Unit of Measure")
+    secondary_uom_qty = fields.Float(
+        string="Secondary UOM Qty", digits="Product Unit of Measure"
+    )
 
     @api.onchange("secondary_uom_qty")
-    def secondary_uom_qty(self):
+    def onchange_secondary_uom_qty(self):
         if self.secondary_uom_id:
             self.product_qty = self.secondary_uom_qty * self.secondary_uom_id.factor
 
@@ -31,10 +31,12 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def _prepare_scan_log_values(self, log_detail=False):
         vals = super()._prepare_scan_log_values(log_detail=log_detail)
-        vals.update({
-            'secondary_uom_id': self.secondary_uom_id.id,
-            'secondary_uom_qty': self.secondary_uom_qty,
-        })
+        vals.update(
+            {
+                "secondary_uom_id": self.secondary_uom_id.id,
+                "secondary_uom_qty": self.secondary_uom_qty,
+            }
+        )
         return vals
 
     def reset_qty(self):
@@ -50,7 +52,7 @@ class WizStockBarcodesRead(models.AbstractModel):
             self._set_messagge_info(
                 "not_found", _("Barcode for product secondary uom not found")
             )
-            return False
+            return super().process_barcode_package(package_barcode, processed)
         else:
             if len(secondary_uom) > 1:
                 self._set_messagge_info(

@@ -99,9 +99,7 @@ class WizStockBarcodesRead(models.AbstractModel):
         packaging = self.env["product.packaging"].search(domain)
         if packaging:
             if len(packaging) > 1:
-                self._set_messagge_info(
-                    "more_match", _("More than one package found")
-                )
+                self._set_messagge_info("more_match", _("More than one package found"))
                 return True
             self.action_packaging_scaned_post(packaging)
             self.action_done()

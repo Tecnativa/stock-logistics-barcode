@@ -57,8 +57,9 @@ class WizStockBarcodesRead(models.AbstractModel):
                 processed = True
                 self.action_product_scaned_post(product)
         if package_barcode:
-            if not self.process_barcode_package(package_barcode, processed):
-                return False
+            value_returned = self.process_barcode_package(package_barcode, processed)
+            if value_returned is not None:
+                return value_returned
         if lot_barcode and self.product_id.tracking != "none":
             self.process_lot(barcode_decoded)
             processed = True
@@ -81,9 +82,7 @@ class WizStockBarcodesRead(models.AbstractModel):
             return False
         else:
             if len(packaging) > 1:
-                self._set_messagge_info(
-                    "more_match", _("More than one package found")
-                )
+                self._set_messagge_info("more_match", _("More than one package found"))
                 return False
             processed = True
             self.action_packaging_scaned_post(packaging)
