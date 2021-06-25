@@ -1,0 +1,60 @@
+.oe_stock_scan_button {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+}
+
+.oe_sticky_bottom {
+    position: sticky;
+    bottom: 0;
+    padding: 0.5em;
+    background-color: $o-view-background-color;
+    border: 0 solid $border-color;
+    border-width: 1px 0 0 0;
+}
+
+.oe_stock_barcordes_form {
+    .o_group {
+        &.o_inner_group {
+            margin-bottom: 0 !important;
+        }
+
+        margin: 0 !important;
+    }
+
+    .o_form_sheet,
+    .o_form_sheet_bg {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        border: 0 !important;
+    }
+
+    .o_field_widget {
+        margin-bottom: 0 !important;
+    }
+
+    .o_kanban_record {
+        padding: 0.3em;
+
+        &.o_kanban_ghost {
+            display: none;
+        }
+    }
+
+    .alert {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        border-radius: 0;
+    }
+}
+
+.o_kanban_barcode {
+    .o_kanban_record.oe_kanban_details {
+        @extend .btn;
+        @extend .btn-secondary;
+        padding: 0.6em 0;
+        margin-bottom: 0.5em;
+    }
+}

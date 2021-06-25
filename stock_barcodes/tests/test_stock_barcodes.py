@@ -109,6 +109,7 @@ class TestStockBarcodes(TransactionCase):
         self.assertEqual(self.wiz_scan.location_id, self.location_1)
 
     def test_wizard_scan_product(self):
+        self.wiz_scan.location_id = self.location_1
         self.action_barcode_scanned(self.wiz_scan, "8480000723208")
         self.assertEqual(self.wiz_scan.product_id, self.product_wo_tracking)
         self.assertEqual(self.wiz_scan.product_qty, 1.0)
@@ -118,6 +119,7 @@ class TestStockBarcodes(TransactionCase):
     def test_wizard_scan_product_manual_entry(self):
         # Test manual entry
         self.wiz_scan.manual_entry = True
+        self.wiz_scan.location_id = self.location_1
         self.action_barcode_scanned(self.wiz_scan, "8480000723208")
         self.assertEqual(self.wiz_scan.product_qty, 0.0)
         self.wiz_scan.product_qty = 50.0
@@ -126,6 +128,7 @@ class TestStockBarcodes(TransactionCase):
         self.assertTrue(self.wiz_scan.scan_log_ids[:1].manual_entry)
 
     def test_wizard_scan_package(self):
+        self.wiz_scan.location_id = self.location_1
         self.action_barcode_scanned(self.wiz_scan, "5420008510489")
         self.assertEqual(self.wiz_scan.product_id, self.product_tracking)
         self.assertEqual(self.wiz_scan.product_qty, 5.0)
@@ -146,11 +149,11 @@ class TestStockBarcodes(TransactionCase):
         self.product_wo_tracking.packaging_ids.barcode = "5420008510489"
         self.action_barcode_scanned(self.wiz_scan, "5420008510489")
         self.assertEqual(
-            self.wiz_scan.message,
-            "Barcode: 5420008510489 (More than one package found)",
+            self.wiz_scan.message, "5420008510489 (More than one package found)",
         )
 
     def test_wizard_scan_lot(self):
+        self.wiz_scan.location_id = self.location_1.id
         self.action_barcode_scanned(self.wiz_scan, "8411822222568")
         # Lot found for one product, so product_id is filled
         self.assertTrue(self.wiz_scan.product_id)
@@ -163,20 +166,10 @@ class TestStockBarcodes(TransactionCase):
 
     def test_wizard_scan_not_found(self):
         self.action_barcode_scanned(self.wiz_scan, "84118xxx22568")
-        self.assertEqual(
-            self.wiz_scan.message, "Barcode: 84118xxx22568 (Barcode not found)"
-        )
+        self.assertEqual(self.wiz_scan.message, "84118xxx22568 (Barcode not found)")
 
     def test_wizard_remove_last_scan(self):
         self.assertTrue(self.wiz_scan.action_undo_last_scan())
-
-    def test_wizard_onchange_location(self):
-        self.action_barcode_scanned(self.wiz_scan, "8480000723208")
-        self.assertEqual(self.wiz_scan.product_id, self.product_wo_tracking)
-        self.wiz_scan.location_id = self.location_2
-        self.wiz_scan.onchange_location_id()
-        self.assertFalse(self.wiz_scan.product_id)
-        self.assertFalse(self.wiz_scan.packaging_id)
 
     def test_wiz_clean_lot(self):
         self.action_barcode_scanned(self.wiz_scan, "8433281006850")
