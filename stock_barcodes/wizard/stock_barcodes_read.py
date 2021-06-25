@@ -20,7 +20,12 @@ class WizStockBarcodesRead(models.AbstractModel):
     packaging_id = fields.Many2one(comodel_name="product.packaging")
     packaging_qty = fields.Float(string="Package Qty", digits="Product Unit of Measure")
     product_qty = fields.Float(digits="Product Unit of Measure")
-    manual_entry = fields.Boolean(string="Manual entry data")
+    manual_entry = fields.Boolean(
+        string="Manual entry", related="option_group_id.manual_entry"
+    )
+    confirmed_moves = fields.Boolean(
+        string="Confirmed moves", related="option_group_id.confirmed_moves"
+    )
     # Computed field for display all scanning logs from res_model and res_id
     # when change product_id
     scan_log_ids = fields.Many2many(
@@ -36,11 +41,20 @@ class WizStockBarcodesRead(models.AbstractModel):
         readonly=True,
     )
     message = fields.Char(readonly=True)
+    message_step = fields.Char(readonly=True)
+    guided_product_id = fields.Many2one(comodel_name="product.product")
+    guided_location_id = fields.Many2one(comodel_name="stock.location")
+    guided_lot_id = fields.Many2one(comodel_name="stock.production.lot")
+    action_ids = fields.Many2many(
+        comodel_name="stock.barcodes.action", compute="_compute_action_ids"
+    )
+    option_group_id = fields.Many2one(comodel_name="stock.barcodes.option.group")
+    visible_force_done = fields.Boolean()
 
-    @api.onchange("location_id")
-    def onchange_location_id(self):
-        self.packaging_id = False
-        self.product_id = False
+    @api.depends("res_id")
+    def _compute_action_ids(self):
+        actions = self.env["stock.barcodes.action"].search([])
+        self.action_ids = actions
 
     @api.onchange("packaging_qty")
     def onchange_packaging_qty(self):
@@ -54,12 +68,12 @@ class WizStockBarcodesRead(models.AbstractModel):
         """
         self.message_type = message_type
         if self.barcode:
-            self.message = _("Barcode: %s (%s)") % (self.barcode, message)
+            self.message = _("%s (%s)") % (self.barcode, message)
         else:
             self.message = "%s" % message
 
     def process_barcode(self, barcode):
-        self._set_messagge_info("success", _("Barcode read correctly"))
+        self._set_messagge_info("success", _("OK"))
         domain = self._barcode_domain(barcode)
         product = self.env["product.product"].search(domain)
         if product:
@@ -91,12 +105,18 @@ class WizStockBarcodesRead(models.AbstractModel):
                 self.action_lot_scaned_post(lot)
                 self.action_done()
                 return
-        location = self.env["stock.location"].search(domain)
+        if self._scanned_location(barcode):
+            return
+        self._set_messagge_info("not_found", _("Barcode not found"))
+
+    def _scanned_location(self, barcode):
+        location = self.env["stock.location"].search(self._barcode_domain(barcode))
         if location:
             self.location_id = location
             self._set_messagge_info("info", _("Waiting product"))
-            return
-        self._set_messagge_info("not_found", _("Barcode not found"))
+            return True
+        else:
+            return False
 
     def _barcode_domain(self, barcode):
         return [("barcode", "=", barcode)]
@@ -106,12 +126,63 @@ class WizStockBarcodesRead(models.AbstractModel):
         self.reset_qty()
         self.process_barcode(barcode)
 
+    def check_location_contidion(self):
+        if not self.location_id:
+            self._set_messagge_info("info", _("Waiting location"))
+            # Remove product when no location has been scanned
+            self.product_id = False
+            return False
+        return True
+
+    def check_lot_contidion(self):
+        if self.product_id.tracking != "none" and not self.lot_id:
+            self._set_messagge_info("info", _("Waiting lot"))
+            return False
+        return True
+
     def check_done_conditions(self):
+        result_ok = self.check_location_contidion()
+        if not result_ok:
+            return False
+        if not self.product_id:
+            self._set_messagge_info("info", _("Waiting product"))
+            return False
+        result_ok = self.check_lot_contidion()
+        if not result_ok:
+            return False
         if not self.product_qty:
             self._set_messagge_info("info", _("Waiting quantities"))
             return False
+        if (
+            self.option_group_id.barcode_guided_mode == "guided"
+            and not self._check_guided_values()
+        ):
+            return False
         if self.manual_entry:
             self._set_messagge_info("success", _("Manual entry OK"))
+        return True
+
+    def _check_guided_values(self):
+        if (
+            self.product_id != self.guided_product_id
+            and self.option_group_id.get_option_value("product_id", "forced")
+        ):
+            self._set_messagge_info("more_match", _("Wrong product"))
+            self.product_qty = 0.0
+            return False
+        if (
+            self.guided_product_id.tracking != "none"
+            and self.lot_id != self.guided_lot_id
+            and self.option_group_id.get_option_value("lot_id", "forced")
+        ):
+            self._set_messagge_info("more_match", _("Wrong lot"))
+            return False
+        if (
+            self.location_id != self.guided_location_id
+            and self.option_group_id.get_option_value("location_id", "forced")
+        ):
+            self._set_messagge_info("more_match", _("Wrong location"))
+            return False
         return True
 
     def action_done(self):
@@ -144,6 +215,14 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def action_clean_lot(self):
         self.lot_id = False
+
+    def action_clean_values(self):
+        self.product_id = False
+        self.lot_id = False
+        self.packaging_id = False
+        self.location_id = False
+        self.product_qty = 0.0
+        self.packaging_qty = 0.0
 
     def action_manual_entry(self):
         return True
@@ -186,3 +265,34 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def action_undo_last_scan(self):
         return True
+
+    def open_actions(self):
+        action = self.get_formview_action()
+        action["res_id"] = self.id
+        ctx = self.env.context.copy()
+        ctx.update({"display_menu": True})
+        action["context"] = ctx
+        return action
+
+    def action_back(self):
+        action = self.get_formview_action()
+        action["res_id"] = self.id
+        ctx = self.env.context.copy()
+        ctx.update({"display_menu": False})
+        action["context"] = ctx
+        return action
+
+    def open_records(self):
+        action = self.action_ids
+        return action
+
+    def get_option_value(self, field_name, attribute):
+        option = self.option_group_id.option_ids.filtered(
+            lambda op: op.field_name == field_name
+        )[:1]
+        return option[attribute]
+
+    def action_force_done(self):
+        res = self.with_context(force_create_move=True).action_done()
+        self.visible_force_done = False
+        return res
