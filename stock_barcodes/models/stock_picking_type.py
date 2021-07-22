@@ -17,6 +17,7 @@ class StockPickingType(models.Model):
             "picking_type_code": self.code,
             "option_group_id": self.barcode_option_group_id.id,
             "picking_mode": "picking",
+            "picking_type_id": self.id,
         }
         if self.barcode_option_group_id.get_option_value(
             "location_id", "filled_default"

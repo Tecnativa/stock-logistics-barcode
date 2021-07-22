@@ -26,6 +26,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
     picking_ids = fields.Many2many(
         comodel_name="stock.picking", string="Pickings", readonly=True
     )
+    picking_type_id = fields.Many2one(comodel_name="stock.picking.type", readonly=True,)
     pending_moves = fields.Html(compute="_compute_pending_move",)
     candidate_picking_ids = fields.One2many(
         comodel_name="wiz.candidate.picking",
@@ -256,6 +257,8 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         ]
         if self.picking_id:
             domain.append(("picking_id", "=", self.picking_id.id))
+        if self.picking_type_id:
+            domain.append(("picking_type_id", "=", self.picking_type_id.id))
         return domain
 
     def _set_candidate_pickings(self, candidate_pickings):
