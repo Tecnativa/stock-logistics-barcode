@@ -27,7 +27,6 @@ class StockPickingType(models.Model):
                 location = self.default_location_src_id
             vals["location_id"] = location.id
         wiz = self.env["wiz.stock.barcodes.read.picking"].create(vals)
-        wiz.determine_todo_action()
         action = self.env.ref(
             "stock_barcodes.action_stock_barcodes_read_picking"
         ).read()[0]

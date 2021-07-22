@@ -13,12 +13,5 @@ odoo.define("stock_barcodes.FormView", function(require) {
          *
          * @override
          */
-        _extractParamsFromAction: function(action) {
-            const params = this._super.apply(this, arguments);
-            if (action && action.context && action.context.control_panel_hidden) {
-                params.withControlPanel = false;
-            }
-            return params;
-        },
     });
 });
