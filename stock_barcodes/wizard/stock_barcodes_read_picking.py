@@ -279,14 +279,31 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         lines = moves_todo.mapped("move_line_ids").filtered(
             lambda l: (
                 # l.picking_id == self.picking_id and
-                l.location_id == self.location_id
-                if self.picking_type_code == "outgoing"
-                else l.location_dest_id == self.location_id
+                (
+                    l.location_id == self.location_id
+                    if self.picking_type_code == "outgoing"
+                    else l.location_dest_id == self.location_id
+                )
                 and l.product_id == self.product_id
                 and l.lot_id == self.lot_id
                 and l.barcode_scan_state == "pending"
             )
         )
+        if not lines:
+            lines = moves_todo.mapped("move_line_ids").filtered(
+                lambda l: (
+                    # l.picking_id == self.picking_id and
+                    (
+                        l.location_id == self.location_id
+                        if self.picking_type_code == "outgoing"
+                        else l.location_dest_id == self.location_id
+                    )
+                    and l.product_id == self.product_id
+                    and l.lot_id == self.lot_id
+                    and l.product_uom_qty == 0.0
+                    and l.qty_done > 0.0
+                )
+            )
         # Determine location depend on picking type code
         # lines = lines.filtered(lambda ln: )
         available_qty = self.product_qty

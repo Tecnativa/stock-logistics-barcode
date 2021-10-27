@@ -12,6 +12,8 @@
                 <field name="product_id" />
                 <field name="lot_id" />
                 <field name="uom_id" />
+                <field name="package_id" />
+                <field name="result_package_id" />
                 <field name="product_uom_qty" />
                 <field name="qty_done" />
                 <field name="state" />
@@ -34,6 +36,18 @@
                                     </strong>
                                 </div>
                             </div>
+                            <t t-if="record.package_id or record.result_package_id">
+                                <div class="row">
+                                    <div class="col">
+                                        <span>
+                                            <field name="package_id" />
+                                        </span>
+                                        <span>
+                                            <field name="result_package_id" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </t>
                             <div class="row">
                                 <div class="col-12">
                                     <span>

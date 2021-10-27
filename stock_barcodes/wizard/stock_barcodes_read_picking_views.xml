@@ -82,7 +82,7 @@
                                             >Res.: </label>
                                             <field name="product_qty_reserved" />
                                             <label for="product_qty_done">Done: </label>
-                                            <strong class="text-success">
+                                            <strong>
                                                 <field name="product_qty_done" />
                                             </strong>
                                         </div>
