@@ -45,6 +45,8 @@ class WizStockBarcodesReadTodo(models.TransientModel):
     product_id = fields.Many2one(comodel_name="product.product")
     lot_id = fields.Many2one(comodel_name="stock.production.lot")
     uom_id = fields.Many2one(comodel_name="uom.uom")
+    package_id = fields.Many2one(comodel_name="stock.quant.package")
+    result_package_id = fields.Many2one(comodel_name="stock.quant.package")
 
     res_model_id = fields.Many2one(comodel_name="ir.model")
     res_ids = fields.Char()
@@ -73,6 +75,8 @@ class WizStockBarcodesReadTodo(models.TransientModel):
                         "product_id": line.product_id.id,
                         "lot_id": line.lot_id.id,
                         "uom_id": line.product_uom_id.id,
+                        "package_id": line.package_id.id,
+                        "result_package_id": line.result_package_id.id,
                         "product_qty_reserved": line.product_qty,
                         "product_uom_qty": line.product_uom_qty,
                         "qty_done": line.qty_done,

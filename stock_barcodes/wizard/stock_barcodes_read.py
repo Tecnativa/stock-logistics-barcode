@@ -72,8 +72,41 @@ class WizStockBarcodesRead(models.AbstractModel):
         else:
             self.message = "%s" % message
 
-    def process_barcode(self, barcode):
+    def process_barcode(self, barcode):  # noqa: C901
         self._set_messagge_info("success", _("OK"))
+        if self.env.user.has_group("stock.group_tracking_lot"):
+            quants = self.env["stock.quant"].search(
+                [
+                    ("location_id.usage", "=", "internal"),
+                    ("package_id.name", "=", barcode),
+                ]
+            )
+            if len(quants) == 1:
+                # All ok
+                self.action_product_scaned_post(quants.product_id)
+                if quants.lot_id:
+                    self.action_lot_scaned_post(quants.lot_id)
+                # TODO: Change condition
+                if self.option_group_id.code == "OUT":
+                    self.location_id = quants.location_id
+                else:
+                    self.product_qty = quants.quantity
+                if not self.manual_entry:
+                    self.action_done()
+                return True
+            elif len(quants) > 1:
+                # More than one record found with same barcode.
+                # Could be half lot in two distinct locations.
+                # Empty location field to force a location barcode scan
+                products = quants.mapped("product_id")
+                if len(products) == 1:
+                    self.action_product_scaned_post(products[0])
+                lots = quants.mapped("lot_id")
+                if len(lots) == 1:
+                    self.action_lot_scaned_post(lots[0])
+                self._set_messagge_info("more_match", _("More than one location found"))
+                self.location_id = False
+                return False
         domain = self._barcode_domain(barcode)
         product = self.env["product.product"].search(domain)
         if product:
