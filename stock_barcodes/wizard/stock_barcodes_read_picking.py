@@ -274,9 +274,9 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         moves_todo = StockMove.search(domain)
         if not getattr(self, "_search_candidate_%s" % self.picking_mode,)(moves_todo):
             return False
-
+        sml_vals = {}
         # TODO: Check location or location_dest
-        lines = moves_todo.mapped("move_line_ids").filtered(
+        candidate_lines = moves_todo.mapped("move_line_ids").filtered(
             lambda l: (
                 # l.picking_id == self.picking_id and
                 (
@@ -285,21 +285,30 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                     else l.location_dest_id == self.location_id
                 )
                 and l.product_id == self.product_id
-                and l.lot_id == self.lot_id
-                and l.barcode_scan_state == "pending"
             )
         )
+        lines = candidate_lines.filtered(
+            lambda l: (l.lot_id == self.lot_id and l.barcode_scan_state == "pending")
+        )
+        # For incoming pickings the lot is not filled so we try fill it with
+        # the lot scanned
+        if (
+            not lines
+            and self.picking_type_code == "incoming"
+            and self.product_id.tracking != "none"
+        ):
+            lines = candidate_lines.filtered(
+                lambda l: (not l.lot_id and l.barcode_scan_state == "pending")
+            )
+            if lines:
+                sml_vals.update(
+                    {"lot_id": self.lot_id.id, "lot_name": self.lot_id.name}
+                )
+        # The new lines scanned has been created without reserved quantity
         if not lines:
-            lines = moves_todo.mapped("move_line_ids").filtered(
+            lines = candidate_lines.filtered(
                 lambda l: (
-                    # l.picking_id == self.picking_id and
-                    (
-                        l.location_id == self.location_id
-                        if self.picking_type_code == "outgoing"
-                        else l.location_dest_id == self.location_id
-                    )
-                    and l.product_id == self.product_id
-                    and l.lot_id == self.lot_id
+                    l.lot_id == self.lot_id
                     and l.product_uom_qty == 0.0
                     and l.qty_done > 0.0
                 )
@@ -328,7 +337,8 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                 )
             else:
                 assigned_qty = available_qty
-            line.write({"qty_done": line.qty_done + assigned_qty})
+            sml_vals.update({"qty_done": line.qty_done + assigned_qty})
+            line.write(sml_vals)
             if line.qty_done >= line.product_uom_qty:
                 line.barcode_scan_state = "done"
             elif self.env.context.get("done_forced"):
