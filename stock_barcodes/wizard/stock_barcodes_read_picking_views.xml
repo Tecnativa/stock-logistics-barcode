@@ -110,7 +110,7 @@
                     </kanban>
                 </field>
                 <field
-                    name="todo_line_ids"
+                    name="pending_move_ids"
                     invisible="1"
                     readonly="1"
                     mode="kanban"
@@ -122,6 +122,65 @@
                 <field name="picking_type_code" invisible="1" force_save="1" />
                 <field name="picking_id" invisible="1" force_save="1" />
             </field>
+            <xpath expr="//field[@name='product_qty']/.." position="after">
+                <group
+                    string="Pending moves"
+                    attrs="{'invisible': [('pending_move_ids', '=', [])]}"
+                >
+                    <field
+                        name="pending_move_ids"
+                        options="{'no_open': True}"
+                        nolabel="1"
+                        mode="tree,kanban"
+                    >
+                        <tree string="Pending moves">
+                            <field name="product_id" />
+                            <field name="product_uom_qty" />
+                            <field name="qty_done" />
+                        </tree>
+                        <kanban class="o_kanban_mobile">
+                            <field name="product_id" />
+                            <field name="product_uom_qty" />
+                            <field name="qty_done" />
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div t-attf-class="oe_kanban_card">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <strong>
+                                                    <span>
+                                                        <field name="product_id" />
+                                                    </span>
+                                                </strong>
+                                            </div>
+                                            <div class="col-2">
+                                                <span class="pull-right text-right">
+                                                    <field name="product_uom_qty" />
+                                                </span>
+                                            </div>
+                                            <div class="col-2">
+                                                <span class="pull-right text-right">
+                                                    <field name="qty_done" />
+                                                </span>
+                                            </div>
+                                            <div class="col-1">
+                                                <button
+                                                    name="fill_from_pending_line"
+                                                    type="object"
+                                                    class="btn"
+                                                    context="{'wiz_barcode_id': parent.id}"
+                                                >
+                                                    <i class="fa fa-upload fa-2x" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </group>
+            </xpath>
         </field>
     </record>
     <!--

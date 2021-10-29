@@ -84,7 +84,8 @@
         >
             <field name="name">Picking IN options</field>
             <field name="code">IN</field>
-            <field name="barcode_guided_mode">guided</field>
+            <field name="barcode_guided_mode" />
+            <field name="auto_put_in_pack">True</field>
         </record>
         <record
             id="stock_barcodes_option_location_picking_in"
