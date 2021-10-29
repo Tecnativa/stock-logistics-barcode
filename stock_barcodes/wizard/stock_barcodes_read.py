@@ -18,6 +18,8 @@ class WizStockBarcodesRead(models.AbstractModel):
     lot_id = fields.Many2one(comodel_name="stock.production.lot")
     location_id = fields.Many2one(comodel_name="stock.location")
     packaging_id = fields.Many2one(comodel_name="product.packaging")
+    package_id = fields.Many2one(comodel_name="stock.quant.package")
+    result_package_id = fields.Many2one(comodel_name="stock.quant.package")
     packaging_qty = fields.Float(string="Package Qty", digits="Product Unit of Measure")
     product_qty = fields.Float(digits="Product Unit of Measure")
     manual_entry = fields.Boolean(
@@ -79,11 +81,13 @@ class WizStockBarcodesRead(models.AbstractModel):
                 [
                     ("location_id.usage", "=", "internal"),
                     ("package_id.name", "=", barcode),
+                    ("quantity", ">", 0.0),
                 ]
             )
             if len(quants) == 1:
                 # All ok
                 self.action_product_scaned_post(quants.product_id)
+                self.package_id = quants.package_id
                 if quants.lot_id:
                     self.action_lot_scaned_post(quants.lot_id)
                 # TODO: Change condition
@@ -253,6 +257,8 @@ class WizStockBarcodesRead(models.AbstractModel):
         self.product_id = False
         self.lot_id = False
         self.packaging_id = False
+        self.package_id = False
+        self.result_package_id = False
         self.location_id = False
         self.product_qty = 0.0
         self.packaging_qty = 0.0
