@@ -28,6 +28,11 @@ class TestStockBarcodes(TransactionCase):
 
         self.company = self.env.user.company_id
 
+        # Option groups for test
+        self.option_group = self.env["stock.barcodes.option.group"].create(
+            {"name": "option group for tests", "show_scan_log": True}
+        )
+
         # warehouse and locations
         self.warehouse = self.env.ref("stock.warehouse0")
         self.stock_location = self.env.ref("stock.stock_location_stock")
@@ -98,7 +103,9 @@ class TestStockBarcodes(TransactionCase):
                 "quantity": 100.0,
             }
         )
-        self.wiz_scan = self.WizScanRead.new()
+        self.wiz_scan = self.WizScanRead.with_context(
+            default_option_group_id=self.option_group.id
+        ).new()
 
     def action_barcode_scanned(self, wizard, barcode):
         wizard._barcode_scanned = barcode

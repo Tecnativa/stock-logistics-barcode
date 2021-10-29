@@ -17,6 +17,9 @@ class StockInventory(models.Model):
             "res_id": self.id,
             "location_id": self.location_ids[:1].id,
             "product_id": self.product_ids[:1].id,
+            "option_group_id": self.env.ref(
+                "stock_barcodes.stock_barcodes_option_group_inventory"
+            ).id,
         }
         wiz = self.env["wiz.stock.barcodes.read.inventory"].create(vals)
         action = wiz.get_formview_action()

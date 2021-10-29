@@ -19,6 +19,8 @@ class TestStockBarcodesPicking(TestStockBarcodes):
         self.barcode_option_group_in = self.env.ref(
             "stock_barcodes.stock_barcodes_option_group_picking_in"
         )
+        self.barcode_option_group_out.show_scan_log = True
+        self.barcode_option_group_in.show_scan_log = True
         self.barcode_option_group_out.barcode_guided_mode = False
         self.barcode_option_group_in.barcode_guided_mode = False
         self.partner_agrolite = self.env.ref("base.res_partner_2")
