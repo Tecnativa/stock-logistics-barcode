@@ -281,16 +281,19 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     @api.depends("product_id", "lot_id")
     def _compute_scan_log_ids(self):
-        logs = self.env["stock.barcodes.read.log"].search(
-            [
-                ("res_model_id", "=", self.res_model_id.id),
-                ("res_id", "=", self.res_id),
-                ("location_id", "=", self.location_id.id),
-                ("product_id", "=", self.product_id.id),
-            ],
-            limit=10,
-        )
-        self.scan_log_ids = logs
+        if self.option_group_id.show_scan_log:
+            logs = self.env["stock.barcodes.read.log"].search(
+                [
+                    ("res_model_id", "=", self.res_model_id.id),
+                    ("res_id", "=", self.res_id),
+                    ("location_id", "=", self.location_id.id),
+                    ("product_id", "=", self.product_id.id),
+                ],
+                limit=10,
+            )
+            self.scan_log_ids = logs
+        else:
+            self.scan_log_ids = False
 
     def reset_qty(self):
         self.product_qty = 0

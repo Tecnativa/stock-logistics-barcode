@@ -17,6 +17,11 @@ class StockBarcodesOptionGroup(models.Model):
     )
     manual_entry = fields.Boolean(string="Manual entry data")
     confirmed_moves = fields.Boolean(string="Confirmed moves")
+    show_pending_moves = fields.Boolean(string="Show pending moves")
+    show_scan_log = fields.Boolean(string="Show scan log")
+    auto_put_in_pack = fields.Boolean(
+        string="Auto put in pack", help="Auto put in pack before picking validation"
+    )
 
     def get_option_value(self, field_name, attribute):
         option = self.option_ids.filtered(

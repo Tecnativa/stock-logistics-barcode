@@ -40,6 +40,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         [("incoming", "Vendors"), ("outgoing", "Customers"), ("internal", "Internal")],
         "Type of Operation",
     )
+    # TODO: Check if move_line_ids is used
     move_line_ids = fields.Many2many(comodel_name="stock.move.line", readonly=True)
     todo_line_ids = fields.One2many(
         comodel_name="wiz.stock.barcodes.read.todo", inverse_name="wiz_barcode_id",
@@ -50,12 +51,24 @@ class WizStockBarcodesReadPicking(models.TransientModel):
     )
     todo_line_id = fields.Many2one(comodel_name="wiz.stock.barcodes.read.todo")
     picking_mode = fields.Selection([("picking", "Picking mode")])
+    pending_move_ids = fields.Many2many(
+        comodel_name="stock.move.line", compute="_compute_pending_move_ids",
+    )
 
     @api.depends("todo_line_id")
     def _compute_todo_line_display_ids(self):
         """Technical field to display only the first record in kanban view
         """
         self.todo_line_display_ids = self.todo_line_id
+
+    @api.depends("picking_id", "picking_id.move_line_ids.barcode_scan_state")
+    def _compute_pending_move_ids(self):
+        if self.option_group_id.show_pending_moves:
+            self.pending_move_ids = self.picking_id.move_line_ids.filtered(
+                lambda ln: ln.barcode_scan_state == "pending"
+            )
+        else:
+            self.pending_move_ids = False
 
     def name_get(self):
         return [
@@ -550,6 +563,8 @@ class WizCandidatePicking(models.TransientModel):
         picking = self.env["stock.picking"].browse(
             self.env.context.get("picking_id", False)
         )
+        if picking.picking_type_id.barcode_option_group_id.auto_put_in_pack:
+            picking.put_in_pack()
         return picking.button_validate()
 
     def action_open_picking(self):
