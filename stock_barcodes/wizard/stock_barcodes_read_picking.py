@@ -223,6 +223,9 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             "lot_id": self.lot_id.id,
             "lot_name": self.lot_id.name,
             "barcode_scan_state": "done_forced",
+            # TODO: relocation and aoutgoing scope
+            "package_id": self.package_id.id,
+            "result_package_id": self.package_id.id,
         }
 
     def _states_move_allowed(self):

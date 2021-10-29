@@ -176,6 +176,14 @@
                                 groups="product.group_stock_packaging"
                             />
                             <field
+                                name="package_id"
+                                options="{'no_create': True}"
+                                attrs="{'readonly': [('manual_entry', '=', False)]}"
+                                invisible="1"
+                                force_save="1"
+                                groups="stock.group_tracking_lot"
+                            />
+                            <field
                                 name="packaging_qty"
                                 attrs="{'invisible': ['|', ('packaging_id', '=', False), ('manual_entry', '=', False)], 'readonly': [('manual_entry', '=', False)]}"
                                 force_save="1"
