@@ -39,9 +39,10 @@ class TestStockBarcodesGS1(TestStockBarcodes):
                 "barcode": "19501101530000",
             }
         )
+        # Set location to avoid crash tests
+        self.wiz_scan.location_id = self.location_1
 
     def test_wizard_scan_gs1_package_multi(self):
-        self.wiz_scan.location_id = self.location_1
         self.packaging_gs1.product_id = self.product_tracking_gs1
         lot = self.StockProductionLot.create(
             {
