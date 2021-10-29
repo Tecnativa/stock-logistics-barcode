@@ -105,7 +105,7 @@ class TestStockBarcodesGS1(TestStockBarcodes):
         self.action_barcode_scanned(self.wiz_scan, self.gs1_barcode_02_not_found)
         self.assertEqual(
             self.wiz_scan.message,
-            "020xxx0001234567150410183724 (Barcode for product not found)",
+            "020xxx0001234567150410183724 (Barcode for product packaging not found)",
         )
 
     def test_wizard_scan_gs1_product_as_packaging(self):
@@ -113,8 +113,7 @@ class TestStockBarcodesGS1(TestStockBarcodes):
         self.action_barcode_scanned(self.wiz_scan, self.gs1_barcode_02)
         self.assertEqual(
             self.wiz_scan.message,
-            "0207010001234567150410183724 "
-            "(Barcode for product packaging not found)",
+            "0207010001234567150410183724 " "(Barcode for product packaging not found)",
         )
         self.ProductPackaging.create(
             {
