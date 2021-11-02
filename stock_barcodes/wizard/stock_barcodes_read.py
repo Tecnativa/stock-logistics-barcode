@@ -92,6 +92,14 @@ class WizStockBarcodesRead(models.AbstractModel):
                     self.action_lot_scaned_post(quants.lot_id)
                 # TODO: Change condition
                 if self.option_group_id.code == "OUT":
+                    if (
+                        self.location_id != self.guided_location_id
+                        and self.option_group_id.get_option_value(
+                            "location_id", "forced"
+                        )
+                    ):
+                        self._set_messagge_info("more_match", _("Wrong location"))
+                        return False
                     self.location_id = quants.location_id
                 else:
                     self.product_qty = quants.quantity
