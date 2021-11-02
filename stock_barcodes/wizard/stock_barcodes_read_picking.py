@@ -573,8 +573,6 @@ class WizCandidatePicking(models.TransientModel):
         picking = self.env["stock.picking"].browse(
             self.env.context.get("picking_id", False)
         )
-        if picking.picking_type_id.barcode_option_group_id.auto_put_in_pack:
-            picking.put_in_pack()
         return picking.button_validate()
 
     def action_open_picking(self):
