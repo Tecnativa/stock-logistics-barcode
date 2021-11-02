@@ -27,3 +27,8 @@ class StockPicking(models.Model):
         ).read()[0]
         action["res_id"] = wiz.id
         return action
+
+    def button_validate(self):
+        if self.picking_type_id.barcode_option_group_id.auto_put_in_pack:
+            self.put_in_pack()
+        return super().button_validate()
