@@ -329,6 +329,9 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                     and l.qty_done > 0.0
                 )
             )
+        if lines:
+            # Hook: extra filter to be extend by other modules
+            lines = self.filter_sml(candidate_lines, lines, sml_vals)
         # Determine location depend on picking type code
         # lines = lines.filtered(lambda ln: )
         available_qty = self.product_qty
@@ -389,6 +392,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             move_lines_dic[line.id] = available_qty
         self.update_fields_after_process_stock(moves_todo)
         return move_lines_dic
+
+    def filter_sml(self, candidate_lines, lines, sml_vals):
+        """Empty method that needs to be implemented in other modules."""
+        return lines
 
     def update_fields_after_process_stock(self, moves):
         self.picking_product_qty = sum(moves.mapped("quantity_done"))
