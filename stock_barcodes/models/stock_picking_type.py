@@ -18,14 +18,18 @@ class StockPickingType(models.Model):
             "option_group_id": self.barcode_option_group_id.id,
             "picking_mode": "picking",
         }
+        if self.code == "outgoing":
+            vals["location_dest_id"] = self.default_location_dest_id.id
+        if self.code == "incoming":
+            vals["location_id"] = self.default_location_src_id.id
         if self.barcode_option_group_id.get_option_value(
             "location_id", "filled_default"
         ):
-            if self.code == "incoming":
-                location = self.default_location_dest_id
-            elif self.code in ["outgoing", "internal"]:
-                location = self.default_location_src_id
-            vals["location_id"] = location.id
+            vals["location_id"] = self.default_location_src_id
+        if self.barcode_option_group_id.get_option_value(
+            "location_dest_id", "filled_default"
+        ):
+            vals["location_dest_id"] = self.default_location_dest_id
         wiz = self.env["wiz.stock.barcodes.read.picking"].create(vals)
         wiz.determine_todo_action()
         action = self.env.ref(
@@ -33,3 +37,18 @@ class StockPickingType(models.Model):
         ).read()[0]
         action["res_id"] = wiz.id
         return action
+
+    def action_barcode_new_picking(self):
+        """
+            'search_default_picking_type_id': [active_id],
+            'default_picking_type_id': active_id,
+            'contact_display': 'partner_address',
+        """
+        picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.id,
+                "location_id": self.default_location_src_id.id,
+                "location_dest_id": self.default_location_dest_id.id,
+            }
+        )
+        return picking.action_barcode_scan()

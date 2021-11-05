@@ -49,6 +49,10 @@
         <field name="model">stock.picking.type</field>
         <field name="inherit_id" ref="stock.stock_picking_type_kanban" />
         <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="default_location_src_id" invisible="1" />
+                <field name="default_location_dest_id" invisible="1" />
+            </field>
             <xpath expr="//div[hasclass('o_kanban_primary_left')]" position="inside">
                 <div
                     class="mt8"
@@ -60,6 +64,22 @@
                         class="btn btn-secondary"
                     >
                         <i class="fa fa-barcode fa-2x" />
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//div[hasclass('o_kanban_primary_right')]" position="inside">
+                <div
+                    class="mt8 pull-right"
+                    t-if="record.default_location_src_id.raw_value and record.default_location_dest_id.raw_value"
+                >
+                    <button
+                        name="action_barcode_new_picking"
+                        type="object"
+                        class="btn btn-secondary"
+                        context="{'default_immediate_transfer': True}"
+                    >
+                        <i class="fa fa-plus" />
+                        <small>New</small>
                     </button>
                 </div>
             </xpath>

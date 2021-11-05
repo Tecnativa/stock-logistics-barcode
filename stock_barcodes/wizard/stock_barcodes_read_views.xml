@@ -108,6 +108,11 @@
                         <field name="product_tracking" invisible="1" force_save="1" />
                         <field name="guided_product_id" invisible="1" force_save="1" />
                         <field name="guided_location_id" invisible="1" force_save="1" />
+                        <field
+                            name="guided_location_dest_id"
+                            invisible="1"
+                            force_save="1"
+                        />
                         <field name="guided_lot_id" invisible="1" force_save="1" />
                         <field name="visible_force_done" invisible="1" force_save="1" />
                         <field name="res_model_id" invisible="1" />
@@ -126,6 +131,12 @@
                                 attrs="{'readonly': [('manual_entry', '=', False)]}"
                                 force_save="1"
                             />
+                            <!--                            <field-->
+                            <!--                                name="location_dest_id"-->
+                            <!--                                options="{'no_create': True}"-->
+                            <!--                                attrs="{'readonly': [('manual_entry', '=', False)]}"-->
+                            <!--                                force_save="1"-->
+                            <!--                            />-->
                         </group>
                         <group
                             groups="stock.group_production_lot"
@@ -285,6 +296,14 @@
                         attrs="{'invisible': [('visible_force_done', '=', False)]}"
                         class="btn-danger"
                     />
+                    <button
+                        name="action_clean_values"
+                        type="object"
+                        class="btn-warning"
+                        invisible="context.get('display_menu', False)"
+                    >
+                        <i class="fa fa-recycle" />
+                    </button>
                     <button
                         name="open_actions"
                         type="object"

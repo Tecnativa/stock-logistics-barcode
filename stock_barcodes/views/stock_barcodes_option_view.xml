@@ -14,11 +14,12 @@
                         <field name="confirmed_moves" />
                         <field name="show_pending_moves" />
                         <field name="show_scan_log" />
+                        <field name="ignore_filled_fields" />
                         <field name="auto_put_in_pack" />
                     </group>
                     <field name="option_ids">
                         <tree editable="bottom">
-                            <field name="sequence" />
+                            <field name="sequence" widget="handle" />
                             <field name="name" />
                             <field name="code" />
                             <field name="access_group_id" />
@@ -27,6 +28,7 @@
                             <field name="forced" />
                             <field name="is_invisible" />
                             <field name="to_scan" />
+                            <field name="required" />
                         </tree>
                     </field>
                 </sheet>
@@ -51,6 +53,7 @@
                 <field name="forced" />
                 <field name="is_invisible" />
                 <field name="to_scan" />
+                <field name="required" />
             </tree>
         </field>
     </record>

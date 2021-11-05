@@ -169,3 +169,7 @@ class WizStockBarcodesReadInventory(models.TransientModel):
     @api.onchange("manual_entry")
     def _onchange_manual_entry(self):
         self.auto_lot = self._default_auto_lot()
+
+    def action_clean_values(self):
+        super().action_clean_values()
+        self.location_id = False
