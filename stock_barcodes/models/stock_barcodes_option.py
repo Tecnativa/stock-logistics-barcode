@@ -19,6 +19,7 @@ class StockBarcodesOptionGroup(models.Model):
     confirmed_moves = fields.Boolean(string="Confirmed moves")
     show_pending_moves = fields.Boolean(string="Show pending moves")
     show_scan_log = fields.Boolean(string="Show scan log")
+    ignore_filled_fields = fields.Boolean(string="Ignore filled fields")
     auto_put_in_pack = fields.Boolean(
         string="Auto put in pack", help="Auto put in pack before picking validation"
     )
@@ -49,3 +50,4 @@ class StockBarcodesOption(models.Model):
     forced = fields.Boolean()
     is_invisible = fields.Boolean()
     to_scan = fields.Boolean()
+    required = fields.Boolean()

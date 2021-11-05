@@ -109,18 +109,23 @@
                         </templates>
                     </kanban>
                 </field>
-                <field
-                    name="pending_move_ids"
-                    invisible="1"
-                    readonly="1"
-                    mode="kanban"
-                    force_save="1"
-                />
                 <field name="todo_line_display_ids" mode="kanban" force_save="1" />
             </xpath>
             <field name="location_id" position="before">
                 <field name="picking_type_code" invisible="1" force_save="1" />
                 <field name="picking_id" invisible="1" force_save="1" />
+            </field>
+            <field name="location_id" position="attributes">
+                <attribute
+                    name="attrs"
+                >{'readonly': [('manual_entry', '=', False)], 'invisible': [('picking_type_code', '=', 'incoming')]}</attribute>
+            </field>
+            <field name="location_id" position="after">
+                <field
+                    name="location_dest_id"
+                    force_save="1"
+                    attrs="{'readonly': [('manual_entry', '=', False)], 'invisible': [('picking_type_code', '=', 'outgoing')]}"
+                />
             </field>
             <xpath expr="//field[@name='product_qty']/.." position="after">
                 <group
@@ -129,8 +134,9 @@
                 >
                     <field
                         name="pending_move_ids"
-                        options="{'no_open': True}"
+                        options="{'no_open': True, 'always_reload': True}"
                         nolabel="1"
+                        force_save="1"
                         mode="tree,kanban"
                     >
                         <tree string="Pending moves">

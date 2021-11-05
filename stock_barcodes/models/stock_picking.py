@@ -16,10 +16,16 @@ class StockPicking(models.Model):
             "option_group_id": option_group.id,
             "picking_mode": "picking",
         }
+        if self.picking_type_id.code == "outgoing":
+            vals["location_dest_id"] = self.location_dest_id.id
+        if self.picking_type_id.code == "incoming":
+            vals["location_id"] = self.location_id.id
+
         if option_group.get_option_value("location_id", "filled_default"):
-            out_picking = self.picking_type_code == "outgoing"
-            location = self.location_id if out_picking else self.location_dest_id
-            vals["location_id"] = location.id
+            vals["location_id"] = self.location_id.id
+        if option_group.get_option_value("location_dest_id", "filled_default"):
+            vals["location_dest_id"] = self.location_dest_id.id
+
         wiz = self.env["wiz.stock.barcodes.read.picking"].create(vals)
         wiz.determine_todo_action()
         action = self.env.ref(
