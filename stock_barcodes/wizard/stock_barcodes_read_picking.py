@@ -52,7 +52,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
     todo_line_id = fields.Many2one(comodel_name="wiz.stock.barcodes.read.todo")
     picking_mode = fields.Selection([("picking", "Picking mode")])
     pending_move_ids = fields.Many2many(
-        comodel_name="stock.move.line", compute="_compute_pending_move_ids",
+        comodel_name="stock.move", compute="_compute_pending_move_ids",
     )
 
     @api.depends("todo_line_id")
@@ -61,11 +61,13 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         """
         self.todo_line_display_ids = self.todo_line_id
 
-    @api.depends("picking_id", "picking_id.move_line_ids.barcode_scan_state")
+    @api.depends("picking_id", "picking_id.move_lines.move_line_ids.barcode_scan_state")
     def _compute_pending_move_ids(self):
         if self.option_group_id.show_pending_moves:
-            self.pending_move_ids = self.picking_id.move_line_ids.filtered(
-                lambda ln: ln.barcode_scan_state == "pending"
+            self.pending_move_ids = self.picking_id.move_lines.filtered(
+                lambda sm: any(
+                    sml.barcode_scan_state == "pending" for sml in sm.move_line_ids
+                )
             )
         else:
             self.pending_move_ids = False
@@ -504,15 +506,15 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         self.remove_scanning_log(log_scan)
         return res
 
-    def action_clean_values(self):
-        super().action_clean_values()
-        if self.picking_type_code == "outgoing":
-            self.location_id = False
-        elif self.picking_type_code == "incoming":
-            self.location_dest_id = False
-        else:
-            self.location_id = False
-            self.location_dest_id = False
+    # def action_clean_values(self):
+    #     super().action_clean_values()
+    #     if self.picking_type_code == "outgoing":
+    #         self.location_id = False
+    #     elif self.picking_type_code == "incoming":
+    #         self.location_dest_id = False
+    #     else:
+    #         self.location_id = False
+    #         self.location_dest_id = False
 
 
 class WizCandidatePicking(models.TransientModel):

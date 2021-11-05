@@ -51,3 +51,4 @@ class StockBarcodesOption(models.Model):
     is_invisible = fields.Boolean()
     to_scan = fields.Boolean()
     required = fields.Boolean()
+    clean_after_done = fields.Boolean()

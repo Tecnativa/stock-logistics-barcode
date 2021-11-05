@@ -115,11 +115,12 @@ class WizStockBarcodesRead(models.AbstractModel):
             lot = self.env["stock.production.lot"].search(lot_domain)
             if len(lot) == 1:
                 self.product_id = lot.product_id
-            if lot:
-                self._set_messagge_info("success", _("Lote leido"))
                 self.action_lot_scaned_post(lot)
-                # self.action_done()
                 return True
+            elif lot:
+                self._set_messagge_info(
+                    "more_match", _("More than one lot found\nScan product before")
+                )
         return False
 
     def process_barcode_package_id(self):
@@ -179,10 +180,12 @@ class WizStockBarcodesRead(models.AbstractModel):
         return False
 
     def process_barcode(self, barcode):
+        self._set_messagge_info("success", _("OK"))
         options = self.option_group_id.option_ids
         barcode_found = False
         options_to_scan = options.filtered("to_scan")
         options_required = options.filtered("required")
+        options_to_clean = options.filtered("clean_after_done")
         for option in options_to_scan:
             if (
                 self.option_group_id.ignore_filled_fields
@@ -198,7 +201,8 @@ class WizStockBarcodesRead(models.AbstractModel):
                 if res:
                     barcode_found = True
                     break
-                # return res
+                elif self.message_type != "success":
+                    return False
         if not barcode_found:
             if self.option_group_id.ignore_filled_fields:
                 self._set_messagge_info(
@@ -211,13 +215,12 @@ class WizStockBarcodesRead(models.AbstractModel):
             if not getattr(self, option.field_name, False):
                 self._set_messagge_info("info", option.name)
                 return False
-        self._set_messagge_info("success", _("OK"))
         res = self.action_done()
         if res:
-            # Empty last field to scan
-            last_field = options_required[-1:].field_name
-            if last_field:
-                setattr(self, last_field, False)
+            # Empty fields checked as clean after action_done process
+            for option in options_to_clean:
+                if option.field_name:
+                    setattr(self, option.field_name, False)
             # Empty wizard quantities
             self.reset_qty()
         return res
@@ -337,11 +340,16 @@ class WizStockBarcodesRead(models.AbstractModel):
         self.lot_id = False
 
     def action_clean_values(self):
-        self.product_id = False
-        self.lot_id = False
-        self.packaging_id = False
-        self.package_id = False
-        self.result_package_id = False
+        options = self.option_group_id.option_ids
+        options_to_clean = options.filtered("clean_after_done")
+        for option in options_to_clean:
+            if option.field_name:
+                setattr(self, option.field_name, False)
+        # self.product_id = False
+        # self.lot_id = False
+        # self.packaging_id = False
+        # self.package_id = False
+        # self.result_package_id = False
         self.product_qty = 0.0
         self.packaging_qty = 0.0
 
