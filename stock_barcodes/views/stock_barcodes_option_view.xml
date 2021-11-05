@@ -29,6 +29,7 @@
                             <field name="is_invisible" />
                             <field name="to_scan" />
                             <field name="required" />
+                            <field name="clean_after_done" />
                         </tree>
                     </field>
                 </sheet>
@@ -54,6 +55,7 @@
                 <field name="is_invisible" />
                 <field name="to_scan" />
                 <field name="required" />
+                <field name="clean_after_done" />
             </tree>
         </field>
     </record>

@@ -95,6 +95,7 @@
                 ref="stock_barcodes.stock_barcodes_option_group_picking_out"
             />
         </record>
+        <!-- Incoming options -->
         <record
             id="stock_barcodes_option_group_picking_in"
             model="stock.barcodes.option.group"
@@ -105,15 +106,15 @@
             <field name="auto_put_in_pack">True</field>
         </record>
         <record
-            id="stock_barcodes_option_location_picking_in"
+            id="stock_barcodes_option_location_dest_picking_in"
             model="stock.barcodes.option"
         >
-            <field name="name">Scan location</field>
+            <field name="name">Scan location dest</field>
             <field name="sequence">10</field>
-            <field name="code">location</field>
-            <field name="field_name">location_id</field>
+            <field name="code">location_dest</field>
+            <field name="field_name">location_dest_id</field>
             <field name="filled_default">True</field>
-            <field name="forced">True</field>
+            <field name="forced">False</field>
             <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
