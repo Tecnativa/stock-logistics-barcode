@@ -28,7 +28,7 @@
                             type="object"
                             class="btn-primary"
                         />
-                        <button string="Cancel" special="cancel" class="btn-default" />
+                        <button string="Cancel" name="cancel" class="btn-default" type="object"/>
                     </footer>
                 </sheet>
             </form>
@@ -40,6 +40,6 @@
         <field name="view_mode">form</field>
         <field name="context">{}</field>
         <field name="view_id" ref="view_stock_barcodes_new_lot" />
-        <field name="target">new</field>
+        <field name="target">inline</field>
     </record>
 </odoo>
