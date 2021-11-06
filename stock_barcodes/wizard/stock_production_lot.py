@@ -25,12 +25,26 @@ class WizStockBarcodesNewLot(models.TransientModel):
             "company_id": self.env.user.company_id.id,
         }
 
+    def get_scan_wizard(self):
+        return self.env[self.env.context["active_model"]].browse(
+            self.env.context["active_id"]
+        )
+
+    def scan_wizard_action(self):
+        wiz = self.get_scan_wizard()
+        action = self.env.ref(
+            "stock_barcodes.action_stock_barcodes_read_picking"
+        ).read()[0]
+        action["res_id"] = wiz.id
+        return action
+
     def confirm(self):
         lot = self.env["stock.production.lot"].create(self._prepare_lot_values())
         # Assign lot created to wizard scanning barcode lot_id field
-        wiz = self.env[self.env.context["active_model"]].browse(
-            self.env.context["active_id"]
-        )
+        wiz = self.get_scan_wizard()
         if wiz:
             wiz.lot_id = lot
-        return lot
+        return self.scan_wizard_action()
+
+    def cancel(self):
+        return self.scan_wizard_action()

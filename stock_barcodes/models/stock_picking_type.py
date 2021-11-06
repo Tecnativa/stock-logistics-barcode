@@ -25,11 +25,11 @@ class StockPickingType(models.Model):
         if self.barcode_option_group_id.get_option_value(
             "location_id", "filled_default"
         ):
-            vals["location_id"] = self.default_location_src_id
+            vals["location_id"] = self.default_location_src_id.id
         if self.barcode_option_group_id.get_option_value(
             "location_dest_id", "filled_default"
         ):
-            vals["location_dest_id"] = self.default_location_dest_id
+            vals["location_dest_id"] = self.default_location_dest_id.id
         wiz = self.env["wiz.stock.barcodes.read.picking"].create(vals)
         wiz.determine_todo_action()
         action = self.env.ref(
