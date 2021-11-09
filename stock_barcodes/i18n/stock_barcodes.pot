@@ -596,7 +596,7 @@ msgstr ""
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__manual_entry
-msgid "Manual entry data"
+msgid "Manual entry"
 msgstr ""
 
 #. module: stock_barcodes

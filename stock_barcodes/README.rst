@@ -23,7 +23,7 @@ Stock Barcodes
     :target: https://runbot.odoo-community.org/runbot/150/13.0
     :alt: Try me on Runbot
 
-|badge1| |badge2| |badge3| |badge4| |badge5| 
+|badge1| |badge2| |badge3| |badge4| |badge5|
 
 This module provides a barcode reader interface for stock module.
 
@@ -108,7 +108,7 @@ scanning the product.
 Manual entry mode
 ~~~~~~~~~~~~~~~~~
 
-You can change to "manual entry data" to allow to select data without scanner
+You can change to "manual entry" to allow to select data without scanner
 hardware, but hardward scanner still active on, so a use case would be when
 user wants set quantities manually instead increment 1.0 unit peer scan action.
 

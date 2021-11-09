@@ -613,8 +613,8 @@ msgstr "Entrada manual correcta"
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__manual_entry
-msgid "Manual entry data"
-msgstr "Entrada manual de datos"
+msgid "Manual entry"
+msgstr "Entrada manual"
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read__message

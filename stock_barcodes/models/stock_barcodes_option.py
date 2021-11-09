@@ -13,9 +13,11 @@ class StockBarcodesOptionGroup(models.Model):
         comodel_name="stock.barcodes.option", inverse_name="option_group_id", copy=True
     )
     barcode_guided_mode = fields.Selection(
-        [("guided", "Guided")], string="Guide mode for barcode"
+        [
+            ("guided", "Guided"),
+        ], string="Guide mode for barcode"
     )
-    manual_entry = fields.Boolean(string="Manual entry data")
+    manual_entry = fields.Boolean(string="Manual entry")
     confirmed_moves = fields.Boolean(string="Confirmed moves")
     show_pending_moves = fields.Boolean(string="Show pending moves")
     show_scan_log = fields.Boolean(string="Show scan log")
@@ -23,6 +25,8 @@ class StockBarcodesOptionGroup(models.Model):
     auto_put_in_pack = fields.Boolean(
         string="Auto put in pack", help="Auto put in pack before picking validation"
     )
+    step_by_step = fields.Boolean()
+    is_manual_qty = fields.Boolean()
 
     def get_option_value(self, field_name, attribute):
         option = self.option_ids.filtered(
@@ -35,7 +39,7 @@ class StockBarcodesOptionGroup(models.Model):
 class StockBarcodesOption(models.Model):
     _name = "stock.barcodes.option"
     _description = "Options for barcode interface"
-    _order = "sequence, id"
+    _order = "step, sequence, id"
 
     sequence = fields.Integer(string="Sequence", default=100)
     name = fields.Char()
@@ -52,3 +56,5 @@ class StockBarcodesOption(models.Model):
     to_scan = fields.Boolean()
     required = fields.Boolean()
     clean_after_done = fields.Boolean()
+    message = fields.Char()
+    step = fields.Integer(default=1)

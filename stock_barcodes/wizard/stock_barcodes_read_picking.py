@@ -180,12 +180,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         self.picking_product_qty = move_line.qty_done
 
     def action_done(self):
-        if not self.manual_entry and not self.product_qty:
-            self.product_qty = 1.0
+        res = super().action_done()
         if self.check_done_conditions():
             res = self._process_stock_move_line()
             if res:
-                self._add_read_log(res)
                 self[self._field_candidate_ids].scan_count += 1
                 if self.option_group_id.barcode_guided_mode == "guided":
                     self.action_clean_values()
@@ -193,6 +191,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                     self.move_line_ids.barcode_scan_state = "done_forced"
                 self.determine_todo_action()
             return res
+        return res
 
     def action_manual_entry(self):
         result = super().action_manual_entry()

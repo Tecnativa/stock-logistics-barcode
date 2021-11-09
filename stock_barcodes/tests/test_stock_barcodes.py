@@ -143,7 +143,7 @@ class TestStockBarcodes(TransactionCase):
             self.wiz_scan.packaging_id, self.product_tracking.packaging_ids
         )
 
-        # Manual entry data
+        # Manual entry
         self.wiz_scan.manual_entry = True
         self.action_barcode_scanned(self.wiz_scan, "5420008510489")
         self.assertEqual(self.wiz_scan.packaging_qty, 0.0)
