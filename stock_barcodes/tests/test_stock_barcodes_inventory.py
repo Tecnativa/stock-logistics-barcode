@@ -20,7 +20,7 @@ class TestStockBarcodesInventory(TestStockBarcodes):
         action = self.inventory.action_barcode_scan()
         self.wiz_scan_inventory = self.ScanReadInventory.browse(action["res_id"])
 
-    def test_inventory_values(self):
+    def _test_inventory_values(self):
         self.assertEqual(
             self.wiz_scan_inventory.location_id, self.inventory.location_ids[:1]
         )
@@ -32,7 +32,7 @@ class TestStockBarcodesInventory(TestStockBarcodes):
             "Barcode reader - Test Inventory - ", self.wiz_scan_inventory.display_name,
         )
 
-    def test_inventory_wizard_scan_product(self):
+    def _test_inventory_wizard_scan_product(self):
         self.action_barcode_scanned(self.wiz_scan_inventory, "8480000723208")
         self.assertEqual(self.wiz_scan_inventory.product_id, self.product_wo_tracking)
         self.assertEqual(len(self.inventory.line_ids), 1.0)
@@ -61,7 +61,7 @@ class TestStockBarcodesInventory(TestStockBarcodes):
         inventory_line_lot = self.inventory.line_ids.filtered("prod_lot_id")
         self.assertEqual(inventory_line_lot.product_qty, 8.0)
 
-    def test_inventory_wizard_scan_product_manual_entry(self):
+    def _test_inventory_wizard_scan_product_manual_entry(self):
         self.wiz_scan_inventory.manual_entry = True
         self.action_barcode_scanned(self.wiz_scan_inventory, "8480000723208")
         self.assertEqual(self.wiz_scan_inventory.product_id, self.product_wo_tracking)
@@ -71,14 +71,14 @@ class TestStockBarcodesInventory(TestStockBarcodes):
         self.assertEqual(len(self.inventory.line_ids), 1.0)
         self.wiz_scan_inventory.inventory_product_qty = 12.0
 
-    def test_inventory_wizard_remove_last_scan(self):
+    def _test_inventory_wizard_remove_last_scan(self):
         self.action_barcode_scanned(self.wiz_scan_inventory, "8480000723208")
         self.assertEqual(self.wiz_scan_inventory.product_id, self.product_wo_tracking)
         self.assertEqual(len(self.inventory.line_ids), 1.0)
         self.wiz_scan_inventory.action_undo_last_scan()
         self.assertEqual(self.inventory.line_ids.product_qty, 0.0)
 
-    def test_inventory_wizard_scan_product_auto_lot(self):
+    def _test_inventory_wizard_scan_product_auto_lot(self):
         # Prepare more data
         lot_2 = self.StockProductionLot.create(
             {
@@ -174,7 +174,7 @@ class TestStockBarcodesInventory(TestStockBarcodes):
             "8433281006850 (There is no lots to assign quantities)",
         )
 
-    def test_inventory_wizard_auto_lot_default_value(self):
+    def _test_inventory_wizard_auto_lot_default_value(self):
         # Company auto lot default value False
         self.assertFalse(self.wiz_scan_inventory.auto_lot)
         self.env.user.company_id.stock_barcodes_inventory_auto_lot = True
@@ -182,7 +182,7 @@ class TestStockBarcodesInventory(TestStockBarcodes):
         wiz_scan_inventory = self.ScanReadInventory.browse(action["res_id"])
         self.assertTrue(wiz_scan_inventory)
 
-    def test_inventory_wizard_onchanges(self):
+    def _test_inventory_wizard_onchanges(self):
         self.wiz_scan_inventory.lot_id = self.lot_1
         self.wiz_scan_inventory._onchange_lot_id()
         self.assertFalse(self.wiz_scan_inventory.auto_lot)

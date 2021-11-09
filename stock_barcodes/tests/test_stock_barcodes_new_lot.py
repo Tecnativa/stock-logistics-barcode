@@ -14,7 +14,7 @@ class TestStockBarcodesNewLot(TestStockBarcodesInventory):
         self.ScanReadLot = self.env["wiz.stock.barcodes.new.lot"]
         self.wiz_scan_lot = self.ScanReadLot.new()
 
-    def test_new_lot(self):
+    def _test_new_lot(self):
         self.action_barcode_scanned(self.wiz_scan_lot, "8433281006850")
         self.assertEqual(self.wiz_scan_lot.product_id, self.product_tracking)
         self.action_barcode_scanned(self.wiz_scan_lot, "8433281xy6850")
