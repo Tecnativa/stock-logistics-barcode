@@ -96,8 +96,8 @@ class WizStockBarcodesReadInventory(models.TransientModel):
             self.action_done()
         return result
 
-    def reset_qty(self):
-        super().reset_qty()
+    def action_clean_values(self):
+        super().action_clean_values()
         self.inventory_product_qty = 0.0
 
     def action_undo_last_scan(self):
@@ -158,7 +158,8 @@ class WizStockBarcodesReadInventory(models.TransientModel):
 
     @api.onchange("product_id")
     def _onchange_product_id(self):
-        self.lot_id = False
+        if self.product_id != self.lot_id.product_id:
+            self.lot_id = False
         self.auto_lot = self._default_auto_lot()
 
     @api.onchange("lot_id")
@@ -169,7 +170,3 @@ class WizStockBarcodesReadInventory(models.TransientModel):
     @api.onchange("manual_entry")
     def _onchange_manual_entry(self):
         self.auto_lot = self._default_auto_lot()
-
-    def action_clean_values(self):
-        super().action_clean_values()
-        self.location_id = False

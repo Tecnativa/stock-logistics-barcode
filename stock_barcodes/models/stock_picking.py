@@ -25,7 +25,6 @@ class StockPicking(models.Model):
             vals["location_id"] = self.location_id.id
         if option_group.get_option_value("location_dest_id", "filled_default"):
             vals["location_dest_id"] = self.location_dest_id.id
-
         wiz = self.env["wiz.stock.barcodes.read.picking"].create(vals)
         wiz.determine_todo_action()
         action = self.env.ref(

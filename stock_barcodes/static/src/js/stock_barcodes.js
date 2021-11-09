@@ -7,6 +7,22 @@ odoo.define("stock_barcodes.FormController", function(require) {
     var FormController = require("web.FormController");
 
     FormController.include({
+//        start: function(){
+//            this.call("bus_service", "on", "notification", this, this.bus_notification);
+//            return this._super.apply(this, arguments);
+//        },
+//        bus_notification: function(notifications) {
+//            var self = this;
+//            _.each(notifications, function(notification) {
+//                var channel = notification[0];
+//                var message = notification[1];
+//                if (channel === "notify_barcodes_qty") {
+//                    if (message.action === "focus") {
+//                        this.find(`[name=${message.field_name}] input`).select();
+//                    }
+//                }
+//            });
+//        },
         _barcodeScanned: function(barcode, target) {
             var self = this;
 
