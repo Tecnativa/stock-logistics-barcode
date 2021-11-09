@@ -7,22 +7,26 @@ odoo.define("stock_barcodes.FormController", function(require) {
     var FormController = require("web.FormController");
 
     FormController.include({
-        //        Start: function(){
-        //            this.call("bus_service", "on", "notification", this, this.bus_notification);
-        //            return this._super.apply(this, arguments);
-        //        },
-        //        bus_notification: function(notifications) {
-        //            var self = this;
-        //            _.each(notifications, function(notification) {
-        //                var channel = notification[0];
-        //                var message = notification[1];
-        //                if (channel === "notify_barcodes_qty") {
-        //                    if (message.action === "focus") {
-        //                        this.find(`[name=${message.field_name}] input`).select();
-        //                    }
-        //                }
-        //            });
-        //        },
+        start: function() {
+            console.log("TEST LONGPOLLING start");
+            this.call("bus_service", "on", "notification", this, this.bus_notification);
+            return this._super.apply(this, arguments);
+        },
+        bus_notification: function(notifications) {
+            console.log("TEST LONGPOLLING PPPP");
+            var self = this;
+            _.each(notifications, function(notification) {
+                console.log("TEST LONGPOLLING notif");
+                var channel = notification[0];
+                var message = notification[1];
+                if (channel === "wiz.stock.barcodes.read.picking") {
+                    if (message.action === "focus") {
+                        console.log("TEST LONGPOLLING");
+                        self.find(`[name=${message.field_name}] input`).select();
+                    }
+                }
+            });
+        },
         _barcodeScanned: function(barcode, target) {
             var self = this;
 
