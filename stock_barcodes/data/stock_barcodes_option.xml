@@ -16,11 +16,9 @@
         >
             <field name="name">Scan location</field>
             <field name="sequence">10</field>
-            <field name="code">location</field>
             <field name="field_name">location_id</field>
             <field name="filled_default">True</field>
             <field name="forced">True</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -33,11 +31,9 @@
         >
             <field name="name">Scan product</field>
             <field name="sequence">20</field>
-            <field name="code">product</field>
             <field name="field_name">product_id</field>
             <field name="filled_default">True</field>
             <field name="forced">True</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -50,11 +46,9 @@
         >
             <field name="name">Scan lot</field>
             <field name="sequence">30</field>
-            <field name="code">lot</field>
             <field name="field_name">lot_id</field>
             <field name="filled_default">True</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -67,11 +61,9 @@
         >
             <field name="name">Scan Quant Package</field>
             <field name="sequence">25</field>
-            <field name="code">package</field>
             <field name="field_name">package_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -84,11 +76,9 @@
         >
             <field name="name">Product Qty</field>
             <field name="sequence">40</field>
-            <field name="code">product_qty</field>
             <field name="field_name">product_qty</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">False</field>
             <field
                 name="option_group_id"
@@ -111,11 +101,9 @@
         >
             <field name="name">Scan location dest</field>
             <field name="sequence">10</field>
-            <field name="code">location_dest</field>
             <field name="field_name">location_dest_id</field>
             <field name="filled_default">True</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -128,11 +116,9 @@
         >
             <field name="name">Scan product</field>
             <field name="sequence">20</field>
-            <field name="code">product</field>
             <field name="field_name">product_id</field>
             <field name="filled_default">True</field>
             <field name="forced">True</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -142,11 +128,9 @@
         <record id="stock_barcodes_option_lot_picking_in" model="stock.barcodes.option">
             <field name="name">Scan lot</field>
             <field name="sequence">30</field>
-            <field name="code">lot</field>
             <field name="field_name">lot_id</field>
             <field name="filled_default">True</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -159,11 +143,9 @@
         >
             <field name="name">Product Qty</field>
             <field name="sequence">40</field>
-            <field name="code">product_qty</field>
             <field name="field_name">product_qty</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">False</field>
             <field
                 name="option_group_id"
@@ -185,11 +167,9 @@
         >
             <field name="name">Scan location</field>
             <field name="sequence">10</field>
-            <field name="code">location</field>
             <field name="field_name">location_id</field>
             <field name="filled_default">True</field>
             <field name="forced">True</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -202,11 +182,9 @@
         >
             <field name="name">Scan location dest</field>
             <field name="sequence">15</field>
-            <field name="code">location_dest</field>
             <field name="field_name">location_dest_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -219,11 +197,9 @@
         >
             <field name="name">Scan product</field>
             <field name="sequence">20</field>
-            <field name="code">product</field>
             <field name="field_name">product_id</field>
             <field name="filled_default">True</field>
             <field name="forced">True</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -236,11 +212,9 @@
         >
             <field name="name">Scan Quant Package</field>
             <field name="sequence">25</field>
-            <field name="code">package</field>
             <field name="field_name">package_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">False</field>
             <field
                 name="option_group_id"
@@ -253,11 +227,9 @@
         >
             <field name="name">Scan lot</field>
             <field name="sequence">30</field>
-            <field name="code">lot</field>
             <field name="field_name">lot_id</field>
             <field name="filled_default">True</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -270,11 +242,9 @@
         >
             <field name="name">Product Qty</field>
             <field name="sequence">40</field>
-            <field name="code">product_qty</field>
             <field name="field_name">product_qty</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">False</field>
             <field
                 name="option_group_id"
@@ -297,11 +267,9 @@
         >
             <field name="name">Scan location</field>
             <field name="sequence">10</field>
-            <field name="code">location</field>
             <field name="field_name">location_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -314,11 +282,9 @@
         >
             <field name="name">Scan product</field>
             <field name="sequence">20</field>
-            <field name="code">product</field>
             <field name="field_name">product_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -331,11 +297,9 @@
         >
             <field name="name">Scan Quant Package</field>
             <field name="sequence">25</field>
-            <field name="code">package</field>
             <field name="field_name">package_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -348,11 +312,9 @@
         >
             <field name="name">Scan lot</field>
             <field name="sequence">30</field>
-            <field name="code">lot</field>
             <field name="field_name">lot_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -365,11 +327,9 @@
         >
             <field name="name">Scan location dest</field>
             <field name="sequence">40</field>
-            <field name="code">location_dest</field>
             <field name="field_name">location_dest_id</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">True</field>
             <field
                 name="option_group_id"
@@ -382,11 +342,9 @@
         >
             <field name="name">Product Qty</field>
             <field name="sequence">50</field>
-            <field name="code">product_qty</field>
             <field name="field_name">product_qty</field>
             <field name="filled_default">False</field>
             <field name="forced">False</field>
-            <field name="is_invisible">False</field>
             <field name="to_scan">False</field>
             <field
                 name="option_group_id"

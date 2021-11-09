@@ -451,6 +451,11 @@ msgid "Get lots automatically for inventories"
 msgstr "Obtener lotes automáticamente para inventarios"
 
 #. module: stock_barcodes
+#: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__barcode_guided_mode
+msgid "Mode"
+msgstr "Modo"
+
+#. module: stock_barcodes
 #: model:ir.model.fields.selection,name:stock_barcodes.selection__stock_barcodes_option_group__barcode_guided_mode__guided
 msgid "Guided"
 msgstr "Guiado"

@@ -32,9 +32,7 @@ class WizStockBarcodesNewLot(models.TransientModel):
 
     def scan_wizard_action(self):
         wiz = self.get_scan_wizard()
-        action = self.env.ref(
-            "stock_barcodes.action_stock_barcodes_read_picking"
-        ).read()[0]
+        action = wiz.get_formview_action()
         action["res_id"] = wiz.id
         return action
 

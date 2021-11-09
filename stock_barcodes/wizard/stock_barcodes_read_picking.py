@@ -181,16 +181,16 @@ class WizStockBarcodesReadPicking(models.TransientModel):
 
     def action_done(self):
         res = super().action_done()
-        if self.check_done_conditions():
-            res = self._process_stock_move_line()
-            if res:
+        if res:
+            move_dic = self._process_stock_move_line()
+            if move_dic:
                 self[self._field_candidate_ids].scan_count += 1
                 if self.option_group_id.barcode_guided_mode == "guided":
                     self.action_clean_values()
                 if self.env.context.get("force_create_move"):
                     self.move_line_ids.barcode_scan_state = "done_forced"
                 self.determine_todo_action()
-            return res
+            return bool(move_dic)
         return res
 
     def action_manual_entry(self):
@@ -368,10 +368,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             self._set_messagge_info(
                 "more_match", _("Quantities scanned are higher than necessary")
             )
-            if not self.option_group_id.get_option_value("product_qty", "forced"):
-                self.with_context(visible_force_done=True).determine_todo_action()
-            else:
-                self.determine_todo_action()
+            self.visible_force_done = True
             return False
         move_lines_dic = {}
         for line in lines:
@@ -504,16 +501,6 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         )
         self.remove_scanning_log(log_scan)
         return res
-
-    # def action_clean_values(self):
-    #     super().action_clean_values()
-    #     if self.picking_type_code == "outgoing":
-    #         self.location_id = False
-    #     elif self.picking_type_code == "incoming":
-    #         self.location_dest_id = False
-    #     else:
-    #         self.location_id = False
-    #         self.location_dest_id = False
 
 
 class WizCandidatePicking(models.TransientModel):

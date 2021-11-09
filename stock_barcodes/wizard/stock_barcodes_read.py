@@ -58,6 +58,7 @@ class WizStockBarcodesRead(models.AbstractModel):
     visible_force_done = fields.Boolean()
     step = fields.Integer()
     is_manual_qty = fields.Boolean(compute="_compute_is_manual_qty")
+    is_manual_confirm = fields.Boolean(compute="_compute_is_manual_qty")
     # Technical field to allow use in attrs
     display_menu = fields.Boolean(compute="_compute_display_menu")
 
@@ -70,6 +71,7 @@ class WizStockBarcodesRead(models.AbstractModel):
     def _compute_is_manual_qty(self):
         for rec in self:
             rec.is_manual_qty = rec.option_group_id.is_manual_qty
+            rec.is_manual_confirm = rec.option_group_id.is_manual_confirm
 
     @api.depends_context("display_menu")
     def _compute_display_menu(self):
@@ -154,7 +156,7 @@ class WizStockBarcodesRead(models.AbstractModel):
                 # Review conditions
                 if self.option_group_id.code in ["OUT", "INV"]:
                     self.location_id = quants.location_id
-                else:
+                elif not self.is_manual_qty:
                     self.product_qty = quants.quantity
                 return True
             elif len(quants) > 1:
@@ -197,8 +199,7 @@ class WizStockBarcodesRead(models.AbstractModel):
         barcode_found = False
         options_to_scan = options.filtered("to_scan")
         options_required = options.filtered("required")
-        if self.option_group_id.step_by_step:
-            options_to_scan = options_to_scan.filtered(lambda op: op.step == self.step)
+        options_to_scan = options_to_scan.filtered(lambda op: op.step == self.step)
         for option in options_to_scan:
             if (
                 self.option_group_id.ignore_filled_fields
@@ -224,6 +225,16 @@ class WizStockBarcodesRead(models.AbstractModel):
             else:
                 self._set_messagge_info("not_found", _("Barcode not found"))
             return False
+        if not self.check_option_required():
+            return False
+        if self.is_manual_confirm:
+            self._set_messagge_info("info", _("Review and confirm"))
+            return False
+        return self.action_confirm()
+
+    def check_option_required(self):
+        options = self.option_group_id.option_ids
+        options_required = options.filtered("required")
         for option in options_required:
             if not getattr(self, option.field_name, False):
                 # if self.is_manual_qty and option.field_name in
@@ -238,14 +249,10 @@ class WizStockBarcodesRead(models.AbstractModel):
                 # return self.action_manual_quantity()
                 if option.field_name == "lot_id" and self.product_id.tracking == "none":
                     continue
-                self._set_messagge_info("info", option.message)
+                self._set_messagge_info("info", option.name)
                 self.action_show_step()
                 return False
-        res = self.action_done()
-        if res:
-            # Empty fields checked as clean after action_done process
-            self.action_clean_values()
-        return res
+        return True
 
     def _scanned_location(self, barcode):
         location = self.env["stock.location"].search(self._barcode_domain(barcode))
@@ -261,7 +268,7 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def on_barcode_scanned(self, barcode):
         self.barcode = barcode
-        return self.process_barcode(barcode)
+        self.process_barcode(barcode)
 
     def check_location_contidion(self):
         if not self.location_id:
@@ -449,15 +456,14 @@ class WizStockBarcodesRead(models.AbstractModel):
         return option[attribute]
 
     def action_force_done(self):
-        res = self.with_context(force_create_move=True).action_done()
+        res = self.with_context(force_create_move=True).action_confirm()
         self.visible_force_done = False
         return res
 
     @api.model
     def create(self, vals):
         wiz = super().create(vals)
-        if wiz.option_group_id.step_by_step:
-            wiz.action_show_step()
+        wiz.action_show_step()
         return wiz
 
     def action_manual_quantity(self):
@@ -474,15 +480,11 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     @api.onchange("step")
     def action_show_step(self):
-        if not self.option_group_id.step_by_step:
-            return False
         options_required = self.option_group_id.option_ids.filtered("required")
         self.step = 0
         for option in options_required:
             if not getattr(self, option.field_name, False):
                 self.step = option.step
-                # if option.field_name in ['product_qty', 'packaging_qty']:
-                #     return self.action_manual_quantity()
                 break
         if not self.step:
             self.step = options_required[:1].step
@@ -491,10 +493,12 @@ class WizStockBarcodesRead(models.AbstractModel):
             lambda op: op.step == self.step
         )
         self._set_messagge_info(
-            "info", "Scan {}".format(", ".join(options.mapped("message")))
+            "info", _("Scan {}").format(", ".join(options.mapped("name")))
         )
 
-    def action_manual_confirm(self):
+    def action_confirm(self):
+        if not self.check_option_required():
+            return False
         res = self.action_done()
         if res:
             self.action_clean_values()

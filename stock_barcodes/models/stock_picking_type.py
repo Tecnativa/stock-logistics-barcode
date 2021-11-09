@@ -39,11 +39,6 @@ class StockPickingType(models.Model):
         return action
 
     def action_barcode_new_picking(self):
-        """
-            'search_default_picking_type_id': [active_id],
-            'default_picking_type_id': active_id,
-            'contact_display': 'partner_address',
-        """
         picking = self.env["stock.picking"].create(
             {
                 "picking_type_id": self.id,
