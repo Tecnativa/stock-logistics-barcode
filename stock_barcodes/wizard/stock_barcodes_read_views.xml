@@ -106,7 +106,7 @@
                         <field name="message_type" invisible="1" />
                         <field name="barcode" invisible="1" force_save="1" />
                         <field name="step" invisible="1" force_save="1" />
-                        <field name="is_manual_qty" invisible="1"/>
+                        <field name="is_manual_qty" invisible="1" />
                         <field name="product_tracking" invisible="1" force_save="1" />
                         <field name="guided_product_id" invisible="1" force_save="1" />
                         <field name="guided_location_id" invisible="1" force_save="1" />
@@ -351,7 +351,6 @@
         <field name="view_id" ref="view_stock_barcodes_read_form" />
         <field name="target">current</field>
     </record>
-
     <record id="view_stock_barcodes_read_form_manual_qty" model="ir.ui.view">
         <field name="name">stock.barcodes.read.form.manual_qty</field>
         <field name="model">wiz.stock.barcodes.read</field>
@@ -359,7 +358,7 @@
         <field name="arch" type="xml">
             <form string="Barcodes manual quantities">
                 <sheet>
-                    <field name="packaging_id" invisible="1"/>
+                    <field name="packaging_id" invisible="1" />
                     <field
                         name="packaging_qty"
                         attrs="{'invisible': [('packaging_id', '=', False)]}"
@@ -384,5 +383,4 @@
             </form>
         </field>
     </record>
-
 </odoo>

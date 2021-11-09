@@ -28,7 +28,12 @@
                             type="object"
                             class="btn-primary"
                         />
-                        <button string="Cancel" name="cancel" class="btn-default" type="object"/>
+                        <button
+                            string="Cancel"
+                            name="cancel"
+                            class="btn-default"
+                            type="object"
+                        />
                     </footer>
                 </sheet>
             </form>

@@ -21,7 +21,7 @@
                     </group>
                     <field name="option_ids">
                         <tree editable="bottom">
-                            <field name="step"/>
+                            <field name="step" />
                             <field name="sequence" widget="handle" />
                             <field name="name" />
                             <field name="message" />

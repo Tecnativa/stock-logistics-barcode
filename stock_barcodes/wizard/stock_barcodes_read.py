@@ -226,16 +226,17 @@ class WizStockBarcodesRead(models.AbstractModel):
             return False
         for option in options_required:
             if not getattr(self, option.field_name, False):
-                # if self.is_manual_qty and option.field_name in ['product_qty', 'packaging_qty']:
-                    # self.env["bus.bus"].sendone(
-                    #     (self._cr.dbname, self._name,
-                    #      self.id), {
-                    #     "action": "focus",
-                    #     "field_name": "product_qty"
-                    #     }
-                    # )
-                    # return self.action_manual_quantity()
-                if option.field_name == 'lot_id' and self.product_id.tracking == 'none':
+                # if self.is_manual_qty and option.field_name in
+                # ['product_qty', 'packaging_qty']:
+                # self.env["bus.bus"].sendone(
+                #     (self._cr.dbname, self._name,
+                #      self.id), {
+                #     "action": "focus",
+                #     "field_name": "product_qty"
+                #     }
+                # )
+                # return self.action_manual_quantity()
+                if option.field_name == "lot_id" and self.product_id.tracking == "none":
                     continue
                 self._set_messagge_info("info", option.message)
                 self.action_show_step()
@@ -461,7 +462,9 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def action_manual_quantity(self):
         action = self.get_formview_action()
-        form_view = self.env.ref("stock_barcodes.view_stock_barcodes_read_form_manual_qty")
+        form_view = self.env.ref(
+            "stock_barcodes.view_stock_barcodes_read_form_manual_qty"
+        )
         action["views"] = [(form_view.id, "form")]
         action["res_id"] = self.ids[0]
         return action
@@ -485,8 +488,11 @@ class WizStockBarcodesRead(models.AbstractModel):
             self.step = options_required[:1].step
 
         options = self.option_group_id.option_ids.filtered(
-            lambda op: op.step == self.step)
-        self._set_messagge_info("info", "Scan {}".format(', '.join(options.mapped("message"))))
+            lambda op: op.step == self.step
+        )
+        self._set_messagge_info(
+            "info", "Scan {}".format(", ".join(options.mapped("message")))
+        )
 
     def action_manual_confirm(self):
         res = self.action_done()
