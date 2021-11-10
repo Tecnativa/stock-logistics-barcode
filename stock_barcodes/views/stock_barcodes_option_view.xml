@@ -27,6 +27,7 @@
                             <field name="auto_put_in_pack" />
                             <field name="is_manual_confirm" />
                             <field name="is_manual_qty" />
+                            <field name="allow_negative_quant" />
                         </group>
                     </group>
                     <field name="option_ids">

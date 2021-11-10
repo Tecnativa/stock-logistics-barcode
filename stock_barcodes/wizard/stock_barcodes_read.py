@@ -61,6 +61,7 @@ class WizStockBarcodesRead(models.AbstractModel):
     is_manual_confirm = fields.Boolean(compute="_compute_is_manual_qty")
     # Technical field to allow use in attrs
     display_menu = fields.Boolean(compute="_compute_display_menu")
+    qty_available = fields.Float(compute="_compute_qty_available")
 
     @api.depends("res_id")
     def _compute_action_ids(self):
@@ -77,6 +78,24 @@ class WizStockBarcodesRead(models.AbstractModel):
     def _compute_display_menu(self):
         self.display_menu = self.env.context.get("display_menu")
 
+    @api.depends("location_id", "product_id", "lot_id")
+    def _compute_qty_available(self):
+        if not self.product_id or self.location_id.usage != "internal":
+            self.qty_available = 0.0
+            return
+        domain_quant = [
+            ("product_id", "=", self.product_id.id),
+            ("location_id", "=", self.location_id.id),
+        ]
+        if self.lot_id:
+            domain_quant.append(("lot_id", "=", self.lot_id.id))
+        # if self.package_id:
+        #     domain_quant.append(('package_id', '=', self.package_id.id))
+        groups = self.env["stock.quant"].read_group(
+            domain_quant, ["quantity"], [], orderby="id"
+        )
+        self.qty_available = groups[0]["quantity"]
+
     @api.onchange("packaging_qty")
     def onchange_packaging_qty(self):
         if self.packaging_id:
@@ -88,7 +107,9 @@ class WizStockBarcodesRead(models.AbstractModel):
         For manual entry mode barcode is not set so is not displayed
         """
         self.message_type = message_type
-        if self.barcode and self.message_type in ["more_match", "not_found"]:
+        # TODO: Uncomment this line when the tests of all modules have been adapted
+        # if self.barcode and self.message_type in ["more_match", "not_found"]:
+        if self.barcode:
             self.message = _("%s (%s)") % (self.barcode, message)
         else:
             self.message = "%s" % message

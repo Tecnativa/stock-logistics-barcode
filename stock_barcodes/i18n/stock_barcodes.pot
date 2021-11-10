@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-10 16:55+0000\n"
-"PO-Revision-Date: 2021-11-10 16:55+0000\n"
+"POT-Creation-Date: 2021-11-10 22:56+0000\n"
+"PO-Revision-Date: 2021-11-10 22:56+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -65,31 +65,6 @@ msgid "<span>New lot</span>"
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model:res.groups,name:stock_barcodes.group_track_pending_products_picking_barcode_detailed_operations
-msgid ""
-"Add table to track pending products at picking stock wizard for detailed "
-"operations"
-msgstr ""
-
-#. module: stock_barcodes
-#: model:res.groups,name:stock_barcodes.group_track_pending_products_picking_barcode_non_detailed_operations
-msgid ""
-"Add table to track pending products at picking stock wizard for non-detailed"
-" operations"
-msgstr ""
-
-#. module: stock_barcodes
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.res_config_settings_view_form
-msgid ""
-"Add table to track pending products at picking stock wizard.\n"
-"                               Non-detailed operations, detailed operations or both can be shown."
-=======
-=======
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read__action_ids
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__action_ids
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__action_ids
@@ -112,7 +87,11 @@ msgid "Actions for barcode interface"
 msgstr ""
 
 #. module: stock_barcodes
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
+#: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__allow_negative_quant
+msgid "Allow Negative Quant"
+msgstr ""
+
+#. module: stock_barcodes
 #: model_terms:ir.ui.view,arch_db:stock_barcodes.view_stock_barcodes_read_picking_form
 msgid "Are you sure to validate the picking ?"
 msgstr ""
@@ -363,48 +342,22 @@ msgid "Customers"
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__product_uom_qty
-msgid "Demand"
-=======
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.view_stock_barcodes_read_picking_form
-msgid "Dem.:"
->>>>>>> f57f41c... [IMP] stock_barcodes: Add guided mode and restyling.
-msgstr ""
-
-#. module: stock_barcodes
-=======
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__product_uom_qty
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__product_uom_qty
 msgid "Demand"
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__detailed_pending_moves
-msgid "Detailed Pending Moves"
-=======
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read__display_menu
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__display_menu
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__display_menu
 msgid "Display Menu"
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 msgstr ""
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_action__display_name
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option__display_name
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__display_name
-<<<<<<< HEAD
->>>>>>> f57f41c... [IMP] stock_barcodes: Add guided mode and restyling.
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
-=======
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_read_log__display_name
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_read_log_line__display_name
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__display_name
@@ -418,23 +371,9 @@ msgstr ""
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__product_qty_done
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.missing_detailed_moves
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.missing_moves
-=======
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__qty_done
 #: model:ir.model.fields.selection,name:stock_barcodes.selection__stock_move_line__barcode_scan_state__done
 #: model:ir.model.fields.selection,name:stock_barcodes.selection__wiz_stock_barcodes_read_todo__state__done
->>>>>>> f57f41c... [IMP] stock_barcodes: Add guided mode and restyling.
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
-=======
-#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__qty_done
-#: model:ir.model.fields.selection,name:stock_barcodes.selection__stock_move_line__barcode_scan_state__done
-#: model:ir.model.fields.selection,name:stock_barcodes.selection__wiz_stock_barcodes_read_todo__state__done
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 msgid "Done"
 msgstr ""
 
@@ -463,22 +402,6 @@ msgid "Ensure the traceability of a storable product in your warehouse."
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.missing_detailed_moves
-msgid "From"
-msgstr ""
-
-#. module: stock_barcodes
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
-#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__auto_lot
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.view_stock_barcodes_read_inventory_form
-msgid "Get lots automatically"
-=======
-=======
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option__field_name
 msgid "Field Name"
 msgstr ""
@@ -717,10 +640,7 @@ msgid "Lot scanned"
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-=======
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__manual_entry
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_read_log__manual_entry
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read__manual_entry
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__manual_entry
@@ -902,13 +822,6 @@ msgid "Partner"
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__pending_moves
-msgid "Pending Moves"
-=======
 #: model:ir.model.fields.selection,name:stock_barcodes.selection__stock_move_line__barcode_scan_state__pending
 #: model:ir.model.fields.selection,name:stock_barcodes.selection__wiz_stock_barcodes_read_todo__state__pending
 msgid "Pending"
@@ -917,7 +830,6 @@ msgstr ""
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__pending_move_ids
 msgid "Pending Move"
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 msgstr ""
 
 #. module: stock_barcodes
@@ -926,7 +838,6 @@ msgid "Pending moves"
 msgstr ""
 
 #. module: stock_barcodes
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_read_log__picking_id
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__picking_id
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__picking_id
@@ -969,19 +880,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read__product_id
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__product_id
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__product_id
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.missing_detailed_moves
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.missing_moves
-=======
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__product_id
->>>>>>> f57f41c... [IMP] stock_barcodes: Add guided mode and restyling.
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
-=======
-#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__product_id
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 msgid "Product"
 msgstr ""
 
@@ -995,6 +894,19 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__product_qty
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__product_qty
 msgid "Product Qty"
+msgstr ""
+
+#. module: stock_barcodes
+#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read__qty_available
+#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__qty_available
+#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__qty_available
+msgid "Qty Available"
+msgstr ""
+
+#. module: stock_barcodes
+#: code:addons/stock_barcodes/wizard/stock_barcodes_read_picking.py:0
+#, python-format
+msgid "Quantities not available in location"
 msgstr ""
 
 #. module: stock_barcodes
@@ -1043,10 +955,7 @@ msgstr ""
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__product_qty_reserved
-<<<<<<< HEAD
-=======
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__product_qty_reserved
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 msgid "Reserved"
 msgstr ""
 
@@ -1110,17 +1019,8 @@ msgid "Set a default value for scanner."
 msgstr ""
 
 #. module: stock_barcodes
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-#: model:ir.model.fields,field_description:stock_barcodes.field_res_config_settings__group_picking_barcode_wizard_detailed_operations
-#: model_terms:ir.ui.view,arch_db:stock_barcodes.res_config_settings_view_form
-msgid "Show detailed operations"
-=======
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__show_pending_moves
 msgid "Show pending moves"
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 msgstr ""
 
 #. module: stock_barcodes
@@ -1130,11 +1030,6 @@ msgstr ""
 
 #. module: stock_barcodes
 #: model_terms:ir.ui.view,arch_db:stock_barcodes.stock_picking_kanban
-<<<<<<< HEAD
->>>>>>> f57f41c... [IMP] stock_barcodes: Add guided mode and restyling.
->>>>>>> d8bbf8d... [IMP] stock_barcodes: Add guided mode and restyling.
-=======
->>>>>>> 00eba36... [IMP] stock_barcodes: Add manual confirm
 #: model_terms:ir.ui.view,arch_db:stock_barcodes.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock_barcodes.view_stock_inventory_kanban
 msgid "Start barcode interface"
