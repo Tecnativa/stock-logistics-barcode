@@ -88,7 +88,7 @@ class WizStockBarcodesRead(models.AbstractModel):
         For manual entry mode barcode is not set so is not displayed
         """
         self.message_type = message_type
-        if self.barcode:
+        if self.barcode and self.message_type in ["more_match", "not_found"]:
             self.message = _("%s (%s)") % (self.barcode, message)
         else:
             self.message = "%s" % message
@@ -237,15 +237,14 @@ class WizStockBarcodesRead(models.AbstractModel):
         options_required = options.filtered("required")
         for option in options_required:
             if not getattr(self, option.field_name, False):
-                # if self.is_manual_qty and option.field_name in
-                # ['product_qty', 'packaging_qty']:
-                # self.env["bus.bus"].sendone(
-                #     (self._cr.dbname, self._name,
-                #      self.id), {
-                #     "action": "focus",
-                #     "field_name": "product_qty"
-                #     }
-                # )
+                if self.is_manual_qty and option.field_name in [
+                    "product_qty",
+                    "packaging_qty",
+                ]:
+                    self.env["bus.bus"].sendone(
+                        "stock_barcodes_read",
+                        {"action": "focus", "field_name": "product_qty"},
+                    )
                 # return self.action_manual_quantity()
                 if option.field_name == "lot_id" and self.product_id.tracking == "none":
                     continue

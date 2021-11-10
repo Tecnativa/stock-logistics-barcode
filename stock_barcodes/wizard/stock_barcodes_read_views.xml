@@ -47,7 +47,7 @@
                         </field>
                     </div>
                     <div invisible="context.get('display_menu', False)">
-                        <div name="info" class="text-center">
+                        <div name="info" class="text-center h3">
                             <div
                                 class="alert alert-success"
                                 role="status"
@@ -127,36 +127,47 @@
                             widget="barcode_handler"
                             invisible="1"
                         />
+                        <group name="location">
+                            <div>
+                                <span
+                                    class="fa fa-map-marker fa-2x text-center"
+                                    style="width:15%"
+                                />
+                                <field
+                                    name="location_id"
+                                    options="{'no_create': True}"
+                                    attrs="{'readonly': [('manual_entry', '=', False)]}"
+                                    force_save="1"
+                                    style="width:85%"
+                                    class="h5"
+                                />
+                            </div>
+                        </group>
                         <group>
-                            <field
-                                name="location_id"
-                                options="{'no_create': True}"
-                                attrs="{'readonly': [('manual_entry', '=', False)]}"
-                                force_save="1"
-                            />
-                            <!--                            <field-->
-                            <!--                                name="location_dest_id"-->
-                            <!--                                options="{'no_create': True}"-->
-                            <!--                                attrs="{'readonly': [('manual_entry', '=', False)]}"-->
-                            <!--                                force_save="1"-->
-                            <!--                            />-->
+                            <div>
+                                <span
+                                    class="fa fa-th-list fa-2x text-center"
+                                    style="width:15%"
+                                />
+                                <field
+                                    name="product_id"
+                                    options="{'no_create': True}"
+                                    attrs="{'readonly': [('manual_entry', '=', False)]}"
+                                    force_save="1"
+                                    style="width:85%"
+                                    class="h5"
+                                />
+                            </div>
                         </group>
                         <group
                             groups="stock.group_production_lot"
                             attrs="{'invisible': [('product_tracking', 'in', [False, 'none'])]}"
                         >
-                        </group>
-                        <group>
-                            <field
-                                name="product_id"
-                                options="{'no_create': True}"
-                                attrs="{'readonly': [('manual_entry', '=', False)]}"
-                                force_save="1"
-                            />
-                        </group>
-                        <group>
-                            <label for="lot_id">Lot</label>
                             <div>
+                                <span
+                                    class="fa fa-tags fa-2x text-center"
+                                    style="width:15%"
+                                />
                                 <field
                                     name="lot_id"
                                     options="{'no_create': True}"
@@ -164,7 +175,8 @@
                                     context="{'default_product_id': product_id}"
                                     attrs="{'readonly': [('manual_entry', '=', False)]}"
                                     force_save="1"
-                                    style="width:75%"
+                                    style="width:60%"
+                                    class="h5"
                                 />
                                 <button
                                     class="btn btn-warning"
@@ -182,15 +194,19 @@
                                 />
                             </div>
                         </group>
-                        <group>
-                            <field
-                                name="packaging_id"
-                                options="{'no_create': True}"
-                                domain="[('product_id', '=', product_id)]"
-                                attrs="{'readonly': [('manual_entry', '=', False)]}"
-                                force_save="1"
-                                groups="product.group_stock_packaging"
-                            />
+                        <group name="product">
+                            <div class="mt8 text-center">
+                                <field
+                                    name="product_qty"
+                                    attrs="{'invisible': [('manual_entry', '=', False), ('is_manual_qty', '=', False)], 'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
+                                    force_save="1"
+                                    widget="numeric_step"
+                                    options="{'auto_select': True}"
+                                    style="width:60%"
+                                />
+                            </div>
+                        </group>
+                        <group name="package">
                             <field
                                 name="package_id"
                                 options="{'no_create': True}"
@@ -199,21 +215,35 @@
                                 force_save="1"
                                 groups="stock.group_tracking_lot"
                             />
-                            <field
-                                name="packaging_qty"
-                                attrs="{'invisible': ['|', ('packaging_id', '=', False), '&amp;', ('manual_entry', '=', False), ('is_manual_qty', '=', False)], 'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
-                                force_save="1"
-                                widget="numeric_step"
-                                options="{'auto_select': True}"
-                            />
-                            <field
-                                name="product_qty"
-                                attrs="{'invisible': [('manual_entry', '=', False), ('is_manual_qty', '=', False)], 'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
-                                force_save="1"
-                                widget="numeric_step"
-                                options="{'auto_select': True}"
-                                default_focus="1"
-                            />
+                        </group>
+                        <group name="packaging" groups="product.group_stock_packaging">
+                            <div>
+                                <span
+                                    class="fa fa-dropbox fa-2x text-center"
+                                    style="width:15%"
+                                />
+                                <field
+                                    name="packaging_id"
+                                    options="{'no_create': True}"
+                                    domain="[('product_id', '=', product_id)]"
+                                    attrs="{'readonly': [('manual_entry', '=', False)]}"
+                                    force_save="1"
+                                    style="width:85%"
+                                    class="h5"
+                                />
+                            </div>
+                        </group>
+                        <group name="packaging_qty">
+                            <div class="mt8 text-center">
+                                <field
+                                    name="packaging_qty"
+                                    attrs="{'invisible': ['|', ('packaging_id', '=', False), '&amp;', ('manual_entry', '=', False), ('is_manual_qty', '=', False)], 'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
+                                    force_save="1"
+                                    widget="numeric_step"
+                                    options="{'auto_select': True}"
+                                    style="width:60%"
+                                />
+                            </div>
                         </group>
                         <group
                             string="Current product scanning log"

@@ -69,23 +69,23 @@
                                                     force_save="1"
                                                 />
                                             </strong>
-                                            <field name="date" widget="date" />
+                                            <!--                                            <field name="date" widget="date" />-->
                                         </div>
-                                        <div>
-                                            <field name="partner_id" />
-                                        </div>
-                                        <div>
-                                            <label for="product_uom_qty">Dem.: </label>
-                                            <field name="product_uom_qty" />
-                                            <label
-                                                for="product_qty_reserved"
-                                            >Res.: </label>
-                                            <field name="product_qty_reserved" />
-                                            <label for="product_qty_done">Done: </label>
-                                            <strong>
-                                                <field name="product_qty_done" />
-                                            </strong>
-                                        </div>
+                                        <!--                                        <div>-->
+                                        <!--                                            <field name="partner_id" />-->
+                                        <!--                                        </div>-->
+                                        <!--                                        <div>-->
+                                        <!--                                            <label for="product_uom_qty">Dem.: </label>-->
+                                        <!--                                            <field name="product_uom_qty" />-->
+                                        <!--                                            <label-->
+                                        <!--                                                for="product_qty_reserved"-->
+                                        <!--                                            >Res.: </label>-->
+                                        <!--                                            <field name="product_qty_reserved" />-->
+                                        <!--                                            <label for="product_qty_done">Done: </label>-->
+                                        <!--                                            <strong>-->
+                                        <!--                                                <field name="product_qty_done" />-->
+                                        <!--                                            </strong>-->
+                                        <!--                                        </div>-->
                                         <div>
                                             <a
                                                 name="action_open_picking"
@@ -115,18 +115,29 @@
                 <field name="picking_type_code" invisible="1" force_save="1" />
                 <field name="picking_id" invisible="1" force_save="1" />
             </field>
-            <field name="location_id" position="attributes">
+            <group name="location" position="attributes">
                 <attribute
                     name="attrs"
                 >{'readonly': [('manual_entry', '=', False)], 'invisible': [('picking_type_code', '=', 'incoming')]}</attribute>
-            </field>
-            <field name="location_id" position="after">
-                <field
-                    name="location_dest_id"
-                    force_save="1"
-                    attrs="{'readonly': [('manual_entry', '=', False)], 'invisible': [('picking_type_code', '=', 'outgoing')]}"
-                />
-            </field>
+            </group>
+            <group name="location" position="after">
+                <group
+                    name="location_dest"
+                    attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"
+                >
+                    <div>
+                        <span class="fa fa-share fa-2x text-center" style="width:15%" />
+                        <field
+                            name="location_dest_id"
+                            options="{'no_create': True}"
+                            attrs="{'readonly': [('manual_entry', '=', False)]}"
+                            force_save="1"
+                            style="width:85%"
+                            class="h4"
+                        />
+                    </div>
+                </group>
+            </group>
             <xpath expr="//field[@name='product_qty']/.." position="after">
                 <group
                     string="Pending moves"
