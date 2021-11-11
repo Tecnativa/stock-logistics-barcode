@@ -10,6 +10,7 @@ class StockBarcodesAction(models.Model):
     _order = "sequence, id"
 
     name = fields.Char()
+    active = fields.Boolean(default=True)
     sequence = fields.Integer(string="Sequence", default=100)
     action_window_id = fields.Many2one(
         comodel_name="ir.actions.act_window", string="Action window"

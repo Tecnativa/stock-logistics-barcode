@@ -20,8 +20,13 @@
                             <field name="manual_entry" />
                             <field name="confirmed_moves" />
                             <field name="show_pending_moves" />
+                            <field
+                                name="source_pending_moves"
+                                attrs="{'invisible': [('show_pending_moves', '=', False), ('barcode_guided_mode', '=', False)]}"
+                            />
                             <field name="show_scan_log" />
                             <field name="auto_put_in_pack" />
+                            <field name="group_key_for_todo_records" />
                         </group>
                         <group>
                             <field name="ignore_filled_fields" />

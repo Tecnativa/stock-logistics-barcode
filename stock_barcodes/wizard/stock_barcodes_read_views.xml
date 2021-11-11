@@ -170,11 +170,14 @@
                                 />
                             </div>
                         </group>
-                        <group name="product">
+                        <group
+                            name="product"
+                            attrs="{'invisible': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
+                        >
                             <div class="mt8 text-center">
                                 <field
                                     name="product_qty"
-                                    attrs="{'invisible': [('manual_entry', '=', False), ('is_manual_qty', '=', False)], 'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
+                                    attrs="{'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
                                     force_save="1"
                                     widget="numeric_step"
                                     options="{'auto_select': True}"
@@ -182,14 +185,16 @@
                                 />
                             </div>
                         </group>
-                        <group name="package">
+                        <group
+                            name="package"
+                            groups="stock.group_tracking_lot"
+                            invisible="1"
+                        >
                             <field
                                 name="package_id"
                                 options="{'no_create': True}"
                                 attrs="{'readonly': [('manual_entry', '=', False)]}"
-                                invisible="1"
                                 force_save="1"
-                                groups="stock.group_tracking_lot"
                             />
                         </group>
                         <group name="packaging" groups="product.group_stock_packaging">
@@ -209,11 +214,14 @@
                                 />
                             </div>
                         </group>
-                        <group name="packaging_qty">
+                        <group
+                            name="packaging_qty"
+                            attrs="{'invisible': ['|', ('packaging_id', '=', False), '&amp;', ('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
+                        >
                             <div class="mt8 text-center">
                                 <field
                                     name="packaging_qty"
-                                    attrs="{'invisible': ['|', ('packaging_id', '=', False), '&amp;', ('manual_entry', '=', False), ('is_manual_qty', '=', False)], 'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
+                                    attrs="{'readonly': [('manual_entry', '=', False), ('is_manual_qty', '=', False)]}"
                                     force_save="1"
                                     widget="numeric_step"
                                     options="{'auto_select': True}"
@@ -222,6 +230,7 @@
                             </div>
                         </group>
                         <group
+                            name="scan_log"
                             string="Current product scanning log"
                             attrs="{'invisible': [('scan_log_ids', '=', [])]}"
                         >

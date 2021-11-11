@@ -52,7 +52,8 @@ class WizStockBarcodesReadPicking(models.TransientModel):
     todo_line_id = fields.Many2one(comodel_name="wiz.stock.barcodes.read.todo")
     picking_mode = fields.Selection([("picking", "Picking mode")])
     pending_move_ids = fields.Many2many(
-        comodel_name="stock.move", compute="_compute_pending_move_ids",
+        comodel_name="wiz.stock.barcodes.read.todo",
+        compute="_compute_pending_move_ids",
     )
 
     @api.depends("todo_line_id")
@@ -61,13 +62,11 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         """
         self.todo_line_display_ids = self.todo_line_id
 
-    @api.depends("picking_id", "picking_id.move_lines.move_line_ids.barcode_scan_state")
+    @api.depends("todo_line_ids")
     def _compute_pending_move_ids(self):
         if self.option_group_id.show_pending_moves:
-            self.pending_move_ids = self.picking_id.move_lines.filtered(
-                lambda sm: any(
-                    sml.barcode_scan_state == "pending" for sml in sm.move_line_ids
-                )
+            self.pending_move_ids = self.todo_line_ids.filtered(
+                lambda t: t.state == "pending"
             )
         else:
             self.pending_move_ids = False
@@ -106,20 +105,32 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         # we need create it in this onchange
         self._set_default_picking()
         self.determine_todo_action()
+        self.fill_pending_moves()
 
     def get_sorted_move_lines(self, move_lines):
         if self.picking_id.picking_type_code in ["incoming", "internal"]:
             location_field = "location_dest_id"
         else:
             location_field = "location_id"
-        move_lines = move_lines.sorted(
-            lambda ml: (
-                ml[location_field].posx,
-                ml[location_field].posy,
-                ml[location_field].posz,
-                ml[location_field].name,
+        if self.option_group_id.source_pending_moves == "move_line_ids":
+            move_lines = move_lines.sorted(
+                lambda sml: (
+                    sml[location_field].posx,
+                    sml[location_field].posy,
+                    sml[location_field].posz,
+                    sml[location_field].name,
+                )
             )
-        )
+        else:
+            # Stock moves
+            move_lines = move_lines.sorted(
+                lambda sm: (
+                    (sm.move_line_ids[:1] or sm)[location_field].posx,
+                    (sm.move_line_ids[:1] or sm)[location_field].posy,
+                    (sm.move_line_ids[:1] or sm)[location_field].posz,
+                    (sm.move_line_ids[:1] or sm)[location_field].name,
+                )
+            )
         return move_lines
 
     def _get_stock_move_lines_todo(self):
@@ -129,9 +140,22 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         )
         return move_lines
 
+    def fill_pending_moves(self):
+        if (
+            self.option_group_id.barcode_guided_mode != "guided"
+            and self.option_group_id.show_pending_moves
+            and not self.todo_line_ids
+        ):
+            self.fill_todo_records()
+
+    def get_moves_or_move_lines(self):
+        if self.option_group_id.source_pending_moves == "move_line_ids":
+            return self.picking_id.move_line_ids.filtered(lambda ln: ln.move_id)
+        else:
+            return self.picking_id.move_lines
+
     def fill_todo_records(self):
-        move_lines = self.picking_id.move_line_ids
-        move_lines = self.get_sorted_move_lines(move_lines)
+        move_lines = self.get_sorted_move_lines(self.get_moves_or_move_lines())
         self.env["wiz.stock.barcodes.read.todo"].fill_records(self, [move_lines])
 
     def determine_todo_action(self, forced_todo_line=False):

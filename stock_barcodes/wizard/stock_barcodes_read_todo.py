@@ -3,6 +3,7 @@
 from collections import OrderedDict
 
 from odoo import api, fields, models
+from odoo.tools.safe_eval import safe_eval
 
 
 class WizStockBarcodesReadTodo(models.TransientModel):
@@ -53,8 +54,14 @@ class WizStockBarcodesReadTodo(models.TransientModel):
     line_ids = fields.Many2many(comodel_name="stock.move.line")
     position_index = fields.Integer()
 
-    def _group_key(self, line):
-        return (line.location_id, line.product_id, line.lot_id)
+    def _group_key(self, wiz, line):
+        group_key_for_todo_records = wiz.option_group_id.group_key_for_todo_records
+        if group_key_for_todo_records:
+            return safe_eval(group_key_for_todo_records, globals_dict={"object": line})
+        if wiz.option_group_id.source_pending_moves == "move_line_ids":
+            return (line.location_id, line.product_id, line.lot_id)
+        else:
+            return (line.location_id, line.product_id)
 
     @api.model
     def fill_records(self, wiz_barcode, lines_list):
@@ -67,33 +74,65 @@ class WizStockBarcodesReadTodo(models.TransientModel):
         position = 0
         for lines in lines_list:
             for line in lines:
-                key = self._group_key(line)
+                key = self._group_key(wiz_barcode, line)
                 if key not in todo_vals:
-                    todo_vals[key] = {
-                        "location_id": line.location_id.id,
-                        "location_dest_id": line.location_dest_id.id,
+                    vals = {
                         "product_id": line.product_id.id,
-                        "lot_id": line.lot_id.id,
-                        "uom_id": line.product_uom_id.id,
-                        "package_id": line.package_id.id,
-                        "result_package_id": line.result_package_id.id,
-                        "product_qty_reserved": line.product_qty,
                         "product_uom_qty": line.product_uom_qty,
-                        "qty_done": line.qty_done,
-                        "line_ids": [(6, 0, line.ids)],
                         "name": "To do action",
                         "position_index": position,
                     }
+                    if (
+                        wiz_barcode.option_group_id.source_pending_moves
+                        == "move_line_ids"
+                    ):
+                        vals.update(
+                            {
+                                "location_id": line.location_id.id,
+                                "location_dest_id": line.location_dest_id.id,
+                                "lot_id": line.lot_id.id,
+                                "package_id": line.package_id.id,
+                                "result_package_id": line.result_package_id.id,
+                                "uom_id": line.product_uom_id.id,
+                                "qty_done": line.qty_done,
+                                "product_qty_reserved": line.product_qty,
+                                "line_ids": [(6, 0, line.ids)],
+                            }
+                        )
+                    else:
+                        vals.update(
+                            {
+                                "location_id": (
+                                    line.move_line_ids[:1] or line
+                                ).location_id.id,
+                                "location_dest_id": (
+                                    line.move_line_ids[:1] or line
+                                ).location_dest_id.id,
+                                "uom_id": line.product_uom.id,
+                                "qty_done": line.quantity_done,
+                                "product_qty_reserved": sum(
+                                    line.move_line_ids.mapped("product_qty")
+                                ),
+                                "line_ids": [(6, 0, line.move_line_ids.ids)],
+                            }
+                        )
+                    todo_vals[key] = vals
                     position += 1
                 else:
-                    todo_vals[key]["product_qty_reserved"] += line.product_qty
                     todo_vals[key]["product_uom_qty"] += line.product_uom_qty
-                    todo_vals[key]["qty_done"] += line.qty_done
-                    todo_vals[key]["line_ids"][0][2].append(line.id)
-        # for index, vals in enumerate(todo_vals.values()):
-        #     vals["position_index"] = index
-        #     new_line_ids.append(self.create(vals).id)
-        # wiz_barcode.todo_line_ids = self.browse(new_line_ids)
+                    if (
+                        wiz_barcode.option_group_id.source_pending_moves
+                        == "move_line_ids"
+                    ):
+                        todo_vals[key]["product_qty_reserved"] += line.product_qty
+                        todo_vals[key]["qty_done"] += line.qty_done
+                        todo_vals[key]["line_ids"][0][2].append(line.id)
+                    else:
+                        todo_vals[key]["product_qty_reserved"] += sum(
+                            line.move_line_ids.mapped("product_qty")
+                        )
+                        todo_vals[key]["qty_done"] += line.quantity_done
+                        todo_vals[key]["line_ids"][0][2].extend(line.move_line_ids.ids)
         wiz_barcode.todo_line_ids = self.create(list(todo_vals.values()))
 
     def action_todo_next(self):

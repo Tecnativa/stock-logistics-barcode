@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <data>
+    <data noupdate="1">
         <record id="stock_barcodes_action_picking_in" model="stock.barcodes.action">
             <field name="name">Picking IN</field>
             <field name="sequence">10</field>

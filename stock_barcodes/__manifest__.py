@@ -25,6 +25,8 @@
         "wizard/stock_barcodes_read_inventory_views.xml",
         "wizard/stock_barcodes_read_picking_views.xml",
         "wizard/stock_barcodes_read_todo_view.xml",
+        # Keep order
+        "views/stock_barcodes_menu.xml",
     ],
     "installable": True,
     "pre_init_hook": "pre_init_hook",

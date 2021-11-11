@@ -138,7 +138,7 @@
                     </div>
                 </group>
             </group>
-            <xpath expr="//field[@name='product_qty']/.." position="after">
+            <group name="scan_log" position="before">
                 <group
                     string="Pending moves"
                     attrs="{'invisible': [('pending_move_ids', '=', [])]}"
@@ -154,13 +154,20 @@
                             <field name="state" />
                             <field name="product_id" />
                             <field name="product_uom_qty" />
-                            <field name="quantity_done" />
+                            <field name="qty_done" />
+                            <button
+                                name="fill_from_pending_line"
+                                type="object"
+                                class="btn"
+                                icon="fa-upload fa-2x"
+                                context="{'wiz_barcode_id': parent.id}"
+                            />
                         </tree>
                         <kanban class="o_kanban_mobile">
                             <field name="state" />
                             <field name="product_id" />
                             <field name="product_uom_qty" />
-                            <field name="quantity_done" />
+                            <field name="qty_done" />
                             <templates>
                                 <t t-name="kanban-box">
                                     <div t-attf-class="oe_kanban_card">
@@ -179,10 +186,10 @@
                                             </div>
                                             <div class="col-2">
                                                 <span class="pull-right text-right">
-                                                    <field name="quantity_done" />
+                                                    <field name="qty_done" />
                                                 </span>
                                             </div>
-                                            <div class="col-1">
+                                            <div class="col-2">
                                                 <button
                                                     name="fill_from_pending_line"
                                                     type="object"
@@ -199,7 +206,7 @@
                         </kanban>
                     </field>
                 </group>
-            </xpath>
+            </group>
         </field>
     </record>
     <!--
