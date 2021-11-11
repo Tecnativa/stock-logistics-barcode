@@ -633,4 +633,4 @@ class WizCandidatePicking(models.TransientModel):
         picking = self.env["stock.picking"].browse(
             self.env.context.get("picking_id", False)
         )
-        return picking.get_formview_action()
+        return picking.with_context(control_panel_hidden=False).get_formview_action()
