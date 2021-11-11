@@ -21,13 +21,14 @@
                             <field name="confirmed_moves" />
                             <field name="show_pending_moves" />
                             <field name="show_scan_log" />
+                            <field name="auto_put_in_pack" />
                         </group>
                         <group>
                             <field name="ignore_filled_fields" />
-                            <field name="auto_put_in_pack" />
                             <field name="is_manual_confirm" />
                             <field name="is_manual_qty" />
                             <field name="allow_negative_quant" />
+                            <field name="fill_fields_from_lot" />
                         </group>
                     </group>
                     <field name="option_ids">

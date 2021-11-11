@@ -75,34 +75,8 @@
                                 attrs="{'invisible': [('message_type', '!=', 'not_found')]}"
                             >
                                 <field name="message" />
-                                <button
-                                    class="oe_link"
-                                    name="%(action_stock_barcodes_new_lot)d"
-                                    type="action"
-                                    context="{'default_lot_name': barcode}"
-                                >
-                                    <span>New lot</span>
-                                </button>
                             </div>
                         </div>
-                        <!--                        <div name="message_step" class="text-center">-->
-                        <!--                            <div-->
-                        <!--                                class="alert alert-success"-->
-                        <!--                                role="status"-->
-                        <!--                                attrs="{'invisible': [('message_step', '=', False)]}"-->
-                        <!--                            >-->
-                        <!--                                <field name="message_step" />-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
-                        <!--                        <div>-->
-                        <!--                            <field-->
-                        <!--                                name="manual_entry"-->
-                        <!--                                widget="FieldBarcodeBooleanToggle"-->
-                        <!--                            />-->
-                        <!--                            <label for="manual_entry">-->
-                        <!--                            Manual entry-->
-                        <!--                            </label>-->
-                        <!--                        </div>-->
                         <field name="message_type" invisible="1" />
                         <field name="barcode" invisible="1" force_save="1" />
                         <field name="step" invisible="1" force_save="1" />
@@ -123,6 +97,7 @@
                         <field name="option_group_id" invisible="1" force_save="1" />
                         <field name="confirmed_moves" invisible="1" force_save="1" />
                         <field name="qty_available" invisible="1" />
+                        <field name="owner_id" invisible="1" force_save="1" />
                         <field
                             name="_barcode_scanned"
                             widget="barcode_handler"

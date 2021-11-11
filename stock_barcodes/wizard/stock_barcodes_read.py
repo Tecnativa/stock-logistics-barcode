@@ -23,6 +23,7 @@ class WizStockBarcodesRead(models.AbstractModel):
     packaging_id = fields.Many2one(comodel_name="product.packaging")
     package_id = fields.Many2one(comodel_name="stock.quant.package")
     result_package_id = fields.Many2one(comodel_name="stock.quant.package")
+    owner_id = fields.Many2one(comodel_name="res.partner")
     packaging_qty = fields.Float(string="Package Qty", digits="Product Unit of Measure")
     product_qty = fields.Float(digits="Product Unit of Measure")
     manual_entry = fields.Boolean(
@@ -147,8 +148,28 @@ class WizStockBarcodesRead(models.AbstractModel):
                 lot_domain.append(("product_id", "=", self.product_id.id))
             lot = self.env["stock.production.lot"].search(lot_domain)
             if len(lot) == 1:
-                self.product_id = lot.product_id
-                self.action_lot_scaned_post(lot)
+                if self.option_group_id.fill_fields_from_lot:
+                    quant_domain = [
+                        ("lot_id.name", "=", self.barcode),
+                        ("quantity", ">", 0.0),
+                    ]
+                    if self.location_id:
+                        quant_domain.append(("location_id", "=", self.location_id.id))
+                    else:
+                        quant_domain.append(("location_id.usage", "=", "internal"))
+                    if self.owner_id:
+                        quant_domain.append(("owner_id", "=", self.owner_id.id))
+                    quants = self.env["stock.quant"].search(quant_domain)
+                    if not quants:
+                        self._set_messagge_info(
+                            "more_match",
+                            _("No stock available for this lot with screen values"),
+                        )
+                        return False
+                    self.set_info_from_quants(quants)
+                else:
+                    self.product_id = lot.product_id
+                    self.action_lot_scaned_post(lot)
                 return True
             elif lot:
                 self._set_messagge_info(
@@ -157,43 +178,65 @@ class WizStockBarcodesRead(models.AbstractModel):
         return False
 
     def process_barcode_package_id(self):
-        if self.env.user.has_group("stock.group_tracking_lot"):
-            quants = self.env["stock.quant"].search(
-                [
-                    ("location_id.usage", "=", "internal"),
-                    ("package_id.name", "=", self.barcode),
-                    ("quantity", ">", 0.0),
-                ]
-            )
-            if len(quants) == 1:
-                # All ok
-                self._set_messagge_info("success", _("Paquete leido"))
-                self.action_product_scaned_post(quants.product_id)
-                self.package_id = quants.package_id
-                if quants.product_id:
-                    self.action_product_scaned_post(quants.product_id)
-                if quants.lot_id:
-                    self.action_lot_scaned_post(quants.lot_id)
-                # Review conditions
-                if self.option_group_id.code in ["OUT", "INV"]:
-                    self.location_id = quants.location_id
-                elif not self.is_manual_qty:
-                    self.product_qty = quants.quantity
-                return True
-            elif len(quants) > 1:
-                # More than one record found with same barcode.
-                # Could be half lot in two distinct locations.
-                # Empty location field to force a location barcode scan
-                products = quants.mapped("product_id")
-                if len(products) == 1:
-                    self.action_product_scaned_post(products[0])
-                lots = quants.mapped("lot_id")
-                if len(lots) == 1:
-                    self.action_lot_scaned_post(lots[0])
-                self._set_messagge_info("more_match", _("More than one location found"))
-                self.location_id = False
-                return False
-        return False
+        if not self.env.user.has_group("stock.group_tracking_lot"):
+            return False
+        quant_domain = [
+            ("package_id.name", "=", self.barcode),
+            ("quantity", ">", 0.0),
+        ]
+        if self.location_id:
+            quant_domain.append(("location_id", "=", self.location_id.id))
+        else:
+            quant_domain.append(("location_id.usage", "=", "internal"))
+        if self.owner_id:
+            quant_domain.append(("owner_id", "=", self.owner_id.id))
+        quants = self.env["stock.quant"].search(quant_domain)
+        if not quants:
+            # self._set_messagge_info("more_match", _("Package not fount or empty"))
+            return False
+        self.set_info_from_quants(quants)
+        return True
+
+    def set_info_from_quants(self, quants):
+        """
+        Fill wizard fields from stock quants
+        """
+        if len(quants) == 1:
+            # All ok
+            self.action_product_scaned_post(quants.product_id)
+            self.package_id = quants.package_id
+            if quants.lot_id:
+                self.action_lot_scaned_post(quants.lot_id)
+            if quants.owner_id:
+                self.owner_id = quants.owner_id
+            # Review conditions
+            if not self.location_id and self.option_group_id.code != "IN":
+                self.location_id = quants.location_id
+            if not self.is_manual_qty and self.option_group_id.code not in [
+                "OUT",
+                "INV",
+            ]:
+                self.product_qty = quants.quantity
+        elif len(quants) > 1:
+            # More than one record found with same barcode.
+            # Could be half lot in two distinct locations.
+            # Empty location field to force a location barcode scan
+            products = quants.mapped("product_id")
+            if len(products) == 1:
+                self.action_product_scaned_post(products[0])
+            packages = quants.mapped("package_id")
+            if len(packages) == 1:
+                self.package_id = packages
+            lots = quants.mapped("lot_id")
+            if len(lots) == 1:
+                self.action_lot_scaned_post(lots[0])
+            owners = quants.mapped("owner_id")
+            if len(owners) == 1:
+                self.owner_id = owners
+            locations = quants.mapped("location_id")
+            if len(locations) == 1:
+                if not self.location_id and self.option_group_id.code != "IN":
+                    self.location_id = locations
 
     def process_barcode_result_package_id(self):
         pass
@@ -208,9 +251,7 @@ class WizStockBarcodesRead(models.AbstractModel):
                         "more_match", _("More than one package found")
                     )
                     return False
-                self._set_messagge_info("success", _("Empaquetado de Producto leido"))
                 self.action_packaging_scaned_post(packaging)
-                # self.action_done()
                 return True
         return False
 
@@ -228,8 +269,6 @@ class WizStockBarcodesRead(models.AbstractModel):
                 and getattr(self, option.field_name, False)
             ):
                 continue
-            # res = False
-            # if hasattr(self, "process_barcode_%s" % option.field_name):
             option_func = getattr(self, "process_barcode_%s" % option.field_name, False)
             if option_func:
                 res = option_func()
@@ -244,7 +283,9 @@ class WizStockBarcodesRead(models.AbstractModel):
                     "info", _("Barcode not found or field already filled")
                 )
             else:
-                self._set_messagge_info("not_found", _("Barcode not found"))
+                self._set_messagge_info(
+                    "not_found", _("Barcode not found with this screen values")
+                )
             return False
         if not self.check_option_required():
             return False
@@ -266,7 +307,6 @@ class WizStockBarcodesRead(models.AbstractModel):
                         "stock_barcodes_read",
                         {"action": "focus", "field_name": "product_qty"},
                     )
-                # return self.action_manual_quantity()
                 if option.field_name == "lot_id" and self.product_id.tracking == "none":
                     continue
                 self._set_messagge_info("info", option.name)

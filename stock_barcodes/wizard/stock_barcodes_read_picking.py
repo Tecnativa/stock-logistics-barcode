@@ -228,6 +228,8 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         else:
             vals["package_id"] = self.package_id.id
             vals["result_package_id"] = self.package_id.id
+        if self.owner_id:
+            vals["owner_id"] = self.owner_id.id
         return vals
 
     def _states_move_allowed(self):
