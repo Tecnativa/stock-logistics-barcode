@@ -177,3 +177,6 @@ class WizStockBarcodesReadTodo(models.TransientModel):
                 rec.state = "done"
             else:
                 rec.state = "pending"
+
+    def fill_from_pending_line(self):
+        self.wiz_barcode_id.product_id = self.product_id
