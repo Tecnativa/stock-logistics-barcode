@@ -138,7 +138,7 @@
                     </div>
                 </group>
             </group>
-            <group name="scan_log" position="before">
+            <group name="scan_fields" position="after">
                 <group
                     string="Pending moves"
                     attrs="{'invisible': [('pending_move_ids', '=', [])]}"
