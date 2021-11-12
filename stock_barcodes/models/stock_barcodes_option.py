@@ -12,24 +12,55 @@ class StockBarcodesOptionGroup(models.Model):
     option_ids = fields.One2many(
         comodel_name="stock.barcodes.option", inverse_name="option_group_id", copy=True
     )
-    barcode_guided_mode = fields.Selection([("guided", "Guided")], string="Mode")
-    manual_entry = fields.Boolean(string="Manual entry")
-    confirmed_moves = fields.Boolean(string="Confirmed moves")
-    show_pending_moves = fields.Boolean(string="Show pending moves")
+    barcode_guided_mode = fields.Selection(
+        [("guided", "Guided")],
+        string="Mode",
+        help="When guided mode is selected, information will appear with the "
+        "movement to be processed",
+    )
+    manual_entry = fields.Boolean(
+        string="Manual entry", help="Default value when open scan interface",
+    )
+    confirmed_moves = fields.Boolean(
+        string="Confirmed moves",
+        help="It allows to work with movements without reservation "
+        "(Without detailed operations)",
+    )
+    show_pending_moves = fields.Boolean(
+        string="Show pending moves", help="Shows a list of movements to process"
+    )
     source_pending_moves = fields.Selection(
         [("move_line_ids", "Detailed operations"), ("move_lines", "Operations")],
         default="move_line_ids",
+        help="Origin of the data to generate the movements to process",
     )
-    show_scan_log = fields.Boolean(string="Show scan log")
-    ignore_filled_fields = fields.Boolean(string="Ignore filled fields")
+    show_scan_log = fields.Boolean(
+        string="Show scan log", help="Displays a log of the scans processed"
+    )
+    ignore_filled_fields = fields.Boolean(string="Ignore filled fields",)
     auto_put_in_pack = fields.Boolean(
         string="Auto put in pack", help="Auto put in pack before picking validation"
     )
-    is_manual_qty = fields.Boolean()
-    is_manual_confirm = fields.Boolean()
-    allow_negative_quant = fields.Boolean()
-    fill_fields_from_lot = fields.Boolean()
-    group_key_for_todo_records = fields.Char()
+    is_manual_qty = fields.Boolean(
+        help="If it is checked, it always shows the product quantity field in edit mode"
+    )
+    is_manual_confirm = fields.Boolean(
+        help="If it is marked, the movement must always be confirmed from a button"
+    )
+    allow_negative_quant = fields.Boolean(
+        help="If it is checked, it will allow the creation of movements that "
+        "generate negative stock"
+    )
+    fill_fields_from_lot = fields.Boolean(
+        help="If checked, the fields in the interface will be filled from "
+        "the scanned lot"
+    )
+    group_key_for_todo_records = fields.Char(
+        help="You can establish a list of fields that will act as a grouping "
+        "key to generate the movements to be process.\n"
+        "The object variable is used to refer to the source record\n"
+        "For example, object.location_id,object.product_id,object.lot_id"
+    )
 
     def get_option_value(self, field_name, attribute):
         option = self.option_ids.filtered(lambda op: op.field_name == field_name)[:1]

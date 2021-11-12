@@ -18,7 +18,10 @@
                             <tree string="Actions">
                                 <field name="name" />
                             </tree>
-                            <kanban class="o_kanban_mobile o_kanban_barcode">
+                            <kanban
+                                class="o_kanban_mobile o_kanban_barcode"
+                                style="display:inline-grid"
+                            >
                                 <field name="name" />
                                 <field name="action_window_id" />
                                 <templates>
