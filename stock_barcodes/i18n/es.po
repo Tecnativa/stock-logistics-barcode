@@ -561,7 +561,7 @@ msgstr "Cantidad inventariada"
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__is_manual_confirm
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__is_manual_confirm
 msgid "Is Manual Confirm"
-msgstr "Entrada manual"
+msgstr "Confirmar cada operación"
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_stock_barcodes_option_group__is_manual_qty
@@ -569,7 +569,7 @@ msgstr "Entrada manual"
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__is_manual_qty
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__is_manual_qty
 msgid "Is Manual Qty"
-msgstr "Entrada manual"
+msgstr "Cantidad manual"
 
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_candidate_picking__is_pending
