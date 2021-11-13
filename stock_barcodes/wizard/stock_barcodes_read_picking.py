@@ -313,7 +313,6 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         If only there is one picking the scan data is assigned to it.
         """
         StockMove = self.env["stock.move"]
-        StockMoveLine = self.env["stock.move.line"]
         domain = self._prepare_stock_moves_domain()
         moves_todo = StockMove.search(domain)
         if not getattr(self, "_search_candidate_%s" % self.picking_mode,)(moves_todo):
@@ -430,9 +429,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         ):
             # Create an extra stock move line if this product has an
             # initial demand.
-            line = StockMoveLine.create(
-                self._prepare_move_line_values(moves_todo[:1], available_qty)
-            )
+            line = self.create_new_stock_move_line(moves_todo, available_qty)
             if not line.move_id:
                 self.create_new_stock_move(line)
             # When create new stock move lines and we are in guided mode we need
@@ -443,25 +440,27 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         self.update_fields_after_process_stock(moves_todo)
         return move_lines_dic
 
-    def create_new_stock_move(self, sml):
-        StockMove = self.env["stock.move"]
-        vals = {}
-        # for field in StockMove._fields:
-        #     vals[field] = getattr(sml, field, False)
-        vals.update(
-            {
-                "name": _("New Move:") + sml.product_id.display_name,
-                "product_uom": sml.product_uom_id.id,
-                "product_uom_qty": sml.qty_done,
-                "state": "assigned",
-                "additional": True,
-                "product_id": sml.product_id.id,
-                "location_id": sml.location_id.id,
-                "location_dest_id": sml.location_dest_id.id,
-                "picking_id": sml.picking_id.id,
-            }
+    def create_new_stock_move_line(self, moves_todo, available_qty):
+        """Create a new stock move line when a sml is not available
+        for the wizard values.
+        """
+        return self.env["stock.move.line"].create(
+            self._prepare_move_line_values(moves_todo[:1], available_qty)
         )
-        new_move = StockMove.create(vals)
+
+    def create_new_stock_move(self, sml):
+        vals = {
+            "name": _("New Move:") + sml.product_id.display_name,
+            "product_uom": sml.product_uom_id.id,
+            "product_uom_qty": sml.qty_done,
+            "state": "assigned",
+            "additional": True,
+            "product_id": sml.product_id.id,
+            "location_id": sml.location_id.id,
+            "location_dest_id": sml.location_dest_id.id,
+            "picking_id": sml.picking_id.id,
+        }
+        new_move = self.env["stock.move"].create(vals)
         sml.move_id = new_move
 
     def filter_sml(self, candidate_lines, lines, sml_vals):
