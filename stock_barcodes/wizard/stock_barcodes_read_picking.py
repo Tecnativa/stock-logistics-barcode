@@ -227,12 +227,13 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         """When we've got an out picking, the logical workflow is that
            the scanned location is the location we're getting the stock
            from"""
-        if not self.picking_id:
+        picking = self.env.context.get("picking", self.picking_id)
+        if not picking:
             raise ValidationError(
                 _("You can not add extra moves if you have " "not set a picking")
             )
         vals = {
-            "picking_id": self.picking_id.id,
+            "picking_id": picking.id,
             "move_id": candidate_move.id,
             "qty_done": available_qty,
             "product_uom_id": self.product_id.uom_po_id.id
@@ -429,14 +430,17 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         ):
             # Create an extra stock move line if this product has an
             # initial demand.
-            line = self.create_new_stock_move_line(moves_todo, available_qty)
-            if not line.move_id:
-                self.create_new_stock_move(line)
+            stock_move_lines = self.create_new_stock_move_line(
+                moves_todo, available_qty
+            )
+            for sml in stock_move_lines:
+                if not sml.move_id:
+                    self.create_new_stock_move(sml)
+                move_lines_dic[sml.id] = sml.qty_done
             # When create new stock move lines and we are in guided mode we need
             # link this new lines to the todo line details
             if self.option_group_id.barcode_guided_mode == "guided":
-                self.todo_line_id.line_ids = [(4, line.id)]
-            move_lines_dic[line.id] = available_qty
+                self.todo_line_id.line_ids = [(4, sml.id) for sml in stock_move_lines]
         self.update_fields_after_process_stock(moves_todo)
         return move_lines_dic
 

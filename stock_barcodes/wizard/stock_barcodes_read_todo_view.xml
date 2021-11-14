@@ -44,13 +44,13 @@
                                 t-if="record.lot_id or record.package_id or record.result_package_id"
                             >
                                 <div class="row">
-                                    <div class="col-3">
+                                    <div class="col-4">
                                         <span>
                                             <span class="fa fa-tags" />
                                             <field name="lot_id" />
                                         </span>
                                     </div>
-                                    <div class="col-9">
+                                    <div class="col-8">
                                         <span class="fa fa-dropbox" />
                                         <span>
                                             <field name="package_id" />

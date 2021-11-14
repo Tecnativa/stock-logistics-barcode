@@ -52,6 +52,7 @@ class WizStockBarcodesReadTodo(models.TransientModel):
     res_model_id = fields.Many2one(comodel_name="ir.model")
     res_ids = fields.Char()
     line_ids = fields.Many2many(comodel_name="stock.move.line")
+    stock_move_ids = fields.Many2many(comodel_name="stock.move")
     position_index = fields.Integer()
 
     def _group_key(self, wiz, line):
@@ -97,6 +98,7 @@ class WizStockBarcodesReadTodo(models.TransientModel):
                                 "qty_done": line.qty_done,
                                 "product_qty_reserved": line.product_qty,
                                 "line_ids": [(6, 0, line.ids)],
+                                "stock_move_ids": [(6, 0, line.move_id.ids)],
                             }
                         )
                     else:
@@ -114,6 +116,7 @@ class WizStockBarcodesReadTodo(models.TransientModel):
                                     line.move_line_ids.mapped("product_qty")
                                 ),
                                 "line_ids": [(6, 0, line.move_line_ids.ids)],
+                                "stock_move_ids": [(6, 0, line.ids)],
                             }
                         )
                     todo_vals[key] = vals
@@ -127,12 +130,14 @@ class WizStockBarcodesReadTodo(models.TransientModel):
                         todo_vals[key]["product_qty_reserved"] += line.product_qty
                         todo_vals[key]["qty_done"] += line.qty_done
                         todo_vals[key]["line_ids"][0][2].append(line.id)
+                        todo_vals[key]["stock_move_ids"][0][2].append(line.move_id.id)
                     else:
                         todo_vals[key]["product_qty_reserved"] += sum(
                             line.move_line_ids.mapped("product_qty")
                         )
                         todo_vals[key]["qty_done"] += line.quantity_done
                         todo_vals[key]["line_ids"][0][2].extend(line.move_line_ids.ids)
+                        todo_vals[key]["stock_move_ids"][0][2].extend(line.ids)
         wiz_barcode.todo_line_ids = self.create(list(todo_vals.values()))
 
     def action_todo_next(self):
