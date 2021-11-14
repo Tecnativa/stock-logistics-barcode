@@ -9,7 +9,7 @@ class StockBarcodesAction(models.Model):
     _description = "Actions for barcode interface"
     _order = "sequence, id"
 
-    name = fields.Char()
+    name = fields.Char(translate=True)
     active = fields.Boolean(default=True)
     sequence = fields.Integer(string="Sequence", default=100)
     action_window_id = fields.Many2one(

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 15:34+0000\n"
-"PO-Revision-Date: 2021-11-12 15:34+0000\n"
+"POT-Creation-Date: 2021-11-14 21:57+0000\n"
+"PO-Revision-Date: 2021-11-14 21:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -555,6 +555,7 @@ msgstr ""
 #. module: stock_barcodes
 #: model:ir.model,name:stock_barcodes.model_stock_inventory
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__inventory_id
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_inventory
 msgid "Inventory"
 msgstr ""
 
@@ -914,8 +915,23 @@ msgid "Picking"
 msgstr ""
 
 #. module: stock_barcodes
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_picking_in
+msgid "Picking IN"
+msgstr ""
+
+#. module: stock_barcodes
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_picking_int
+msgid "Picking INTERNAL"
+msgstr ""
+
+#. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__picking_mode
 msgid "Picking Mode"
+msgstr ""
+
+#. module: stock_barcodes
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_picking_out
+msgid "Picking OUT"
 msgstr ""
 
 #. module: stock_barcodes
@@ -1130,6 +1146,11 @@ msgstr ""
 #. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_res_company__stock_barcodes_inventory_auto_lot
 msgid "Stock Barcodes Inventory Auto Lot"
+msgstr ""
+
+#. module: stock_barcodes
+#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__stock_move_ids
+msgid "Stock Move"
 msgstr ""
 
 #. module: stock_barcodes

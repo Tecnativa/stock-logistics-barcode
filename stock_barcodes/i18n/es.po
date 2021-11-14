@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 15:34+0000\n"
-"PO-Revision-Date: 2021-11-12 16:40+0100\n"
+"POT-Creation-Date: 2021-11-14 21:57+0000\n"
+"PO-Revision-Date: 2021-11-14 23:01+0100\n"
 "Last-Translator: Sergio Teruel <sergio.teruel@tecnativa.com>\n"
 "Language-Team: \n"
 "Language: es\n"
@@ -595,6 +595,7 @@ msgstr "Interno"
 #. module: stock_barcodes
 #: model:ir.model,name:stock_barcodes.model_stock_inventory
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_inventory__inventory_id
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_inventory
 msgid "Inventory"
 msgstr "Inventario"
 
@@ -957,9 +958,24 @@ msgid "Picking"
 msgstr "Albarán"
 
 #. module: stock_barcodes
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_picking_in
+msgid "Picking IN"
+msgstr "Recepciones"
+
+#. module: stock_barcodes
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_picking_int
+msgid "Picking INTERNAL"
+msgstr "Transferencias internas"
+
+#. module: stock_barcodes
 #: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_picking__picking_mode
 msgid "Picking Mode"
 msgstr "Modo de albarán"
+
+#. module: stock_barcodes
+#: model:stock.barcodes.action,name:stock_barcodes.stock_barcodes_action_picking_out
+msgid "Picking OUT"
+msgstr "Órdenes de entrega"
 
 #. module: stock_barcodes
 #: model:ir.model,name:stock_barcodes.model_stock_picking_type
@@ -1174,6 +1190,13 @@ msgstr "Paso"
 #: model:ir.model.fields,field_description:stock_barcodes.field_res_company__stock_barcodes_inventory_auto_lot
 msgid "Stock Barcodes Inventory Auto Lot"
 msgstr "Auto lote códigos de barras"
+
+#. module: stock_barcodes
+#: model:ir.model.fields,field_description:stock_barcodes.field_wiz_stock_barcodes_read_todo__stock_move_ids
+#, fuzzy
+#| msgid "Stock move lines"
+msgid "Stock Move"
+msgstr "Movimiento de existencias"
 
 #. module: stock_barcodes
 #: model:ir.model,name:stock_barcodes.model_stock_barcodes_read_log_line
