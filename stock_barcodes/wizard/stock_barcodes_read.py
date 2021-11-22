@@ -148,7 +148,7 @@ class WizStockBarcodesRead(models.AbstractModel):
                 lot_domain.append(("product_id", "=", self.product_id.id))
             lot = self.env["stock.production.lot"].search(lot_domain)
             if len(lot) == 1:
-                if self.option_group_id.fill_fields_from_lot:
+                if self.location_id.usage == 'internal' and self.option_group_id.fill_fields_from_lot:
                     quant_domain = [
                         ("lot_id.name", "=", self.barcode),
                         ("quantity", ">", 0.0),

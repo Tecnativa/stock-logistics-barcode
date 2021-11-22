@@ -483,7 +483,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
 
     def check_done_conditions(self):
         res = super().check_done_conditions()
-        if self.product_qty > self.qty_available and not self.env.context.get(
+        if self.picking_type_code != "incoming" and self.product_qty > self.qty_available and not self.env.context.get(
             "force_create_move", False
         ):
             self._set_messagge_info(
