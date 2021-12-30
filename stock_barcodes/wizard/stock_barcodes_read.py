@@ -561,5 +561,8 @@ class WizStockBarcodesRead(models.AbstractModel):
             return False
         res = self.action_done()
         if res:
+            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ok"})
             self.action_clean_values()
+        else:
+            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ko"})
         return res
