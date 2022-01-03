@@ -16,6 +16,7 @@ class StockBarcodesAction(models.Model):
         comodel_name="ir.actions.act_window", string="Action window"
     )
     context = fields.Char()
+    key_shortcut = fields.Integer()
 
     def open_action(self):
         action = self.action_window_id.read()[0]

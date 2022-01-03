@@ -328,7 +328,12 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def on_barcode_scanned(self, barcode):
         self.barcode = barcode
-        self.process_barcode(barcode)
+        res = self.process_barcode(barcode)
+        if res:
+            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ok"})
+        else:
+            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ko"})
+
 
     def check_location_contidion(self):
         if not self.location_id:
