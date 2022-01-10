@@ -315,7 +315,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         """
         StockMove = self.env["stock.move"]
         domain = self._prepare_stock_moves_domain()
-        moves_todo = StockMove.search(domain)
+        if self.option_group_id.barcode_guided_mode == "guided":
+            moves_todo = self.todo_line_id.stock_move_ids
+        else:
+            moves_todo = StockMove.search(domain)
         if not getattr(self, "_search_candidate_%s" % self.picking_mode,)(moves_todo):
             return False
         sml_vals = {}

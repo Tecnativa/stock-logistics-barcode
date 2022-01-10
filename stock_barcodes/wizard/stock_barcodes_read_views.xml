@@ -120,6 +120,22 @@
                                     />
                                 </div>
                             </group>
+                            <group name="quant_package" groups="stock.group_tracking_lot">
+                                <div class="mt4">
+                                    <span
+                                        class="fa fa-inbox fa-2x text-center"
+                                        style="width:15%"
+                                    />
+                                    <field
+                                        name="package_id"
+                                        options="{'no_create': True}"
+                                        attrs="{'readonly': [('manual_entry', '=', False)]}"
+                                        force_save="1"
+                                        style="width:85%"
+                                        class="h5"
+                                    />
+                                </div>
+                            </group>
                             <group>
                                 <div>
                                     <span

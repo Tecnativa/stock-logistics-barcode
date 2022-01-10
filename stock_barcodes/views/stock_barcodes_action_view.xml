@@ -19,6 +19,8 @@
                 <field name="name" />
                 <field name="action_window_id" />
                 <field name="context" />
+                <field name="key_shortcut" />
+                <button name="action_capture_key_shortcut" type="object" icon="fa-dollar"/>
                 <field name="active" widget="boolean_toggle" />
             </tree>
         </field>
