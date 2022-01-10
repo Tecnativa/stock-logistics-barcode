@@ -24,7 +24,7 @@
                             style="background-color: #FFF8DC;"
                         >
                             <div class="row">
-                                <div class="col-12">
+                                <div class="col">
                                     <span class="fa fa-map-marker" />
                                     <strong>
                                         <field name="location_name" /> \u21E8 <field

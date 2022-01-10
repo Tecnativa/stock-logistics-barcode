@@ -272,6 +272,7 @@ class WizStockBarcodesRead(models.AbstractModel):
             option_func = getattr(self, "process_barcode_%s" % option.field_name, False)
             if option_func:
                 res = option_func()
+                self.play_sounds(res)
                 if res:
                     barcode_found = True
                     break
@@ -304,7 +305,7 @@ class WizStockBarcodesRead(models.AbstractModel):
                     "packaging_qty",
                 ]:
                     self.env["bus.bus"].sendone(
-                        "stock_barcodes_read",
+                        "stock_barcodes_read-{}".format(self.id),
                         {"action": "focus", "field_name": "product_qty"},
                     )
                 if option.field_name == "lot_id" and self.product_id.tracking == "none":
@@ -329,11 +330,6 @@ class WizStockBarcodesRead(models.AbstractModel):
     def on_barcode_scanned(self, barcode):
         self.barcode = barcode
         res = self.process_barcode(barcode)
-        if res:
-            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ok"})
-        else:
-            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ko"})
-
 
     def check_location_contidion(self):
         if not self.location_id:
@@ -561,13 +557,23 @@ class WizStockBarcodesRead(models.AbstractModel):
             "info", _("Scan {}").format(", ".join(options.mapped("name")))
         )
 
+    @api.onchange("package_id")
+    def onchange_package_id(self):
+        if self.manual_entry:
+            self.barcode = self.package_id.name
+            self.process_barcode_package_id()
+
     def action_confirm(self):
         if not self.check_option_required():
             return False
         res = self.action_done()
         if res:
-            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ok"})
             self.action_clean_values()
-        else:
-            self.env["bus.bus"].sendone("stock_barcodes_sound", {"sound": "ko"})
+        self.play_sounds(res)
         return res
+
+    def play_sounds(self, res):
+        if res:
+            self.env["bus.bus"].sendone("stock_barcodes_sound-{}".format(self.ids[0]), {"sound": "ok"})
+        else:
+            self.env["bus.bus"].sendone("stock_barcodes_sound-{}".format(self.ids[0]), {"sound": "ko"})
