@@ -74,7 +74,10 @@ class StockBarcodesOption(models.Model):
 
     sequence = fields.Integer(string="Sequence", default=100)
     name = fields.Char()
-    option_group_id = fields.Many2one(comodel_name="stock.barcodes.option.group")
+    option_group_id = fields.Many2one(
+        comodel_name="stock.barcodes.option.group",
+        ondelete="cascade"
+    )
     field_name = fields.Char()
     filled_default = fields.Boolean()
     forced = fields.Boolean()
