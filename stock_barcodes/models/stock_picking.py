@@ -35,7 +35,9 @@ class StockPicking(models.Model):
         return action
 
     def button_validate(self):
-        if (self.picking_type_id.barcode_option_group_id.auto_put_in_pack and
-                not self.move_line_ids.mapped("result_package_id")):
+        if (
+            self.picking_type_id.barcode_option_group_id.auto_put_in_pack
+            and not self.move_line_ids.mapped("result_package_id")
+        ):
             self.put_in_pack()
         return super().button_validate()

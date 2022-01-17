@@ -232,6 +232,13 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             raise ValidationError(
                 _("You can not add extra moves if you have " "not set a picking")
             )
+        # If we move all package units the result package is the same
+        if (
+            self.package_id
+            and not self.result_package_id
+            and sum(self.package_id.quant_ids.mapped("quantity")) <= self.product_qty
+        ):
+            self.result_package_id = self.package_id
         vals = {
             "picking_id": picking.id,
             "move_id": candidate_move.id,
@@ -245,14 +252,9 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             "lot_id": self.lot_id.id,
             "lot_name": self.lot_id.name,
             "barcode_scan_state": "done_forced",
+            "package_id": self.package_id.id,
+            "result_package_id": self.result_package_id.id,
         }
-        if self.picking_type_code == "outgoing":
-            vals["package_id"] = self.package_id.id
-        elif self.picking_type_code == "incoming":
-            vals["result_package_id"] = self.package_id.id
-        else:
-            vals["package_id"] = self.package_id.id
-            vals["result_package_id"] = self.package_id.id
         if self.owner_id:
             vals["owner_id"] = self.owner_id.id
         return vals
@@ -486,8 +488,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
 
     def check_done_conditions(self):
         res = super().check_done_conditions()
-        if self.picking_type_code != "incoming" and self.product_qty > self.qty_available and not self.env.context.get(
-            "force_create_move", False
+        if (
+            self.picking_type_code != "incoming"
+            and self.product_qty > self.qty_available
+            and not self.env.context.get("force_create_move", False)
         ):
             self._set_messagge_info(
                 "more_match", _("Quantities not available in location")

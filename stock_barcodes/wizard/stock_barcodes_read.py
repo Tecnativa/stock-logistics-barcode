@@ -148,7 +148,10 @@ class WizStockBarcodesRead(models.AbstractModel):
                 lot_domain.append(("product_id", "=", self.product_id.id))
             lot = self.env["stock.production.lot"].search(lot_domain)
             if len(lot) == 1:
-                if self.location_id.usage == 'internal' and self.option_group_id.fill_fields_from_lot:
+                if (
+                    self.location_id.usage == "internal"
+                    and self.option_group_id.fill_fields_from_lot
+                ):
                     quant_domain = [
                         ("lot_id.name", "=", self.barcode),
                         ("quantity", ">", 0.0),
@@ -197,6 +200,16 @@ class WizStockBarcodesRead(models.AbstractModel):
         self.set_info_from_quants(quants)
         return True
 
+    def process_barcode_result_package_id(self):
+        if not self.env.user.has_group("stock.group_tracking_lot"):
+            return False
+        domain = [("name", "=", self.barcode)]
+        package = self.env["stock.quant.package"].search(domain)
+        if package:
+            self.result_package_id = package[:1]
+            return True
+        return False
+
     def set_info_from_quants(self, quants):
         """
         Fill wizard fields from stock quants
@@ -237,9 +250,6 @@ class WizStockBarcodesRead(models.AbstractModel):
             if len(locations) == 1:
                 if not self.location_id and self.option_group_id.code != "IN":
                     self.location_id = locations
-
-    def process_barcode_result_package_id(self):
-        pass
 
     def process_barcode_packaging_id(self):
         domain = self._barcode_domain(self.barcode)
@@ -329,7 +339,7 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def on_barcode_scanned(self, barcode):
         self.barcode = barcode
-        res = self.process_barcode(barcode)
+        self.process_barcode(barcode)
 
     def check_location_contidion(self):
         if not self.location_id:
@@ -574,6 +584,10 @@ class WizStockBarcodesRead(models.AbstractModel):
 
     def play_sounds(self, res):
         if res:
-            self.env["bus.bus"].sendone("stock_barcodes_sound-{}".format(self.ids[0]), {"sound": "ok"})
+            self.env["bus.bus"].sendone(
+                "stock_barcodes_sound-{}".format(self.ids[0]), {"sound": "ok"}
+            )
         else:
-            self.env["bus.bus"].sendone("stock_barcodes_sound-{}".format(self.ids[0]), {"sound": "ko"})
+            self.env["bus.bus"].sendone(
+                "stock_barcodes_sound-{}".format(self.ids[0]), {"sound": "ko"}
+            )
