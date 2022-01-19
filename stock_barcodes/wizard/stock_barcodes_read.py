@@ -314,10 +314,11 @@ class WizStockBarcodesRead(models.AbstractModel):
                     "product_qty",
                     "packaging_qty",
                 ]:
-                    self.env["bus.bus"].sendone(
-                        "stock_barcodes_read-{}".format(self.ids[0]),
-                        {"action": "focus", "field_name": "product_qty"},
-                    )
+                    pass
+                    # self.env["bus.bus"].sendone(
+                    #     "stock_barcodes_read-{}".format(self.ids[0]),
+                    #     {"action": "focus", "field_name": "product_qty"},
+                    # )
                 if option.field_name == "lot_id" and self.product_id.tracking == "none":
                     continue
                 self._set_messagge_info("info", option.name)

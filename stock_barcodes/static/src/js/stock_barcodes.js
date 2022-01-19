@@ -82,7 +82,7 @@ odoo.define("stock_barcodes.FormController", function(require) {
             if (this.modelName.includes("wiz.stock.barcodes.read")) {
                 // TODO: Remove
                 //                alert(ev.keyCode);
-                console.log("KeyDown: " + ev.keyCode);
+//                console.log("KeyDown: " + ev.keyCode);
                 // F9 key
                 if (ev.keyCode === 120) {
                     this.$("button[name='action_clean_values']").click();
@@ -129,15 +129,15 @@ odoo.define("stock_barcodes.FormController", function(require) {
             */
 
             this._super(barcode, target).then(function() {
-                var manual_entry_mode = self.$("div[name='manual_entry'] input").val();
-                if (manual_entry_mode) {
-                    var packaging = self.$("div[name='packaging_id'] input").val();
-                    if (packaging) {
-                        self.$("input[name='packaging_qty']").focus();
+                const record = self.model.get(self.handle);
+                if (self.initialState.data.is_manual_qty || self.initialState.data.manual_entry) {
+                    if (record.data.packaging_id) {
+                        setTimeout(() => {self.$("[name='packaging_qty'] input").select();}, 300);
+
                     } else {
-                        self.$("input[name='product_qty']").focus();
-                    }
-                }
+                        setTimeout(() => {self.$("[name='product_qty'] input").select();}, 300);
+                    };
+                };
             });
         },
         renderButtons: function($node) {
