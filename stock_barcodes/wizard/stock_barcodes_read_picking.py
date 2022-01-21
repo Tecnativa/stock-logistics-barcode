@@ -404,13 +404,20 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             return False
         move_lines_dic = {}
         for line in lines:
-            if line.product_uom_qty:
+            if line.product_uom_qty and len(lines) > 1:
                 assigned_qty = min(
                     max(line.product_uom_qty - line.qty_done, 0.0), available_qty
                 )
             else:
                 assigned_qty = available_qty
             sml_vals.update({"qty_done": line.qty_done + assigned_qty})
+            # Add or remove result_package_id
+            package_qty_available = sum(self.package_id.quant_ids.mapped("quantity"))
+            if sml_vals["qty_done"] >= package_qty_available:
+                if not self.result_package_id:
+                    sml_vals.update({"result_package_id": self.package_id.id})
+            elif line.result_package_id == line.package_id:
+                sml_vals.update({"result_package_id": False})
             line.write(sml_vals)
             if line.qty_done >= line.product_uom_qty:
                 line.barcode_scan_state = "done"

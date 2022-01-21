@@ -64,7 +64,10 @@ odoo.define("stock_barcodes.FormController", function(require) {
                 var message = notification[1];
                 if (channel === "stock_barcodes_read-" + self.initialState.data.id) {
                     if (message.action === "focus") {
-                        self.$(`[name=${message.field_name}] input`).select();
+                        setTimeout(() => {
+                            self.$(`[name=${message.field_name}] input`).select();
+                        }, 300);
+                        //                        Self.$(`[name=${message.field_name}] input`).select();
                     }
                 } else if (
                     channel ===
@@ -82,7 +85,7 @@ odoo.define("stock_barcodes.FormController", function(require) {
             if (this.modelName.includes("wiz.stock.barcodes.read")) {
                 // TODO: Remove
                 //                alert(ev.keyCode);
-//                console.log("KeyDown: " + ev.keyCode);
+                //                console.log("KeyDown: " + ev.keyCode);
                 // F9 key
                 if (ev.keyCode === 120) {
                     this.$("button[name='action_clean_values']").click();
@@ -120,26 +123,26 @@ odoo.define("stock_barcodes.FormController", function(require) {
                 }
             }
         },
-        _barcodeScanned: function(barcode, target) {
-            var self = this;
-
-            /*
-            Set control focus to package_qty or product_qty directly after
-            scan a barcode for manual entry mode entries.
-            */
-
-            this._super(barcode, target).then(function() {
-                const record = self.model.get(self.handle);
-                if (self.initialState.data.is_manual_qty || self.initialState.data.manual_entry) {
-                    if (record.data.packaging_id) {
-                        setTimeout(() => {self.$("[name='packaging_qty'] input").select();}, 300);
-
-                    } else {
-                        setTimeout(() => {self.$("[name='product_qty'] input").select();}, 300);
-                    };
-                };
-            });
-        },
+        //        _barcodeScanned: function(barcode, target) {
+        //            var self = this;
+        //
+        //            /*
+        //            Set control focus to package_qty or product_qty directly after
+        //            scan a barcode for manual entry mode entries.
+        //            */
+        //
+        //            this._super(barcode, target).then(function() {
+        //                const record = self.model.get(self.handle);
+        //                if (self.initialState.data.is_manual_qty || self.initialState.data.manual_entry) {
+        //                    if (record.data.packaging_id) {
+        //                        setTimeout(() => {self.$("[name='packaging_qty'] input").select();}, 300);
+        //
+        //                    } else {
+        //                        setTimeout(() => {self.$("[name='product_qty'] input").select();}, 300);
+        //                    };
+        //                };
+        //            });
+        //        },
         renderButtons: function($node) {
             /* Hide save and discard buttons from wizard, for this form do
                anything and confuse the user if he wants do a manual entry. All
