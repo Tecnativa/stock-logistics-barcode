@@ -20,6 +20,7 @@
                 <field name="action_window_id" />
                 <field name="context" />
                 <field name="key_shortcut" />
+                <field name="key_char_shortcut" />
                 <button
                     name="action_capture_key_shortcut"
                     type="object"

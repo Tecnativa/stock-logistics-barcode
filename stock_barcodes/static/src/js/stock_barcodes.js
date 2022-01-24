@@ -8,15 +8,28 @@ odoo.define("stock_barcodes.FormController", function(require) {
     var FormController = require("web.FormController");
 
     FormController.include({
+        _barcodeModels: [
+            "wiz.stock.barcodes.read",
+            "wiz.stock.barcodes.read.picking",
+            "wiz.stock.barcodes.read.inventory",
+            "stock.picking.type",
+            "stock.picking",
+        ],
+        _is_allowedModel: function(){
+            console.log(this._barcodeModels.indexOf(this.modelName));
+            console.log(this.modelName);
+            debugger;
+            return this._barcodeModels.indexOf(this.modelName) !== -1
+        },
         init: function() {
             this._super.apply(this, arguments);
-            if (this.modelName.includes("wiz.stock.barcodes.read")) {
-                core.bus.on("keydown", this, this._onCoreKeyDown);
-                core.bus.on("keyup", this, this._onCoreKeyUp);
+            if (this._is_allowedModel()) {
+                console.log("INIT");
+                this.kanban_action_button_selected = 0;
             }
         },
         start: function() {
-            if (this.modelName.includes("wiz.stock.barcodes.read")) {
+            if (this._is_allowedModel()) {
                 if (this.call("bus_service", "isMasterTab")) {
                     console.log("stock_barcodes_read-" + this.initialState.data.id);
                     this.call(
@@ -30,13 +43,6 @@ odoo.define("stock_barcodes.FormController", function(require) {
                         "stock_barcodes_sound-" + this.initialState.data.id
                     );
                 }
-                this.call(
-                    "bus_service",
-                    "on",
-                    "notification",
-                    this,
-                    this.bus_notification
-                );
                 this.$sound_ok = $(
                     '<audio src="/stock_barcodes/static/src/sounds/bell.wav" preload="auto"></audio>'
                 );
@@ -52,9 +58,45 @@ odoo.define("stock_barcodes.FormController", function(require) {
         },
         destroy: function() {
             this._super.apply(this, arguments);
-            if (this.modelName.includes("wiz.stock.barcodes.read")) {
+            if (this._is_allowedModel()) {
+                console.log("DESTROY");
                 this.$sound_ok.remove();
                 this.$sound_ko.remove();
+            }
+        },
+        on_detach_callback: function() {
+            this._super.apply(this, arguments);
+            if (this._is_allowedModel()) {
+                console.log("on_detach_callback");
+                core.bus.off("keydown", this, this._onCoreKeyDown);
+                core.bus.off("keyup", this, this._onCoreKeyUp);
+                this.call(
+                    "bus_service",
+                    "off",
+                    "notification",
+                    this,
+                    this.bus_notification
+                );
+            }
+        },
+        on_attach_callback: function() {
+            this._super.apply(this, arguments);
+            if (this._is_allowedModel()) {
+                console.log("on_attach_callback");
+                core.bus.on("keydown", this, this._onCoreKeyDown);
+                core.bus.on("keyup", this, this._onCoreKeyUp);
+                this.call(
+                    "bus_service",
+                    "on",
+                    "notification",
+                    this,
+                    this.bus_notification
+                );
+                console.log(this.$(".oe_kanban_action_button"));
+                this.kanban_action_buttons = this.$(".oe_kanban_action_button");
+                this.kanban_action_buttons[0].focus();
+//                _.defer(() => this.kanban_action_buttons[0].focus());
+                console.log($(":focus"));
             }
         },
         bus_notification: function(notifications) {
@@ -82,10 +124,10 @@ odoo.define("stock_barcodes.FormController", function(require) {
             });
         },
         _onCoreKeyDown: function(ev) {
-            if (this.modelName.includes("wiz.stock.barcodes.read")) {
+            if (this._is_allowedModel()) {
                 // TODO: Remove
                 //                alert(ev.keyCode);
-                //                console.log("KeyDown: " + ev.keyCode);
+                console.log("KeyDown: " + ev.keyCode);
                 // F9 key
                 if (ev.keyCode === 120) {
                     this.$("button[name='action_clean_values']").click();
@@ -110,16 +152,36 @@ odoo.define("stock_barcodes.FormController", function(require) {
                         //                        This.$("button[name='open_actions']").click()
                     }
                 }
+                console.log($(":focus"));
+                // Search kanban buttons to navigate
+                if (ev.keyCode === $.ui.keyCode.UP || ev.keyCode === 84) {
+                    console.log("UP");
+                    --this.kanban_action_button_selected;
+                    if (this.kanban_action_button_selected < 0) {
+                        this.kanban_action_button_selected = this.kanban_action_buttons.length - 1;
+                    }
+                    this.kanban_action_buttons[this.kanban_action_button_selected].focus();
+                }
+                if (ev.keyCode === $.ui.keyCode.DOWN || ev.keyCode === 71) {
+                    console.log("DOWN");
+                    ++this.kanban_action_button_selected;
+                    if (this.kanban_action_button_selected >= this.kanban_action_buttons.length) {
+                        this.kanban_action_button_selected = 0;
+                    }
+//                    debugger;
+                    this.kanban_action_buttons[this.kanban_action_button_selected].focus();
+                }
             }
         },
         _onCoreKeyUp: function(ev) {
-            if (this.modelName.includes("wiz.stock.barcodes.read")) {
+            if (this._is_allowedModel()) {
                 // TODO: Remove
                 //                console.log('KeyUp: ' + ev.keyCode);
                 //                alert(ev.keyCode);
                 // Intro key
                 if (ev.keyCode === $.ui.keyCode.ENTER) {
-                    this.$("button[name='action_confirm']").click();
+                    this.$(":focus").click();
+                    this.$("button[name='action_confirm']:visible").click();
                 }
             }
         },

@@ -21,14 +21,18 @@
                             <kanban class="o_kanban_mobile o_kanban_barcode">
                                 <field name="name" />
                                 <field name="action_window_id" />
+                                <field name="key_shortcut" />
+                                <field name="key_char_shortcut" />
                                 <templates>
                                     <t t-name="kanban-box">
                                         <div class="oe_kanban_details">
-                                            <a
+                                            <button
                                                 name="open_action"
                                                 type="object"
-                                                class="pull-right"
+                                                class="pull-right btn"
                                                 style="width:100%"
+                                                t-att-aria-keyshortcuts="key_char_shortcut"
+                                                t-att-accesskey="record.key_char_shortcut.raw_value"
                                             >
                                                 <div class="row">
                                                     <div class="col">
@@ -39,7 +43,7 @@
                                                         </strong>
                                                     </div>
                                                 </div>
-                                            </a>
+                                            </button>
                                         </div>
                                     </t>
                                 </templates>
