@@ -12,6 +12,10 @@
             />
             <script
                 type="application/javascript"
+                src="/stock_barcodes/static/src/js/kanban_controller.js"
+            />
+            <script
+                type="application/javascript"
                 src="/stock_barcodes/static/src/js/basic_fields.js"
             />
             <script

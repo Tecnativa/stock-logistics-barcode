@@ -18,7 +18,6 @@ odoo.define("stock_barcodes.FormController", function(require) {
         _is_allowedModel: function(){
             console.log(this._barcodeModels.indexOf(this.modelName));
             console.log(this.modelName);
-            debugger;
             return this._barcodeModels.indexOf(this.modelName) !== -1
         },
         init: function() {

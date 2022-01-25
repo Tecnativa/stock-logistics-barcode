@@ -352,7 +352,7 @@
                     <button
                         name="action_clean_values"
                         type="object"
-                        class="btn-warning ml-auto"
+                        class="btn-warning ml-auto oe_kanban_action_button"
                         invisible="context.get('display_menu', False)"
                     >
                         <i class="fa fa-recycle" />
@@ -360,7 +360,7 @@
                     <button
                         name="action_confirm"
                         type="object"
-                        class="btn-success ml-auto"
+                        class="btn-success ml-auto oe_kanban_action_button"
                         attrs="{'invisible': ['|', '|', ('is_manual_confirm', '=', False), ('display_menu', '=', True), ('visible_force_done', '=', True)]}"
                     >
                         <i class="fa fa-check" />
@@ -370,20 +370,20 @@
                         type="object"
                         icon="fa-check"
                         attrs="{'invisible': [('visible_force_done', '=', False)]}"
-                        class="btn-danger ml-auto"
+                        class="btn-danger ml-auto oe_kanban_action_button"
                     />
                     <button
                         name="open_actions"
                         type="object"
                         string="Actions"
-                        class="btn-secondary ml-auto"
+                        class="btn-primary ml-auto oe_kanban_action_button"
                         invisible="context.get('display_menu', False)"
                     />
                     <button
                         name="action_back"
                         type="object"
                         string="Back"
-                        class="btn-secondary ml-auto"
+                        class="btn-secondary ml-auto oe_kanban_action_button"
                         icon="fa-backward"
                         invisible="not context.get('display_menu', False)"
                     />
