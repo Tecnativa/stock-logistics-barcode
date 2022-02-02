@@ -1,23 +1,21 @@
-/* Copyright 2018-2019 Sergio Teruel <sergio.teruel@tecnativa.com>.
- * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). */
-
-odoo.define("stock_barcodes.KanbanController", function(require) {
+odoo.define("stock_barcodes.KanbanRenderer", function(require) {
     "use strict";
 
     var core = require("web.core");
-    var KanbanController = require("web.KanbanController");
+    var KanbanRenderer = require("web.KanbanRenderer");
 
-    KanbanController.include({
+    KanbanRenderer.include({
         _barcodeModels: [
-            "wiz.stock.barcodes.read",
-            "wiz.stock.barcodes.read.picking",
-            "wiz.stock.barcodes.read.inventory",
             "stock.picking.type",
             "stock.picking",
             "stock.barcodes.action",
+            "wiz.stock.barcodes.read",
+            "wiz.stock.barcodes.read.picking",
+            "wiz.stock.barcodes.read.inventory",
+            "wiz.stock.barcodes.read.todo"
         ],
         _is_allowedModel: function(){
-            return this._barcodeModels.indexOf(this.modelName) !== -1
+            return this._barcodeModels.indexOf(this.state.model) !== -1
         },
         init: function() {
             this._super.apply(this, arguments);
@@ -25,29 +23,19 @@ odoo.define("stock_barcodes.KanbanController", function(require) {
                 this.kanban_action_button_selected = 0;
             }
         },
-        on_detach_callback: function() {
-            this._super.apply(this, arguments);
-            if (this._is_allowedModel()) {
-                core.bus.off("keydown", this, this._onCoreKeyDown);
-//                core.bus.off("keyup", this, this._onCoreKeyUp);
-            }
-        },
         on_attach_callback: function() {
             this._super.apply(this, arguments);
             if (this._is_allowedModel()) {
-                core.bus.on("keydown", this, this._onCoreKeyDown);
-//                core.bus.on("keyup", this, this._onCoreKeyUp);
                 this.kanban_action_buttons = this.$(".oe_kanban_action_button:visible");
-                this.kanban_action_buttons[0].focus();
+                console.log("Kanban Rendered: " + this.kanban_action_buttons);
+                if (this.kanban_action_buttons.length){
+                    this.kanban_action_buttons[0].focus();
+                }
             }
         },
-
-        _onCoreKeyDown: function(ev) {
+        _onRecordKeyDown: function(ev) {
             if (this._is_allowedModel()) {
-                console.log("PEPE kanban controller");
-                // TODO: Remove
-//                alert(ev.keyCode);
-//                console.log("KeyDown: " + ev.keyCode);
+                console.log("PEPE Kanban rendered");
                 // F9 key
                 if (ev.keyCode === 120) {
                     this.$("button[name='action_clean_values']").click();
@@ -77,8 +65,9 @@ odoo.define("stock_barcodes.KanbanController", function(require) {
                 if (ev.keyCode === $.ui.keyCode.ENTER || ev.keyCode === 13) {
                     this.kanban_action_buttons[this.kanban_action_button_selected].click();
                 };
-
-            }
+            } else {
+                this._super.apply(this, arguments);
+            };
         },
     });
 });

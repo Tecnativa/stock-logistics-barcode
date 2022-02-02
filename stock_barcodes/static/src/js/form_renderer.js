@@ -1,15 +1,15 @@
 /* Copyright 2018-2019 Sergio Teruel <sergio.teruel@tecnativa.com>.
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). */
 
-odoo.define("stock_barcodes.FormController", function(require) {
+odoo.define("stock_barcodes.FormRenderer", function(require) {
     "use strict";
 
     var core = require("web.core");
-    var FormController = require("web.FormController");
+    var FormRenderer = require("web.FormRenderer");
     const WebClientObj = require("web.web_client");
     var BrowserDetection = require('web.BrowserDetection');
 
-    FormController.include({
+    FormRenderer.include({
         _barcodeModels: [
             "wiz.stock.barcodes.read",
             "wiz.stock.barcodes.read.picking",
@@ -56,6 +56,14 @@ odoo.define("stock_barcodes.FormController", function(require) {
             }
             return this._super.apply(this, arguments);
         },
+        _renderView: function () {
+            return this._super(this, arguments).then(() => {
+                _.defer(() => {
+                    console.log("Form Renderer _renderView: ", this.$(".oe_kanban_action_button:visible"));
+                });
+
+            })
+        },
         destroy: function() {
             this._super.apply(this, arguments);
             if (this._is_allowedModel()) {
@@ -90,6 +98,7 @@ odoo.define("stock_barcodes.FormController", function(require) {
                     this.bus_notification
                 );
                 this.kanban_action_buttons = this.$(".oe_kanban_action_button:visible");
+                console.log("Form Renderer: ", this.kanban_action_buttons);
                 if (this.kanban_action_buttons.length){
                     this.kanban_action_buttons[0].focus();
                 }
@@ -207,47 +216,6 @@ odoo.define("stock_barcodes.FormController", function(require) {
                     this.$("button[name='action_confirm']:visible").click();
                 }
             }
-        },
-        //        _barcodeScanned: function(barcode, target) {
-        //            var self = this;
-        //
-        //            /*
-        //            Set control focus to package_qty or product_qty directly after
-        //            scan a barcode for manual entry mode entries.
-        //            */
-        //
-        //            this._super(barcode, target).then(function() {
-        //                const record = self.model.get(self.handle);
-        //                if (self.initialState.data.is_manual_qty || self.initialState.data.manual_entry) {
-        //                    if (record.data.packaging_id) {
-        //                        setTimeout(() => {self.$("[name='packaging_qty'] input").select();}, 300);
-        //
-        //                    } else {
-        //                        setTimeout(() => {self.$("[name='product_qty'] input").select();}, 300);
-        //                    };
-        //                };
-        //            });
-        //        },
-        renderButtons: function($node) {
-            /* Hide save and discard buttons from wizard, for this form do
-               anything and confuse the user if he wants do a manual entry. All
-               extended models from  wiz.stock.barcodes.read do not have this
-               buttons.
-            */
-
-            this._super($node);
-            if (this.modelName.includes("wiz.stock.barcodes.read.")) {
-                this.$buttons.find(".o_form_buttons_edit").css({display: "none"});
-            }
-        },
-        canBeDiscarded: function(recordID) {
-            /*
-             Silent the warning that says that the record has been modified.
-             */
-            if (!this.modelName.includes("wiz.stock.barcodes.read.")) {
-                return this._super(recordID);
-            }
-            return Promise.resolve(false);
         },
     });
 });

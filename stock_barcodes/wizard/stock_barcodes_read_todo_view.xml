@@ -79,6 +79,7 @@
                                         type="object"
                                         class="btn btn-primary pull-left"
                                         context="{'wiz_barcode_id': parent.id}"
+                                        accesskey="f1"
                                     >
                                         <i class="fa fa-step-backward" />
                                     </button>
@@ -89,6 +90,7 @@
                                         type="object"
                                         class="btn btn-warning pull-right"
                                         context="{'wiz_barcode_id': parent.id}"
+                                        accesskey="f2"
                                     >
                                         <i class="fa fa-recycle" />
                                     </button>
@@ -99,6 +101,7 @@
                                         type="object"
                                         class="btn btn-danger pull-right"
                                         context="{'wiz_barcode_id': parent.id}"
+                                        accesskey="F3"
                                     >
                                     Force
                                     </button>
@@ -109,6 +112,7 @@
                                         type="object"
                                         class="btn btn-primary pull-right"
                                         context="{'wiz_barcode_id': parent.id}"
+                                        accesskey="shift+f4"
                                     >
                                         <i class="fa fa-step-forward" />
                                     </button>
