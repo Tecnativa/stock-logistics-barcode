@@ -9,7 +9,6 @@ odoo.define("stock_barcodes.BasicController", function(require) {
     const WebClientObj = require("web.web_client");
     const BarcodesModelsMixin = require("stock_barcodes.BarcodesModelsMixin");
 
-
     BasicController.include(BarcodesModelsMixin);
     BasicController.include({
         /**
@@ -17,7 +16,9 @@ odoo.define("stock_barcodes.BasicController", function(require) {
          */
         init: function() {
             this._super.apply(this, arguments);
-            this._is_valid_barcode_model = this._isAllowedBarcodeModel(this.initialState.model);
+            this._is_valid_barcode_model = this._isAllowedBarcodeModel(
+                this.initialState.model
+            );
             if (this._is_valid_barcode_model) {
                 this._keybind_selectable_index = 0;
                 this._keybind_selectable_items = [];
@@ -28,8 +29,16 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                     this._channel_barcode_sound = `stock_barcodes_sound-${this.initialState.data.id}`;
 
                     if (this.call("bus_service", "isMasterTab")) {
-                        this.call("bus_service", "addChannel", this._channel_barcode_read);
-                        this.call("bus_service", "addChannel", this._channel_barcode_sound);
+                        this.call(
+                            "bus_service",
+                            "addChannel",
+                            this._channel_barcode_read
+                        );
+                        this.call(
+                            "bus_service",
+                            "addChannel",
+                            this._channel_barcode_sound
+                        );
                     }
                 }
             }
@@ -80,8 +89,10 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                     this,
                     this.onBusNotificationBarcode
                 );
-                this._keybind_selectable_items = this.$(".oe_kanban_action_button:visible");
-                if (this._keybind_selectable_items.length){
+                this._keybind_selectable_items = this.$(
+                    ".oe_kanban_action_button:visible"
+                );
+                if (this._keybind_selectable_items.length) {
                     this._keybind_selectable_items[0].focus();
                 }
             }
@@ -120,12 +131,12 @@ odoo.define("stock_barcodes.BasicController", function(require) {
          *
          * @param {Boolean} status
          */
-        _toggleAccessKeys: function (status) {
+        _toggleAccessKeys: function(status) {
             if (status) {
                 WebClientObj._addAccessKeyOverlays();
             } else {
                 WebClientObj._hideAccessKeyOverlay();
-            };
+            }
             WebClientObj._areAccessKeyVisible = status;
         },
 
@@ -135,15 +146,15 @@ odoo.define("stock_barcodes.BasicController", function(require) {
          *
          * @private
          */
-        _appendBarcodesSounds: function () {
-            this.$sound_ok = $('<audio>',{
-                src: '/stock_barcodes/static/src/sounds/bell.wav',
-                preload: 'auto'
+        _appendBarcodesSounds: function() {
+            this.$sound_ok = $("<audio>", {
+                src: "/stock_barcodes/static/src/sounds/bell.wav",
+                preload: "auto",
             });
             this.$sound_ok.appendTo("body");
-            this.$sound_ko = $('<audio>',{
-                src: '/stock_barcodes/static/src/sounds/error.wav',
-                preload: 'auto'
+            this.$sound_ko = $("<audio>", {
+                src: "/stock_barcodes/static/src/sounds/error.wav",
+                preload: "auto",
             });
             this.$sound_ko.appendTo("body");
         },
@@ -157,12 +168,14 @@ odoo.define("stock_barcodes.BasicController", function(require) {
             if (ev.shift) {
                 prefixkey += "shift+";
             }
-            const elementWithAccessKey = document.querySelector(`[accesskey="${prefixkey}${ev.key.toLowerCase()}"], [accesskey="${prefixkey}${ev.key.toUpperCase()}"]`);
+            const elementWithAccessKey = document.querySelector(
+                `[accesskey="${prefixkey}${ev.key.toLowerCase()}"], [accesskey="${prefixkey}${ev.key.toUpperCase()}"]`
+            );
             if (elementWithAccessKey) {
                 ev.preventDefault();
                 elementWithAccessKey.focus();
                 elementWithAccessKey.click();
-            };
+            }
         },
 
         /**
@@ -176,8 +189,9 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                 const alt = ev.altKey || ev.key === "Alt",
                     newEvent = _.extend({}, ev),
                     shift = ev.shiftKey || ev.key === "Shift";
-                if (ev.keyCode === 113) { // F2
-                    self._toggleAccessKeys(!WebClientObj._areAccessKeyVisible)
+                if (ev.keyCode === 113) {
+                    // F2
+                    self._toggleAccessKeys(!WebClientObj._areAccessKeyVisible);
                 } else if (WebClientObj._areAccessKeyVisible && !shift && !alt) {
                     if (self._is_browser_chrome) {
                         self._onPushKeyForChrome(ev);
@@ -185,38 +199,48 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                         newEvent.altKey = true;
                         newEvent.shiftKey = true;
                         WebClientObj._onKeyDown(newEvent);
-                    };
-                };
+                    }
+                }
 
                 // VIEW ACTIONS MANAGEMENT
-                if (ev.keyCode === 120) { // F9
+                if (ev.keyCode === 120) {
+                    // F9
                     self.$("button[name='action_clean_values']").click();
                 } else if (ev.keyCode === 123) {
                     self.$("button[name='open_actions']").click();
                 } else if (ev.keyCode === $.ui.keyCode.UP || ev.keyCode === 78) {
                     // Search kanban buttons to navigate
-                    console.log("UP: "+ev.keyCode);
+                    console.log("UP: " + ev.keyCode);
                     ev.preventDefault();
                     --self._keybind_selectable_index;
                     if (self._keybind_selectable_index < 0) {
-                        self._keybind_selectable_index = self._keybind_selectable_items.length - 1;
+                        self._keybind_selectable_index =
+                            self._keybind_selectable_items.length - 1;
                     }
-                    self._keybind_selectable_items[self._keybind_selectable_index].focus();
-//                    ev.stopPropagation();
+                    self._keybind_selectable_items[
+                        self._keybind_selectable_index
+                    ].focus();
+                    //                    Ev.stopPropagation();
                 } else if (ev.keyCode === $.ui.keyCode.DOWN || ev.keyCode === 77) {
-                    console.log("DOWN: "+ev.keyCode);
+                    console.log("DOWN: " + ev.keyCode);
                     ev.preventDefault();
                     ++self._keybind_selectable_index;
-                    if (self._keybind_selectable_index >= self._keybind_selectable_items.length) {
+                    if (
+                        self._keybind_selectable_index >=
+                        self._keybind_selectable_items.length
+                    ) {
                         self._keybind_selectable_index = 0;
                     }
-                    self._keybind_selectable_items[self._keybind_selectable_index].focus();
-//                    ev.stopPropagation();
+                    self._keybind_selectable_items[
+                        self._keybind_selectable_index
+                    ].focus();
+                    //                    Ev.stopPropagation();
                 } else if (ev.keyCode === $.ui.keyCode.ENTER || ev.keyCode === 13) {
                     console.log(ev.keyCode);
-                    self._keybind_selectable_items[self._keybind_selectable_index].click();
-                };
-
+                    self._keybind_selectable_items[
+                        self._keybind_selectable_index
+                    ].click();
+                }
             }
         },
 

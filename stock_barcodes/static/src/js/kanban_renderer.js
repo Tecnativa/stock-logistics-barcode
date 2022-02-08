@@ -7,20 +7,21 @@ odoo.define("stock_barcodes.KanbanRenderer", function(require) {
     const KanbanRenderer = require("web.KanbanRenderer");
     const BarcodesModelsMixin = require("stock_barcodes.BarcodesModelsMixin");
 
-
     KanbanRenderer.include(BarcodesModelsMixin);
     KanbanRenderer.include({
         /**
          * @override
          */
-         init: function () {
+        init: function() {
             this._super.apply(this, arguments);
-            this._is_valid_barcode_model = this._isAllowedBarcodeModel(this.state.model);
+            this._is_valid_barcode_model = this._isAllowedBarcodeModel(
+                this.state.model
+            );
             if (this._is_valid_barcode_model) {
                 // Controller base is used when the renderer its initialized by a field
-                this._controller_base = this.findAncestor((parent) => {
+                this._controller_base = this.findAncestor(parent => {
                     return parent instanceof BasicController;
-                })
+                });
             }
         },
 
@@ -30,7 +31,7 @@ odoo.define("stock_barcodes.KanbanRenderer", function(require) {
          *
          * @override
          */
-        _onRecordKeyDown: function (ev) {
+        _onRecordKeyDown: function(ev) {
             if (this._is_valid_barcode_model) {
                 if (this._controller_base) {
                     this._controller_base._onDocumentKeyDown(ev);

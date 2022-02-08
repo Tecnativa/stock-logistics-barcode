@@ -4,7 +4,6 @@
 odoo.define("stock_barcodes.BarcodesModelsMixin", function(require) {
     "use strict";
 
-
     const BarcodesModelsMixin = {
         // Models allowed to have extra keybinding features
         _barcode_models: [
