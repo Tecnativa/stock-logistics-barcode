@@ -10,14 +10,22 @@
 <!--                type="application/javascript"-->
 <!--                src="/stock_barcodes/static/src/js/stock_barcodes.js"-->
 <!--            />-->
-            <script
+            <!-- <script
                 type="application/javascript"
                 src="/stock_barcodes/static/src/js/form_renderer.js"
-            />
+            /> -->
 <!--            <script-->
 <!--                type="application/javascript"-->
 <!--                src="/stock_barcodes/static/src/js/kanban_controller.js"-->
 <!--            />-->
+            <script
+                type="application/javascript"
+                src="/stock_barcodes/static/src/js/barcodes_models_mixin.js"
+            />
+            <script
+                type="application/javascript"
+                src="/stock_barcodes/static/src/js/basic_controller.js"
+            />
             <script
                 type="application/javascript"
                 src="/stock_barcodes/static/src/js/kanban_renderer.js"
