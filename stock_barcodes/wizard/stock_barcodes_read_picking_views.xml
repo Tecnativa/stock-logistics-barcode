@@ -229,7 +229,7 @@
         <field name="view_mode">form</field>
         <field
             name="context"
-        >{'control_panel_hidden': True, "display_menu": True}</field>
+        >{'control_panel_hidden': True, "default_display_menu": True}</field>
         <field name="view_id" ref="view_stock_barcodes_read_picking_form" />
         <field name="target">current</field>
     </record>
