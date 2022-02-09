@@ -348,14 +348,14 @@
                         icon="fa-plus"
                         attrs="{'invisible': [('manual_entry', '=', False)]}"
                         class="btn-primary"
-                        accesskey="f9"
+                        accesskey="5"
                     />
                     <button
                         name="action_clean_values"
                         type="object"
                         class="btn-warning ml-auto oe_kanban_action_button"
                         attrs="{'invisible': [('display_menu', '=', True)]}"
-                        accesskey="f10"
+                        accesskey="6"
                     >
                         <i class="fa fa-recycle" />
                     </button>
@@ -364,7 +364,7 @@
                         type="object"
                         class="btn-success ml-auto oe_kanban_action_button"
                         attrs="{'invisible': ['|', '|', ('is_manual_confirm', '=', False), ('display_menu', '=', True), ('visible_force_done', '=', True)]}"
-                        accesskey="enter"
+                        accesskey="ent"
                     >
                         <i class="fa fa-check" />
                     </button>
@@ -374,7 +374,7 @@
                         icon="fa-check"
                         attrs="{'invisible': [('visible_force_done', '=', False)]}"
                         class="btn-danger ml-auto oe_kanban_action_button"
-                        accesskey="enter"
+                        accesskey="ent"
                     />
                     <button
                         name="open_actions"
@@ -382,7 +382,7 @@
                         string="Actions"
                         class="btn-primary ml-auto oe_kanban_action_button"
                         attrs="{'invisible': [('display_menu', '=', True)]}"
-                        accesskey="f12"
+                        accesskey="0"
                     />
                     <button
                         name="action_back"
@@ -391,6 +391,7 @@
                         class="btn-secondary ml-auto oe_kanban_action_button"
                         icon="fa-backward"
                         attrs="{'invisible': [('display_menu', '=', False)]}"
+                        accesskey="7"
                     />
                 </div>
             </form>
