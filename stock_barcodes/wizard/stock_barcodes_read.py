@@ -61,7 +61,7 @@ class WizStockBarcodesRead(models.AbstractModel):
     is_manual_qty = fields.Boolean(compute="_compute_is_manual_qty")
     is_manual_confirm = fields.Boolean(compute="_compute_is_manual_qty")
     # Technical field to allow use in attrs
-    display_menu = fields.Boolean(compute="_compute_display_menu")
+    display_menu = fields.Boolean()
     qty_available = fields.Float(compute="_compute_qty_available")
 
     @api.depends("res_id")
@@ -74,10 +74,6 @@ class WizStockBarcodesRead(models.AbstractModel):
         for rec in self:
             rec.is_manual_qty = rec.option_group_id.is_manual_qty
             rec.is_manual_confirm = rec.option_group_id.is_manual_confirm
-
-    @api.depends_context("display_menu")
-    def _compute_display_menu(self):
-        self.display_menu = self.env.context.get("display_menu")
 
     @api.depends("location_id", "product_id", "lot_id")
     def _compute_qty_available(self):
@@ -499,20 +495,10 @@ class WizStockBarcodesRead(models.AbstractModel):
         return True
 
     def open_actions(self):
-        action = self.get_formview_action()
-        action["res_id"] = self.id
-        ctx = self.env.context.copy()
-        ctx.update({"display_menu": True})
-        action["context"] = ctx
-        return action
+        self.display_menu = True
 
     def action_back(self):
-        action = self.get_formview_action()
-        action["res_id"] = self.id
-        ctx = self.env.context.copy()
-        ctx.update({"display_menu": False})
-        action["context"] = ctx
-        return action
+        self.display_menu = False
 
     def open_records(self):
         action = self.action_ids

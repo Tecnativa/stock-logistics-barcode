@@ -7,7 +7,7 @@
         <field name="view_mode">form</field>
         <field
             name="context"
-        >{'control_panel_hidden': True, 'display_menu': True}</field>
+        >{'control_panel_hidden': True, 'default_display_menu': True}</field>
     </record>
     <!-- Actions inside the menu -->
     <record id="view_stock_barcodes_action_tree" model="ir.ui.view">

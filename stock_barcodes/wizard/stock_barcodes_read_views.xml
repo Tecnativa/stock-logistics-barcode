@@ -7,7 +7,7 @@
                 <sheet>
                     <div
                         name="menu_actions"
-                        invisible="not context.get('display_menu', False)"
+                        attrs="{'invisible': [('display_menu', '=', False)]}"
                     >
                         <field
                             name="action_ids"
@@ -50,7 +50,7 @@
                             </kanban>
                         </field>
                     </div>
-                    <div invisible="context.get('display_menu', False)">
+                    <div attrs="{'invisible': [('display_menu', '=', True)]}">
                         <div name="info" class="text-center h3">
                             <div
                                 class="alert alert-success"
@@ -354,7 +354,7 @@
                         name="action_clean_values"
                         type="object"
                         class="btn-warning ml-auto oe_kanban_action_button"
-                        invisible="context.get('display_menu', False)"
+                        attrs="{'invisible': [('display_menu', '=', True)]}"
                         accesskey="f10"
                     >
                         <i class="fa fa-recycle" />
@@ -381,7 +381,7 @@
                         type="object"
                         string="Actions"
                         class="btn-primary ml-auto oe_kanban_action_button"
-                        invisible="context.get('display_menu', False)"
+                        attrs="{'invisible': [('display_menu', '=', True)]}"
                         accesskey="f12"
                     />
                     <button
@@ -390,7 +390,7 @@
                         string="Back"
                         class="btn-secondary ml-auto oe_kanban_action_button"
                         icon="fa-backward"
-                        invisible="not context.get('display_menu', False)"
+                        attrs="{'invisible': [('display_menu', '=', False)]}"
                     />
                 </div>
             </form>
