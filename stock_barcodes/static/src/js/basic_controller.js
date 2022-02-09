@@ -20,7 +20,7 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                 this.initialState.model
             );
             if (this._is_valid_barcode_model) {
-                this._keybind_selectable_index = 0;
+                this._keybind_selectable_index = -1;
                 this._keybind_selectable_items = [];
                 this._is_browser_chrome = WebClientObj.BrowserDetection.isBrowserChrome();
                 const state_id = this.initialState.data.id;
@@ -60,7 +60,7 @@ odoo.define("stock_barcodes.BasicController", function(require) {
          */
         on_detach_callback: function() {
             this._super.apply(this, arguments);
-            if (this._is_valid_barcode_model) {
+            if (this._is_valid_barcode_model && ["form", "kanban"].indexOf(this.initialState.viewType) !== -1) {
                 $(document).off("keydown", this._onDocumentKeyDown);
                 $(document).off("keyup", this._onDocumentKeyUp);
                 this.call(
@@ -68,7 +68,7 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                     "off",
                     "notification",
                     this,
-                    this.bus_notification
+                    this.onBusNotificationBarcode
                 );
             }
         },
@@ -78,7 +78,7 @@ odoo.define("stock_barcodes.BasicController", function(require) {
          */
         on_attach_callback: function() {
             this._super.apply(this, arguments);
-            if (this._is_valid_barcode_model) {
+            if (this._is_valid_barcode_model && ["form", "kanban"].indexOf(this.initialState.viewType) !== -1) {
                 this._appendBarcodesSounds();
                 $(document).on("keydown", {controller: this}, this._onDocumentKeyDown);
                 $(document).on("keyup", {controller: this}, this._onDocumentKeyUp);
@@ -92,9 +92,6 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                 this._keybind_selectable_items = this.$(
                     ".oe_kanban_action_button:visible"
                 );
-                if (this._keybind_selectable_items.length) {
-                    this._keybind_selectable_items[0].focus();
-                }
             }
         },
 
@@ -104,23 +101,23 @@ odoo.define("stock_barcodes.BasicController", function(require) {
          * @param {Array} notifications
          */
         onBusNotificationBarcode: function(notifications) {
-            for (const notif in notifications) {
-                const [channel, message] = notification;
-                if (channel === "stock_barcodes_read-" + self.initialState.data.id) {
+            for (const notif of notifications) {
+                const [channel, message] = notif;
+                if (channel === "stock_barcodes_read-" + this.initialState.data.id) {
                     if (message.action === "focus") {
                         setTimeout(() => {
-                            self.$(`[name=${message.field_name}] input`).select();
+                            this.$(`[name=${message.field_name}] input`).select();
                         }, 300);
                         //                        Self.$(`[name=${message.field_name}] input`).select();
                     }
                 } else if (
                     channel ===
-                    "stock_barcodes_sound-" + self.initialState.data.id
+                    "stock_barcodes_sound-" + this.initialState.data.id
                 ) {
                     if (message.sound === "ok") {
-                        self.$sound_ok[0].play();
+                        this.$sound_ok[0].play();
                     } else if (message.sound === "ko") {
-                        self.$sound_ko[0].play();
+                        this.$sound_ko[0].play();
                     }
                 }
             }
@@ -259,6 +256,14 @@ odoo.define("stock_barcodes.BasicController", function(require) {
                     this.$("button[name='action_confirm']:visible").click();
                 }
             }
+        },
+        update: function (params, options) {
+            return this._super.apply(this, arguments).then(() => {
+                this._keybind_selectable_index = -1;
+                this._keybind_selectable_items = this.$(
+                    ".oe_kanban_action_button:visible"
+                );
+            })
         },
     });
 });
