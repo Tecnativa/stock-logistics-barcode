@@ -50,8 +50,12 @@ odoo.define("stock_barcodes.BasicController", function(require) {
         destroy: function() {
             this._super.apply(this, arguments);
             if (this._is_valid_barcode_model) {
-                this.$sound_ok.remove();
-                this.$sound_ko.remove();
+                if (this.$sound_ok){
+                    this.$sound_ok.remove();
+                }
+                if (this.$sound_ko){
+                    this.$sound_ko.remove();
+                }
             }
         },
 
