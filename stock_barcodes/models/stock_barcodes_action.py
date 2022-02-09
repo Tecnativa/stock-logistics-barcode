@@ -27,7 +27,5 @@ class StockBarcodesAction(models.Model):
             ctx.update(action_context)
         if self.context:
             ctx.update(safe_eval(self.context))
-        # Hide menu
-        ctx["display_menu"] = False
         action["context"] = ctx
         return action
