@@ -80,7 +80,15 @@ class WizStockBarcodesReadTodo(models.TransientModel):
             res[quant.product_id] += quant.quantity
         return res
 
+    def _todo_key_contains_model(self, key, model_name):
+        """Ask for grouped key models to do any additional actions"""
+        for item in key:
+            if isinstance(item, models.BaseModel) and item._name == model_name:
+                return True
+        return False
+
     def _prepare_fill_record_values(self, wiz_barcode, line, position):
+        grouped_key = self._group_key(wiz_barcode, line)
         vals = {
             "product_id": line.product_id.id,
             "product_uom_qty": line.product_uom_qty,
@@ -89,25 +97,33 @@ class WizStockBarcodesReadTodo(models.TransientModel):
             "picking_code": line.picking_code,
         }
         if wiz_barcode.option_group_id.source_pending_moves == "move_line_ids":
-            package_product_dic = self._get_all_products_quantities_in_package(
-                line.package_id
-            )
             vals.update(
                 {
                     "location_id": line.location_id.id,
                     "location_dest_id": line.location_dest_id.id,
                     "lot_id": line.lot_id.id,
-                    "package_id": line.package_id.id,
-                    "result_package_id": line.result_package_id.id,
                     "uom_id": line.product_uom_id.id,
                     "product_qty_reserved": line.product_qty,
                     "line_ids": [(6, 0, line.ids)],
                     "stock_move_ids": [(6, 0, line.move_id.ids)],
-                    "package_product_qty": package_product_dic
-                    and package_product_dic[line.product_id]
-                    or 0.0,
+                    "package_product_qty": 0.0,
                 }
             )
+            if self._todo_key_contains_model(
+                grouped_key, model_name="stock.quant.package"
+            ):
+                package_product_dic = self._get_all_products_quantities_in_package(
+                    line.package_id
+                )
+                vals.update(
+                    {
+                        "package_id": line.package_id.id,
+                        "result_package_id": line.result_package_id.id,
+                        "package_product_qty": package_product_dic
+                        and package_product_dic[line.product_id]
+                        or 0.0,
+                    }
+                )
         else:
             vals.update(
                 {

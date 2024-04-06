@@ -75,18 +75,20 @@
                                             </span>
                                         </td>
                                         <td class="text-right">
-                                            <span class="fa fa-dropbox" />
-                                            <span>
-                                                <field name="package_id" />
-                                                <t t-if="record.package_id">(<span
+                                            <t t-if="record.package_id.raw_value">
+                                                <span class="fa fa-dropbox" />
+                                                <span>
+                                                    <field name="package_id" />
+                                                    (<span
                                                         t-esc="record.package_product_qty.value"
                                                     /> <t
                                                         t-esc="record.uom_id.value.slice(0,3)"
-                                                    />)</t>
-                                            </span>
-                                            <span>
-                                                <field name="result_package_id" />
-                                            </span>
+                                                    />)
+                                                </span>
+                                                <span>
+                                                    <field name="result_package_id" />
+                                                </span>
+                                            </t>
                                         </td>
                                     </tr>
                                 </table>
