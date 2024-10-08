@@ -227,7 +227,7 @@ class TestStockBarcodesPicking(TestCommonStockBarcodes):
         self.assertEqual(len(self.wiz_scan_picking.candidate_picking_ids), 2)
         candidate_wiz.action_unlock_picking()
         self.wiz_scan_picking.product_qty = 2
-        self.wiz_scan_picking.option_group_id.confirmed_moves = True
+        self.wiz_scan_picking.confirmed_moves = True
         self.wiz_scan_picking.with_context(force_create_move=True).action_confirm()
         self.assertEqual(len(self.wiz_scan_picking.candidate_picking_ids), 3)
 
@@ -284,6 +284,7 @@ class TestStockBarcodesPicking(TestCommonStockBarcodes):
 
         # Continue test with a outgoing wizard
         self.wiz_scan_picking_out.option_group_id.auto_lot = True
+        self.wiz_scan_picking_out.auto_lot = True
         self.action_barcode_scanned(self.wiz_scan_picking_out, "8433281006850")
         self.assertEqual(self.wiz_scan_picking_out.lot_id, self.lot_1)
 
@@ -292,6 +293,7 @@ class TestStockBarcodesPicking(TestCommonStockBarcodes):
         self.product_tracking.categ_id.removal_strategy_id = self.env.ref(
             "stock.removal_lifo"
         )
+        self.wiz_scan_picking_out.action_clean_values()
         self.action_barcode_scanned(self.wiz_scan_picking_out, "8433281006850")
         self.assertEqual(self.wiz_scan_picking_out.lot_id, lot_3)
 
