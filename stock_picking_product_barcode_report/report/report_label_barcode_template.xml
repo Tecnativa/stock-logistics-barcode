@@ -74,8 +74,8 @@
                         <br />
                         <span t-field="doc.product_id.barcode" />
                         <span t-if="doc.lot_id">/ Lot:<span
-                                t-field="doc.lot_id.name"
-                            /></span>
+                            t-field="doc.lot_id.name"
+                        /></span>
                     </div>
                     <p style="page-break-after:always;" />
                 </t>
