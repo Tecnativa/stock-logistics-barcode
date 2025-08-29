@@ -15,13 +15,13 @@
                 <t t-foreach="label_qty" t-as="i">
                     <br />
                     <div class="page">
-                        <h6 class="text-left">
+                        <h6 class="text-start">
                             <field
                                 t-field="company.display_name"
                                 class="font-weight-bold"
                             />
                         </h6>
-                        <div class="text-left">
+                        <div class="text-start">
                             <span
                                 t-field="company.partner_id"
                                 style="font-size:12px;"
@@ -68,7 +68,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div name="barcode" class="text-left mt8">
+                        <div name="barcode" class="text-start mt8">
                             <span t-esc="barcode" style="font-size: 3em" />
                             <div>
                                 <img
