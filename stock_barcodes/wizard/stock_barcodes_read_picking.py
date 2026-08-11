@@ -513,6 +513,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         elif self.picking_id:
             moves_todo = self.picking_id.move_ids.filtered(
                 lambda sm: sm.product_id == self.product_id
+                and sm.state not in ("cancel", "done")
             )
         else:
             moves_todo = StockMove.search(domain)
@@ -607,6 +608,24 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                 )
             else:
                 assigned_qty = available_qty
+                # Do not overfill this move while sibling moves have pending demand
+                line_move = line.move_id
+                siblings_pending = sum(
+                    max(sm.product_uom_qty - sm.qty_picked, 0.0)
+                    for sm in moves_todo - line_move
+                )
+                if (
+                    float_compare(
+                        siblings_pending,
+                        0,
+                        precision_rounding=self.product_id.uom_id.rounding,
+                    )
+                    > 0
+                ):
+                    assigned_qty = min(
+                        max(line_move.product_uom_qty - line_move.qty_picked, 0.0),
+                        available_qty,
+                    )
             # Not increase qty done if user reads a complete package
             if (
                 self.result_package_id
@@ -676,36 +695,53 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             # stock move lines.
             stock_move_lines = self.env["stock.move.line"].browse()
             more_than_one_move = len(moves_to_link) > 1
-            for move_to_link in moves_to_link:
-                if more_than_one_move:
-                    reserved_qty = sum(
-                        move_to_link.move_line_ids.mapped("quantity_product_uom")
-                    )
-                    qty_picked = sum(move_to_link.move_line_ids.mapped("qty_picked"))
-                    assigned_qty = min(
-                        max(reserved_qty - qty_picked, 0.0), available_qty
-                    )
-                else:
-                    assigned_qty = available_qty
-                if (
-                    float_compare(
-                        assigned_qty,
-                        0,
-                        precision_rounding=self.product_id.uom_id.rounding,
-                    )
-                    > 0
-                ):
-                    stock_move_lines += self.create_new_stock_move_line(
-                        move_to_link, assigned_qty
-                    )
-                    available_qty -= assigned_qty
+            # Reserved quantities first, then demand without reservation backing
+            for allocation_pass in ("reserved", "demand"):
+                for move_to_link in moves_to_link:
+                    if more_than_one_move:
+                        reserved_qty = sum(
+                            move_to_link.move_line_ids.mapped("quantity_product_uom")
+                        )
+                        qty_picked = sum(
+                            move_to_link.move_line_ids.mapped("qty_picked")
+                        )
+                        if allocation_pass == "reserved":
+                            pending_qty = reserved_qty - qty_picked
+                        else:
+                            pending_qty = move_to_link.product_uom_qty - max(
+                                reserved_qty, qty_picked
+                            )
+                        assigned_qty = min(max(pending_qty, 0.0), available_qty)
+                    else:
+                        assigned_qty = available_qty
+                    if (
+                        float_compare(
+                            assigned_qty,
+                            0,
+                            precision_rounding=self.product_id.uom_id.rounding,
+                        )
+                        > 0
+                    ):
+                        stock_move_lines += self.create_new_stock_move_line(
+                            move_to_link, assigned_qty
+                        )
+                        available_qty -= assigned_qty
+                    if (
+                        float_compare(
+                            available_qty,
+                            0,
+                            precision_rounding=self.product_id.uom_id.rounding,
+                        )
+                        < 1
+                    ):
+                        break
                 if (
                     float_compare(
                         available_qty,
                         0,
                         precision_rounding=self.product_id.uom_id.rounding,
                     )
-                    < 0
+                    < 1
                 ):
                     break
             if (
@@ -714,8 +750,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                 )
                 > 0
             ):
-                # After distributing the amount read, I still have an amount to
-                # distribute, and I assign it to the first movement.
+                # Real excess over the total demand: keep it on the first movement
                 stock_move_lines += self.create_new_stock_move_line(
                     moves_to_link[:1], available_qty
                 )
