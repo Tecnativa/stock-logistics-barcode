@@ -26,6 +26,12 @@ class WizStockBarcodesRead(models.AbstractModel):
     total_secondary_uom_qty_done = fields.Float(
         string="Second. Done", digits="Product Unit of Measure", store=False
     )
+    gs1_qty_target_field = fields.Selection(
+        selection=[("secondary_uom_qty", "Secondary unit qty")],
+        help="Technical field to establish which quantity field a GS1 count "
+        "AI (30 - Variable count of items, 37 - Count of items) should be "
+        "routed to, set by AI 02 matching a secondary unit package.",
+    )
 
     @api.onchange("secondary_uom_id", "secondary_uom_qty", "secondary_single_qty")
     def onchange_secondary_uom_qty(self):
@@ -67,6 +73,38 @@ class WizStockBarcodesRead(models.AbstractModel):
             self.action_secondary_uom_scaned_post(secondary_uom)
         return True
 
+    def _process_ai_02(self, gs1_list):
+        secondary_uom = self.env["product.secondary.unit"].search(
+            self._barcode_domain(self.barcode)
+        )
+        if not secondary_uom:
+            self.gs1_qty_target_field = False
+            return super()._process_ai_02(gs1_list)
+        else:
+            if len(secondary_uom) > 1:
+                self._set_messagge_info(
+                    "more_match", _("More than one secondary uom found")
+                )
+                return False
+            self.gs1_qty_target_field = "secondary_uom_qty"
+            self.action_secondary_uom_scaned_post(secondary_uom)
+        return True
+
+    def _set_gs1_product_qty(self, product_qty):
+        """AI 30 (Variable count of items) and AI 37 (Count of items) both
+        route through this shared hook in the base module. When AI 02
+        identified a secondary-unit package above, the count belongs to
+        the secondary unit (e.g. pieces), not the primary quantity (e.g.
+        weight) the base module would otherwise set it to - covering both
+        AIs the same way the base module itself unifies them, instead of
+        only overriding AI 37.
+        """
+        if self.gs1_qty_target_field != "secondary_uom_qty":
+            return super()._set_gs1_product_qty(product_qty)
+        self.secondary_uom_qty = product_qty
+        self.onchange_secondary_uom_qty()
+        return True
+
     @api.onchange("product_id")
     def onchange_product_id(self):
         res = super().onchange_product_id()
@@ -82,4 +120,5 @@ class WizStockBarcodesRead(models.AbstractModel):
         res = super().action_clean_values()
         self.secondary_uom_qty = 0.0
         self.secondary_single_qty = 0.0
+        self.gs1_qty_target_field = False
         return res
