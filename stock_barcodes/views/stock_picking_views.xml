@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
 <odoo>
-    <record id="view_picking_form_qty_picked" model="ir.ui.view">
-        <field name="model">stock.picking</field>
-        <field name="inherit_id" ref="stock_move_line_qty_picked.view_picking_form" />
-        <field name="arch" type="xml">
-            <field name="qty_picked" position="attributes">
-                <attribute name="optional">show</attribute>
-                <attribute name="string">Quantity Picked</attribute>
-                <attribute
-                    name="help"
-                >Quantity actually prepared. If no line is picked, validation uses the usual quantities. Once picking has started, change this quantity in the detailed operations to adjust what will be transferred.</attribute>
-            </field>
-        </field>
-    </record>
     <record id="view_picking_form" model="ir.ui.view">
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form" />
@@ -20,131 +9,61 @@
             <div name="button_box" position="inside">
                 <button
                     name="action_barcode_scan"
-                    class="oe_stat_button"
-                    icon="fa-barcode"
+                    string="Scan"
                     type="object"
-                    help="Start barcode interface"
-                    invisible="state not in ('confirmed', 'assigned')"
-                >
-                    <div class="o_form_field o_stat_info">
-                        <span class="o_stat_text">Scan barcodes</span>
-                    </div>
-                </button>
+                    class="oe_stat_button"
+                    icon="barcode"
+                    invisible="state in ('done', 'cancel')"
+                />
             </div>
         </field>
     </record>
-    <record id="stock_picking_kanban" model="ir.ui.view">
-        <field name="model">stock.picking</field>
-        <field name="inherit_id" ref="stock.stock_picking_kanban" />
+    <record id="stock_picking_batch_form" model="ir.ui.view">
+        <field name="model">stock.picking.batch</field>
+        <field name="inherit_id" ref="stock.stock_picking_batch_form" />
         <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="js_class">stock_barcodes_kanban</attribute>
-            </xpath>
-            <xpath expr="//footer" position="after">
-                <div class="row">
-                    <div class="col-6">
-                        <button
-                            name="action_barcode_scan"
-                            type="object"
-                            icon="fa-barcode"
-                            title="Start barcode interface"
-                            class="btn btn-secondary"
-                        />
-                    </div>
-                </div>
-            </xpath>
-        </field>
-    </record>
-    <record id="stock_picking_type_kanban" model="ir.ui.view">
-        <field name="model">stock.picking.type</field>
-        <field name="inherit_id" ref="stock.stock_picking_type_kanban" />
-        <field name="arch" type="xml">
-            <field name="code" position="after">
-                <field name="default_location_src_id" invisible="1" />
-                <field name="default_location_dest_id" invisible="1" />
-            </field>
-            <field name="warehouse_id" position="after">
-                <field name="barcode_option_group_id" invisible="1" />
-                <div class="row mt-3">
-                    <div
-                        t-if="['incoming', 'outgoing', 'internal'].indexOf(record.code.raw_value) &gt; -1"
-                        class="col-6 text-center"
-                        invisible="barcode_option_group_id==False"
-                    >
-                        <button
-                            name="action_barcode_scan"
-                            type="object"
-                            class="btn btn-secondary"
-                        >
-                            <i
-                                class="fa fa-barcode fa-2x"
-                                title="Start barcode interface"
-                            />
-                        </button>
-                    </div>
-                    <div
-                        t-if="record.default_location_src_id.raw_value and record.default_location_dest_id.raw_value"
-                        class="col-6 text-center"
-                    >
-                        <button
-                            name="action_barcode_new_picking"
-                            type="object"
-                            class="btn btn-secondary"
-                            context="{'default_immediate_transfer': True, 'manual_picking': True}"
-                        >
-                            <i class="fa fa-plus" title="Scan new picking " />
-                            <small>New</small>
-                        </button>
-                    </div>
-                </div>
-            </field>
-        </field>
-    </record>
-    <record id="view_picking_type_form" model="ir.ui.view">
-        <field name="model">stock.picking.type</field>
-        <field name="inherit_id" ref="stock.view_picking_type_form" />
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='use_create_lots']/../.." position="after">
-                <group string="Barcodes">
-                    <field name="barcode_option_group_id" />
-                    <field name="new_picking_barcode_option_group_id" />
-                </group>
-            </xpath>
-        </field>
-    </record>
-    <record id="view_pickingtype_filter" model="ir.ui.view">
-        <field name="model">stock.picking.type</field>
-        <field name="inherit_id" ref="stock.view_pickingtype_filter" />
-        <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="code" string="Type of operation" />
-                <field name="sequence_code" string="Code" />
-                <filter
-                    string="Barcode Options"
-                    name="barcode_options"
-                    domain="[('barcode_option_group_id','!=',False)]"
+            <div name="button_box" position="inside">
+                <button
+                    name="action_capture_open"
+                    string="Scan"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="barcode"
+                    invisible="state != 'in_progress'"
                 />
-            </field>
+            </div>
         </field>
     </record>
-
-    <record id="stock_barcodes_action_picking_tree_ready" model="ir.actions.act_window">
-        <field name="name">Operations</field>
+    <record id="view_picking_barcode_list" model="ir.ui.view">
+        <field name="model">stock.picking</field>
+        <field name="priority" eval="100" />
+        <field name="arch" type="xml">
+            <list create="0" default_order="scheduled_date, id">
+                <field name="name" />
+                <field name="partner_id" />
+                <field name="scheduled_date" />
+                <field name="origin" optional="show" />
+                <field name="picking_type_id" optional="hide" />
+                <field name="state" widget="badge" />
+                <button
+                    name="action_barcode_scan"
+                    type="object"
+                    icon="barcode"
+                    title="Read barcodes"
+                    class="btn-primary"
+                />
+            </list>
+        </field>
+    </record>
+    <record id="action_picking_barcode" model="ir.actions.act_window">
+        <field name="name">Transfers to Read</field>
         <field name="res_model">stock.picking</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">kanban</field>
+        <field name="path">barcode-transfers</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_picking_barcode_list" />
         <field
-            name="context"
-        >{'contact_display': 'partner_address', 'search_default_available': 1}
-        </field>
-        <field name="search_view_id" ref="stock.view_picking_internal_search" />
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No transfer found. Let's create one!
-            </p>
-            <p>
-                Transfers allow you to move products from one location to another.
-            </p>
-        </field>
+            name="domain"
+        >[('state', 'in', ('confirmed', 'waiting', 'assigned'))]</field>
+        <field name="context">{'search_default_available': 1}</field>
     </record>
 </odoo>

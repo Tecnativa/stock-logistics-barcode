@@ -1,179 +1,127 @@
 # Copyright 2019 Sergio Teruel <sergio.teruel@tecnativa.com>
+# Copyright 2026 Tecnativa - Carlos Dauden
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import base64
 import re
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.fields import Domain
 from odoo.tools.safe_eval import safe_eval
-
-REGEX = {
-    "context": r"^[^\s].*[^\s]$|^$",
-    "barcode": "^[a-zA-Z0-9-]+$",
-}
-FIELDS_NAME = {"barcode_options": "barcode_option_group_id"}
 
 
 class StockBarcodesAction(models.Model):
+    """Tiles of the barcode main menu"""
+
     _name = "stock.barcodes.action"
-    _description = "Actions for barcode interface"
+    _description = "Action of the barcode main menu"
     _order = "sequence, id"
 
-    name = fields.Char(translate=True)
+    name = fields.Char(required=True, translate=True)
     active = fields.Boolean(default=True)
     sequence = fields.Integer(default=100)
     action_window_id = fields.Many2one(
-        comodel_name="ir.actions.act_window", string="Action window"
+        comodel_name="ir.actions.act_window", string="Window Action"
     )
-    context = fields.Char()
-    key_shortcut = fields.Integer()
-    key_char_shortcut = fields.Char()
-    icon_class = fields.Char()
-    barcode = fields.Char()
-    barcode_image = fields.Image(
-        "Barcode image",
-        readonly=True,
-        compute="_compute_barcode_image",
-        attachment=True,
+    method = fields.Char(
+        help="Method of stock.barcodes.action returning the action to open, "
+        "instead of a window action, e.g. action_open_inventory",
     )
-
-    count_elements = fields.Integer(default=0, compute="_compute_count_elements")
+    context = fields.Char(help="Context added to the window action")
+    count_model = fields.Char(
+        help="Model of the records counted on the tile, the one of the window "
+        "action by default"
+    )
+    domain = fields.Char(default="[]", help="Records counted on the tile")
+    icon = fields.Char(
+        default="barcode",
+        help="Name of a Material Symbols icon bundled with Odoo, e.g. local_shipping",
+    )
+    barcode = fields.Char(help="Reading it from the main menu opens the action")
+    barcode_image = fields.Image(compute="_compute_barcode_image")
+    count_elements = fields.Integer(compute="_compute_count_elements")
 
     @api.constrains("barcode")
-    def _constrains_barcode(self):
-        for action in self:
-            if action.barcode and not re.match(
-                REGEX.get("barcode", False), action.barcode
-            ):
+    def _check_barcode(self):
+        for action in self.filtered("barcode"):
+            if not re.match(r"^[a-zA-Z0-9-]+$", action.barcode):
                 raise ValidationError(
-                    _(
-                        " The barcode {} is not correct."
-                        "Use numbers, letters and dashes, without spaces."
-                        "E.g. 15753, BC-5789,er-56 "
-                        ""
-                    ).format(action.barcode)
+                    self.env._(
+                        "The barcode %(barcode)s is not correct. Use numbers, "
+                        "letters and dashes, without spaces. E.g. 15753, BC-5789",
+                        barcode=action.barcode,
+                    )
                 )
-            all_barcode = [bar for bar in action.mapped("barcode") if bar]
-            domain = [("barcode", "in", all_barcode)]
-            matched_actions = self.sudo().search(domain, order="id")
-            if len(matched_actions) > len(all_barcode):
+            duplicated = self.search(
+                [("barcode", "=", action.barcode), ("id", "!=", action.id)]
+            )
+            if duplicated:
                 raise ValidationError(
-                    _(
-                        """ Barcode has already been assigned to the action(s): {}."""
-                    ).format(", ".join(matched_actions.mapped("name")))
+                    self.env._(
+                        "The barcode is already used by %(actions)s",
+                        actions=", ".join(duplicated.mapped("name")),
+                    )
                 )
-
-    def _generate_barcode(self):
-        return base64.b64encode(
-            self.env["ir.actions.report"].barcode("Code128", self.barcode)
-        )
 
     @api.depends("barcode")
     def _compute_barcode_image(self):
+        report = self.env["ir.actions.report"]
         for action in self:
-            if action.barcode:
-                action.barcode_image = action._generate_barcode()
-            else:
-                action.barcode_image = False
-
-    @api.constrains("context")
-    def _constrains_context(self):
-        if self.context and not bool(
-            re.match(REGEX.get("context", False), self.context)
-        ):
-            raise ValidationError(_("There can be no spaces at the beginning or end."))
-
-    def _count_elements(self):
-        res_model = self.action_window_id.res_model
-        if not self.context or not res_model:
-            return 0
-        model_fields = self.env[res_model]._fields
-        context_values = self.context.strip("{}").split(",")
-
-        def _map_context_values(x):
-            field_values = x.split(":")
-            field_name = field_values[0].split("search_default_")
-            if len(field_name) > 1:
-                raw_name = field_name[1].strip("'")
-                mapped_name = FIELDS_NAME.get(raw_name)
-                if mapped_name:
-                    # Named search filter mapped to a field: a truthy value
-                    # just activates the filter, whose domain selects the
-                    # records having the field set.
-                    if mapped_name in model_fields:
-                        return (mapped_name, "!=", False)
-                    return False
-                if len(field_values) < 2:
-                    # Malformed entry (no value): the domain can not be built
-                    return False
-                field_value_format = field_values[1].replace("'", "").strip()
-                field_value = (
-                    int(field_value_format)
-                    if field_value_format.isdigit()
-                    else field_value_format
-                )
-                if raw_name in model_fields:
-                    return (raw_name, "=", field_value)
-                return False
-            return ()
-
-        domain = [_map_context_values(x) for x in context_values]
-        if any(val_domain is False for val_domain in domain):
-            # A search_default key does not match any model field: the
-            # domain can not be built reliably, so do not count anything.
-            return 0
-        return self.env[res_model].search_count(
-            [val_domain for val_domain in domain if val_domain]
-        )
-
-    @api.depends("context")
-    def _compute_count_elements(self):
-        for barcode_action in self:
-            barcode_action.count_elements = (
-                barcode_action._count_elements()
-                if barcode_action.context
-                and "search_default_" in barcode_action.context
-                else 0
+            action.barcode_image = (
+                base64.b64encode(report.barcode("Code128", action.barcode))
+                if action.barcode
+                else False
             )
+
+    @api.depends("domain", "count_model", "action_window_id")
+    def _compute_count_elements(self):
+        for action in self:
+            model = action.count_model or action.action_window_id.res_model
+            if not model or not action.domain or action.domain == "[]":
+                action.count_elements = 0
+                continue
+            domain = Domain(safe_eval(action.domain, {"uid": self.env.uid}))
+            action.count_elements = self.env[model].search_count(list(domain))
 
     def open_action(self):
-        action = self.action_window_id.sudo().read()[0]
-        action_context = safe_eval(action["context"])
-        ctx = self.env.context.copy()
-        if action_context:
-            ctx.update(action_context)
+        self.ensure_one()
+        if self.method:
+            return getattr(self, self.method)()
+        action = self.action_window_id._get_action_dict()
+        context = dict(safe_eval(action.get("context") or "{}", {"uid": self.env.uid}))
         if self.context:
-            ctx.update(safe_eval(self.context))
-        if action_context.get("inventory_mode", False):
-            action = self.open_inventory_action(ctx)
-        else:
-            action["context"] = ctx
-
+            context.update(safe_eval(self.context, {"uid": self.env.uid}))
+        action["context"] = context
         return action
 
-    def open_inventory_action(self, ctx):
-        option_group = self.env.ref(
-            "stock_barcodes.stock_barcodes_option_group_inventory"
+    def action_open_inventory(self):
+        """Count the stock of the main warehouse"""
+        warehouse = self.env["stock.warehouse"].search(
+            [("company_id", "=", self.env.company.id)], limit=1
         )
-        vals = {
-            "option_group_id": option_group.id,
-            "manual_entry": option_group.manual_entry,
-            "display_read_quant": option_group.display_read_quant,
-        }
-        if option_group.get_option_value("location_id", "filled_default"):
-            vals["location_id"] = (
-                self.env["stock.warehouse"].search([], limit=1).lot_stock_id.id
-            )
-        wiz = self.env["wiz.stock.barcodes.read.inventory"].create(vals)
-        action = self.env["ir.actions.actions"]._for_xml_id(
-            "stock_barcodes.action_stock_barcodes_read_inventory"
-        )
-        action["res_id"] = wiz.id
-        action["context"] = ctx
-        return action
+        return warehouse.lot_stock_id.action_capture_open()
+
+    @api.model
+    def get_main_menu(self):
+        """Tiles of the main menu"""
+        return [
+            {
+                "id": action.id,
+                "name": action.name,
+                "icon": action.icon,
+                "count": action.count_elements,
+                "barcode": action.barcode,
+            }
+            for action in self.search([])
+        ]
+
+    @api.model
+    def open_by_barcode(self, barcode):
+        """Action of the tile with the barcode read on the main menu"""
+        action = self.search([("barcode", "=", barcode)], limit=1)
+        return action.open_action() if action else False
 
     def print_barcodes(self):
-        report_action = self.env.ref(
+        return self.env.ref(
             "stock_barcodes.action_report_barcode_actions"
-        ).report_action(None, data={})
-        return report_action
+        ).report_action(self, config=False)

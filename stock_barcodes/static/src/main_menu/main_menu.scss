@@ -1,0 +1,15 @@
+.o_stock_barcodes_main_menu {
+    overflow: auto;
+    .o_stock_barcodes_tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        gap: 1rem;
+    }
+    .o_stock_barcodes_tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.5rem 0.5rem;
+    }
+}

@@ -1,0 +1,3 @@
+id,name,model_id,group_id/id,operation,domain
+access_stock_barcodes_action_user,stock.barcodes.action user,stock.barcodes.action,stock.group_stock_user,r,
+access_stock_barcodes_action_manager,stock.barcodes.action manager,stock.barcodes.action,base.group_system,crud,

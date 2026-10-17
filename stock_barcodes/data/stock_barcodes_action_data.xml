@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo noupdate="1">
+    <record id="stock_barcodes_action_receipts" model="stock.barcodes.action">
+        <field name="name">Receipts</field>
+        <field name="sequence" eval="10" />
+        <field name="icon">login</field>
+        <field name="action_window_id" ref="stock.stock_picking_type_action" />
+        <field name="context">{'search_default_capture_incoming': 1}</field>
+        <field name="count_model">stock.picking</field>
+        <field
+            name="domain"
+        >[('picking_type_code', '=', 'incoming'), ('state', '=', 'assigned')]</field>
+    </record>
+    <record id="stock_barcodes_action_deliveries" model="stock.barcodes.action">
+        <field name="name">Deliveries</field>
+        <field name="sequence" eval="20" />
+        <field name="icon">local_shipping</field>
+        <field name="action_window_id" ref="stock.stock_picking_type_action" />
+        <field name="context">{'search_default_capture_outgoing': 1}</field>
+        <field name="count_model">stock.picking</field>
+        <field
+            name="domain"
+        >[('picking_type_code', '=', 'outgoing'), ('state', '=', 'assigned')]</field>
+    </record>
+    <record id="stock_barcodes_action_internal" model="stock.barcodes.action">
+        <field name="name">Internal Transfers</field>
+        <field name="sequence" eval="30" />
+        <field name="icon">sync_alt</field>
+        <field name="action_window_id" ref="stock.stock_picking_type_action" />
+        <field name="context">{'search_default_capture_internal': 1}</field>
+        <field name="count_model">stock.picking</field>
+        <field
+            name="domain"
+        >[('picking_type_code', '=', 'internal'), ('state', '=', 'assigned')]</field>
+    </record>
+    <record id="stock_barcodes_action_inventory" model="stock.barcodes.action">
+        <field name="name">Inventory</field>
+        <field name="sequence" eval="40" />
+        <field name="icon">checklist</field>
+        <field name="method">action_open_inventory</field>
+    </record>
+    <record id="stock_barcodes_action_operations" model="stock.barcodes.action">
+        <field name="name">Operations</field>
+        <field name="sequence" eval="50" />
+        <field name="icon">barcode</field>
+        <field name="action_window_id" ref="stock.stock_picking_type_action" />
+    </record>
+</odoo>

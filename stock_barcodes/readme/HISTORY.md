@@ -1,3 +1,8 @@
+## 20.0.1.0.0 (2026-10-17)
+
+- \[MIG\] Rebuilt on `stock_capture`: the option groups become capture profiles (migrated with their steps; fields of other modules are migrated by them), the reading logic and the documents (transfers, operation types, batch transfers, inventories) move to the engine, and the screens read the real operations instead of copies. Batch transfers, part of `stock` in 20.0, are read without `stock_barcodes_picking_batch`.
+- \[MIG\] Quantities read on pending operations (`qty_picked`) and the backorder decisions are captured when migrating.
+
 ## 18.0.1.6.0 (2026-10-02)
 
 - \[ADD\] Product information: a button next to the read product opens

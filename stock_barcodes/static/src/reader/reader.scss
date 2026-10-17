@@ -1,0 +1,33 @@
+.o_stock_barcodes_form {
+    .o_stock_barcodes_reader {
+        margin: 0.5rem 0;
+        .o_stock_barcodes_message {
+            margin-top: 0.5rem;
+            white-space: pre-line;
+        }
+    }
+    .o_stock_barcodes_toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        .o_stock_barcodes_count {
+            margin-left: auto;
+        }
+    }
+    .o_stock_barcodes_confirm {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .o_stock_barcodes_card {
+        width: 100%;
+        .o_stock_barcodes_captured {
+            font-weight: bold;
+        }
+    }
+    .o_stock_barcodes_note {
+        font-size: 0.875rem;
+    }
+}

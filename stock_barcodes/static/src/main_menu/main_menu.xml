@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<templates xml:space="preserve">
+    <t t-name="stock_barcodes.MainMenu">
+        <div class="o_stock_barcodes_main_menu o_action p-3">
+            <div class="o_stock_barcodes_tiles">
+                <button
+                    t-foreach="this.state.tiles"
+                    t-as="tile"
+                    t-key="tile.id"
+                    class="btn btn-light border o_stock_barcodes_tile"
+                    t-on-click="() => this.openTile(tile)"
+                >
+                    <i class="oi oi-3x" t-att-data-icon="tile.icon" />
+                    <span class="fs-5" t-out="tile.name" />
+                    <span
+                        t-if="tile.count"
+                        class="badge text-bg-primary"
+                        t-out="tile.count"
+                    />
+                </button>
+            </div>
+            <p class="text-muted mt-3">Read the barcode of an action to open it.</p>
+        </div>
+    </t>
+</templates>

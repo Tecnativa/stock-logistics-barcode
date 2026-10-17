@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <record id="stock_capture_session_view_form" model="ir.ui.view">
+        <field name="model">stock.capture.session</field>
+        <field name="arch" type="xml">
+            <form
+                create="0"
+                delete="0"
+                class="o_stock_barcodes_form"
+                string="Barcode reader"
+            >
+                <header>
+                    <button
+                        name="action_validate"
+                        type="object"
+                        string="Validate"
+                        class="btn-primary"
+                        invisible="not can_validate or capture_kind == 'inventory'"
+                    />
+                    <button
+                        name="action_validate"
+                        type="object"
+                        string="Apply"
+                        class="btn-primary"
+                        invisible="capture_kind != 'inventory'"
+                    />
+                    <button
+                        name="action_put_in_pack"
+                        type="object"
+                        string="Put in Pack"
+                        invisible="not can_validate or capture_kind == 'inventory'"
+                        groups="stock.group_tracking_lot"
+                    />
+                    <button
+                        name="action_open_document"
+                        type="object"
+                        string="Open"
+                        invisible="capture_kind == 'inventory'"
+                    />
+                    <button
+                        name="action_open_menu"
+                        type="object"
+                        string="Menu"
+                        class="btn-secondary"
+                    />
+                </header>
+                <sheet>
+                    <field name="capture_kind" invisible="1" />
+                    <field name="can_validate" invisible="1" />
+                    <field name="feedback_seq" invisible="1" />
+                    <field name="feedback_sound" invisible="1" />
+                    <field name="feedback_focus" invisible="1" />
+                    <field name="feedback_notification" invisible="1" />
+                    <field name="message_type" invisible="1" />
+                    <field name="guided" invisible="1" />
+                    <field name="manual_quantity" invisible="1" />
+                    <field name="manual_confirm" invisible="1" />
+                    <field name="force_visible" invisible="1" />
+                    <field name="show_form_scan" invisible="1" />
+                    <field name="show_stock" invisible="1" />
+                    <field name="show_owner" invisible="1" />
+                    <field name="product_tracking" invisible="1" />
+                    <field name="card_source" invisible="1" />
+                    <field name="keep_result_package" invisible="1" />
+                    <field name="show_detailed_operations" invisible="1" />
+                    <field name="location_stock_count" invisible="1" />
+                    <div class="o_stock_barcodes_document">
+                        <h3 class="mb-0">
+                            <field name="document_name" readonly="1" />
+                        </h3>
+                        <field
+                            name="partner_id"
+                            readonly="1"
+                            invisible="not partner_id"
+                        />
+                        <field
+                            name="note"
+                            readonly="1"
+                            invisible="not note"
+                            class="o_stock_barcodes_note"
+                        />
+                    </div>
+                    <widget name="stock_barcodes_reader" />
+                    <div class="o_stock_barcodes_toolbar">
+                        <button
+                            name="action_manual_entry"
+                            type="object"
+                            icon="keyboard"
+                            title="Manual entry"
+                            class="btn btn-secondary"
+                            invisible="manual_entry"
+                        />
+                        <button
+                            name="action_manual_entry"
+                            type="object"
+                            icon="keyboard"
+                            title="Manual entry"
+                            class="btn btn-primary"
+                            invisible="not manual_entry"
+                        />
+                        <button
+                            name="action_clean"
+                            type="object"
+                            icon="backspace"
+                            title="Clean"
+                            class="btn btn-secondary"
+                        />
+                        <button
+                            name="action_product_info"
+                            type="object"
+                            icon="info"
+                            title="Product information"
+                            class="btn btn-secondary"
+                            invisible="not product_id"
+                        />
+                        <button
+                            name="action_assign_serials"
+                            type="object"
+                            icon="label"
+                            title="Serial numbers"
+                            class="btn btn-secondary"
+                            invisible="product_tracking != 'serial' or capture_kind == 'inventory'"
+                            groups="stock.group_production_lot"
+                        />
+                        <button
+                            name="action_new_packaging"
+                            type="object"
+                            icon="inventory_2"
+                            title="New packaging barcode"
+                            class="btn btn-secondary"
+                            invisible="not product_id"
+                            groups="uom.group_uom"
+                        />
+                        <button
+                            name="action_previous_card"
+                            type="object"
+                            icon="chevron_left"
+                            title="Previous"
+                            class="btn btn-secondary"
+                            invisible="not guided"
+                        />
+                        <button
+                            name="action_next_card"
+                            type="object"
+                            icon="chevron_right"
+                            title="Next"
+                            class="btn btn-secondary"
+                            invisible="not guided"
+                        />
+                        <button
+                            name="action_toggle_card_filter"
+                            type="object"
+                            icon="visibility"
+                            title="Show captured or pending"
+                            class="btn btn-secondary"
+                        />
+                        <button
+                            name="action_toggle_detailed_operations"
+                            type="object"
+                            icon="checklist"
+                            title="Captured detailed operations"
+                            class="btn btn-secondary"
+                            invisible="capture_kind == 'inventory'"
+                        />
+                        <span class="o_stock_barcodes_count badge text-bg-info">
+                            <field name="card_count" />
+                        </span>
+                    </div>
+                    <div
+                        class="o_stock_barcodes_values"
+                        invisible="not show_form_scan and not manual_entry"
+                    >
+                        <group>
+                            <label
+                                for="location_id"
+                                invisible="capture_kind in ('incoming', 'inventory')"
+                            />
+                            <label
+                                for="location_id"
+                                string="Location"
+                                invisible="capture_kind != 'inventory'"
+                            />
+                            <div class="o_row" invisible="capture_kind == 'incoming'">
+                                <field
+                                    name="location_id"
+                                    readonly="not manual_entry"
+                                    options="{'no_create': True}"
+                                />
+                                <button
+                                    name="action_select_location"
+                                    type="object"
+                                    icon="location_on"
+                                    title="Select a location with stock"
+                                    class="btn btn-link"
+                                    invisible="location_stock_count &lt; 2"
+                                    context="{'capture_location_field': 'location_id', 'capture_location_reverse': False}"
+                                />
+                            </div>
+                            <field
+                                name="product_id"
+                                readonly="not manual_entry"
+                                options="{'no_create': True}"
+                            />
+                            <field
+                                name="packaging_id"
+                                readonly="not manual_entry"
+                                invisible="not packaging_id and not manual_entry"
+                                domain="[('product_id', '=', product_id)]"
+                                options="{'no_create': True}"
+                            />
+                            <field
+                                name="lot_id"
+                                readonly="not manual_entry"
+                                invisible="not product_tracking"
+                                domain="[('product_id', '=', product_id)]"
+                                options="{'no_create': True}"
+                                groups="stock.group_production_lot"
+                            />
+                            <field
+                                name="lot_name"
+                                readonly="not manual_entry"
+                                invisible="not product_tracking or lot_id"
+                                groups="stock.group_production_lot"
+                            />
+                            <field
+                                name="package_id"
+                                readonly="not manual_entry"
+                                invisible="capture_kind == 'incoming'"
+                                options="{'no_create': True}"
+                                groups="stock.group_tracking_lot"
+                            />
+                            <label
+                                for="result_package_id"
+                                invisible="capture_kind == 'inventory'"
+                                groups="stock.group_tracking_lot"
+                            />
+                            <div
+                                class="o_row"
+                                invisible="capture_kind == 'inventory'"
+                                groups="stock.group_tracking_lot"
+                            >
+                                <field
+                                    name="result_package_id"
+                                    readonly="not manual_entry"
+                                    options="{'no_create': True}"
+                                />
+                                <button
+                                    name="action_create_package"
+                                    type="object"
+                                    icon="add"
+                                    title="New package"
+                                    class="btn btn-link"
+                                />
+                                <button
+                                    name="action_toggle_keep_result_package"
+                                    type="object"
+                                    icon="lock"
+                                    title="Keep the package for the next readings"
+                                    class="btn btn-link"
+                                    invisible="keep_result_package"
+                                />
+                                <button
+                                    name="action_toggle_keep_result_package"
+                                    type="object"
+                                    icon="lock"
+                                    title="The package is kept for the next readings"
+                                    class="btn btn-link text-success"
+                                    invisible="not keep_result_package"
+                                />
+                            </div>
+                            <field
+                                name="owner_id"
+                                readonly="not manual_entry"
+                                invisible="not show_owner"
+                                options="{'no_create': True}"
+                            />
+                            <label
+                                for="location_dest_id"
+                                invisible="capture_kind in ('outgoing', 'inventory')"
+                            />
+                            <div
+                                class="o_row"
+                                invisible="capture_kind in ('outgoing', 'inventory')"
+                            >
+                                <field
+                                    name="location_dest_id"
+                                    readonly="not manual_entry"
+                                    options="{'no_create': True}"
+                                />
+                                <button
+                                    name="action_select_location"
+                                    type="object"
+                                    icon="location_on"
+                                    title="Select a location with stock"
+                                    class="btn btn-link"
+                                    invisible="location_stock_count &lt; 2"
+                                    context="{'capture_location_field': 'location_dest_id', 'capture_location_reverse': True}"
+                                />
+                            </div>
+                            <label for="quantity" />
+                            <div class="o_row">
+                                <field
+                                    name="quantity"
+                                    widget="numeric_step"
+                                    readonly="not manual_entry and not manual_quantity and not manual_confirm"
+                                />
+                                <field
+                                    name="uom_id"
+                                    readonly="not manual_entry"
+                                    options="{'no_create': True, 'no_open': True}"
+                                    groups="uom.group_uom"
+                                />
+                            </div>
+                            <field
+                                name="product_outgoing_qty"
+                                string="To Deliver"
+                                invisible="capture_kind != 'incoming' or not product_outgoing_qty"
+                            />
+                            <field
+                                name="product_available"
+                                string="In Stock"
+                                invisible="not show_stock or not product_id"
+                            />
+                            <label
+                                for="product_captured"
+                                string="Captured / Demand"
+                                invisible="not product_id or capture_kind == 'inventory'"
+                            />
+                            <div
+                                class="o_row"
+                                invisible="not product_id or capture_kind == 'inventory'"
+                            >
+                                <field name="product_captured" nolabel="1" />
+                                <span>/</span>
+                                <field name="product_demand" nolabel="1" />
+                            </div>
+                        </group>
+                        <div class="o_stock_barcodes_confirm">
+                            <button
+                                name="action_confirm"
+                                type="object"
+                                string="Confirm"
+                                class="btn-primary"
+                                invisible="not manual_entry and not manual_confirm"
+                            />
+                            <button
+                                name="action_force"
+                                type="object"
+                                string="Capture anyway"
+                                class="btn-warning"
+                                invisible="not force_visible"
+                            />
+                        </div>
+                    </div>
+                    <field
+                        name="card_move_ids"
+                        nolabel="1"
+                        readonly="1"
+                        invisible="not card_move_ids"
+                        context="{'capture_session_id': id}"
+                        class="o_stock_barcodes_cards"
+                    >
+                        <kanban create="0" class="o_stock_barcodes_card_kanban">
+                            <field name="capture_state" />
+                            <field name="capture_state_color" />
+                            <field name="capture_pending_quantity" />
+                            <field name="uom_id" />
+                            <templates>
+                                <t t-name="card">
+                                    <div
+                                        class="o_stock_barcodes_card"
+                                        t-attf-class="oe_kanban_color_{{record.capture_state_color.raw_value}}"
+                                    >
+                                        <a
+                                            name="action_capture_card_select"
+                                            type="object"
+                                            class="fw-bold"
+                                        >
+                                            <field name="product_id" />
+                                        </a>
+                                        <div class="text-muted small">
+                                            <field name="location_id" />
+                                            <span> → </span>
+                                            <field name="location_dest_id" />
+                                        </div>
+                                        <div class="small">
+                                            <field name="capture_lot_names" />
+                                        </div>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="o_stock_barcodes_captured">
+                                                <field name="captured_quantity" />
+                                            </span>
+                                            <span>/</span>
+                                            <field name="product_uom_qty" />
+                                            <field
+                                                name="uom_id"
+                                                groups="uom.group_uom"
+                                            />
+                                            <div class="ms-auto">
+                                                <button
+                                                    name="action_capture_card_select"
+                                                    type="object"
+                                                    icon="edit"
+                                                    title="Fill the screen with this card"
+                                                    class="btn btn-sm btn-link"
+                                                />
+                                                <button
+                                                    name="action_capture_undo"
+                                                    type="object"
+                                                    icon="undo"
+                                                    title="Undo"
+                                                    class="btn btn-sm btn-link"
+                                                />
+                                                <button
+                                                    name="action_capture_close"
+                                                    type="object"
+                                                    icon="skip_next"
+                                                    title="Close with a backorder"
+                                                    class="btn btn-sm btn-link"
+                                                    context="{'capture_backorder_action': 'create_backorder'}"
+                                                />
+                                                <button
+                                                    name="action_capture_close"
+                                                    type="object"
+                                                    icon="block"
+                                                    title="Close without backorder"
+                                                    class="btn btn-sm btn-link"
+                                                    context="{'capture_backorder_action': 'skip_backorder'}"
+                                                />
+                                                <button
+                                                    name="action_capture_remaining"
+                                                    type="object"
+                                                    title="Capture what is left"
+                                                    class="btn btn-sm btn-primary"
+                                                    invisible="capture_state == 'captured'"
+                                                >
+                                                    <t
+                                                        t-out="record.capture_pending_quantity.value"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    <field
+                        name="card_line_ids"
+                        nolabel="1"
+                        readonly="1"
+                        invisible="not card_line_ids"
+                        context="{'capture_session_id': id}"
+                        class="o_stock_barcodes_cards"
+                    >
+                        <kanban create="0" class="o_stock_barcodes_card_kanban">
+                            <field name="picked" />
+                            <field name="uom_id" />
+                            <field name="capture_card_pending" />
+                            <templates>
+                                <t t-name="card">
+                                    <div
+                                        class="o_stock_barcodes_card"
+                                        t-attf-class="oe_kanban_color_{{record.picked.raw_value ? 10 : 1}}"
+                                    >
+                                        <a
+                                            name="action_capture_card_select"
+                                            type="object"
+                                            class="fw-bold"
+                                        >
+                                            <field name="product_id" />
+                                        </a>
+                                        <div class="text-muted small">
+                                            <field name="location_id" />
+                                            <span> → </span>
+                                            <field name="location_dest_id" />
+                                        </div>
+                                        <div class="small">
+                                            <field
+                                                name="lot_id"
+                                                groups="stock.group_production_lot"
+                                            />
+                                            <field
+                                                name="package_id"
+                                                groups="stock.group_tracking_lot"
+                                            />
+                                        </div>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="o_stock_barcodes_captured">
+                                                <field name="capture_card_captured" />
+                                            </span>
+                                            <span>/</span>
+                                            <field name="capture_card_quantity" />
+                                            <div class="ms-auto">
+                                                <button
+                                                    name="action_capture_card_select"
+                                                    type="object"
+                                                    icon="edit"
+                                                    title="Fill the screen with this card"
+                                                    class="btn btn-sm btn-link"
+                                                />
+                                                <button
+                                                    name="action_capture_card_undo"
+                                                    type="object"
+                                                    icon="undo"
+                                                    title="Undo"
+                                                    class="btn btn-sm btn-link"
+                                                    invisible="not picked"
+                                                />
+                                                <button
+                                                    name="action_capture_card_skip"
+                                                    type="object"
+                                                    icon="skip_next"
+                                                    title="Leave without capturing"
+                                                    class="btn btn-sm btn-link"
+                                                    invisible="picked"
+                                                />
+                                                <button
+                                                    name="action_capture_card_remaining"
+                                                    type="object"
+                                                    title="Capture what is reserved"
+                                                    class="btn btn-sm btn-primary"
+                                                    invisible="picked"
+                                                >
+                                                    <t
+                                                        t-out="record.capture_card_pending.value"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    <field
+                        name="card_quant_ids"
+                        nolabel="1"
+                        readonly="1"
+                        invisible="capture_kind != 'inventory'"
+                        context="{'capture_session_id': id}"
+                        class="o_stock_barcodes_cards"
+                    >
+                        <kanban create="0" class="o_stock_barcodes_card_kanban">
+                            <field name="inventory_quantity_set" />
+                            <templates>
+                                <t t-name="card">
+                                    <div class="o_stock_barcodes_card">
+                                        <a
+                                            name="action_capture_card_select"
+                                            type="object"
+                                            class="fw-bold"
+                                        >
+                                            <field name="product_id" />
+                                        </a>
+                                        <div class="text-muted small">
+                                            <field name="location_id" />
+                                            <field
+                                                name="lot_id"
+                                                groups="stock.group_production_lot"
+                                            />
+                                            <field
+                                                name="package_id"
+                                                groups="stock.group_tracking_lot"
+                                            />
+                                        </div>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="o_stock_barcodes_captured">
+                                                <field name="inventory_quantity" />
+                                            </span>
+                                            <span>/</span>
+                                            <field name="quantity" />
+                                            <div class="ms-auto">
+                                                <button
+                                                    name="action_capture_card_select"
+                                                    type="object"
+                                                    icon="edit"
+                                                    title="Fill the screen with this card"
+                                                    class="btn btn-sm btn-link"
+                                                />
+                                                <button
+                                                    name="action_capture_count_remove"
+                                                    type="object"
+                                                    icon="remove"
+                                                    title="One less"
+                                                    class="btn btn-sm btn-link"
+                                                />
+                                                <button
+                                                    name="action_capture_count_add"
+                                                    type="object"
+                                                    icon="add"
+                                                    title="One more"
+                                                    class="btn btn-sm btn-link"
+                                                />
+                                                <button
+                                                    name="action_capture_count_clear"
+                                                    type="object"
+                                                    icon="delete"
+                                                    title="Clear"
+                                                    class="btn btn-sm btn-link"
+                                                    invisible="not inventory_quantity_set"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    <field
+                        name="captured_line_ids"
+                        nolabel="1"
+                        readonly="1"
+                        invisible="not show_detailed_operations"
+                        context="{'capture_session_id': id}"
+                    >
+                        <list create="0" delete="0">
+                            <field name="product_id" />
+                            <field name="lot_id" groups="stock.group_production_lot" />
+                            <field name="location_id" />
+                            <field name="location_dest_id" />
+                            <field
+                                name="result_package_id"
+                                groups="stock.group_tracking_lot"
+                            />
+                            <field name="quantity" />
+                            <field name="uom_id" groups="uom.group_uom" />
+                            <button
+                                name="action_capture_line_delete"
+                                type="object"
+                                icon="delete"
+                                title="Remove"
+                            />
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="stock_capture_new_packaging_view_form" model="ir.ui.view">
+        <field name="model">stock.capture.new.packaging</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="product_id" readonly="1" />
+                    <field name="allowed_uom_ids" invisible="1" />
+                    <field name="uom_id" required="1" options="{'no_create': True}" />
+                    <field name="barcode" required="1" />
+                </group>
+                <footer>
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Confirm"
+                        class="btn-primary"
+                    />
+                    <button string="Discard" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_capture_session" model="ir.actions.act_window">
+        <field name="name">Barcode Reader</field>
+        <field name="res_model">stock.capture.session</field>
+        <field name="path">barcode-reader</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="stock_capture_session_view_form" />
+        <field name="target">current</field>
+    </record>
+    <record id="stock_capture_product_info_view_form" model="ir.ui.view">
+        <field name="model">stock.capture.product.info</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="show_product_info" invisible="1" />
+                <group invisible="not show_product_info">
+                    <field name="product_id" />
+                    <field name="qty_available" />
+                    <field name="incoming_qty" />
+                    <field name="outgoing_qty" />
+                    <field name="virtual_available" />
+                </group>
+                <field name="line_ids" nolabel="1" readonly="1">
+                    <list create="0" delete="0">
+                        <field name="location_id" />
+                        <field name="quantity" />
+                        <field name="uom_id" groups="uom.group_uom" />
+                        <button
+                            name="action_select"
+                            type="object"
+                            icon="check"
+                            title="Use this location"
+                        />
+                    </list>
+                </field>
+                <footer>
+                    <button string="Close" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

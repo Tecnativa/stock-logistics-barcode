@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <record id="stock_picking_type_kanban" model="ir.ui.view">
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.stock_picking_type_kanban" />
+        <field name="arch" type="xml">
+            <button name="get_action_picking_tree_ready" position="after">
+                <div class="mt-2 d-flex gap-1 o_stock_barcodes_type_buttons">
+                    <button
+                        name="action_barcode_scan"
+                        type="object"
+                        class="btn btn-secondary btn-sm"
+                        title="Read barcodes"
+                    >
+                        <i class="oi" data-icon="barcode" />
+                    </button>
+                    <button
+                        name="action_barcode_ready_pickings"
+                        type="object"
+                        class="btn btn-secondary btn-sm"
+                        title="Transfers ready to read"
+                    >
+                        <i class="oi" data-icon="checklist" />
+                    </button>
+                    <button
+                        name="action_barcode_new_picking"
+                        type="object"
+                        class="btn btn-secondary btn-sm"
+                        title="New transfer read with barcodes"
+                    >
+                        <i class="oi" data-icon="add" />
+                    </button>
+                </div>
+            </button>
+        </field>
+    </record>
+    <record id="view_pickingtype_filter" model="ir.ui.view">
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_pickingtype_filter" />
+        <field name="arch" type="xml">
+            <filter name="favorites" position="after">
+                <separator />
+                <filter
+                    name="capture_incoming"
+                    string="Receipts"
+                    domain="[('code', '=', 'incoming')]"
+                />
+                <filter
+                    name="capture_outgoing"
+                    string="Deliveries"
+                    domain="[('code', '=', 'outgoing')]"
+                />
+                <filter
+                    name="capture_internal"
+                    string="Internal Transfers"
+                    domain="[('code', '=', 'internal')]"
+                />
+            </filter>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<templates xml:space="preserve">
+    <t t-name="stock_barcodes.Reader">
+        <div class="o_stock_barcodes_reader">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="oi" data-icon="barcode" />
+                </span>
+                <input
+                    type="text"
+                    class="form-control o_stock_barcodes_input"
+                    placeholder="Read or type a barcode"
+                    autocomplete="off"
+                    t-on-keydown="this.onInputKeydown"
+                />
+                <button
+                    t-if="this.cameraSupported"
+                    class="btn btn-secondary o_stock_barcodes_camera"
+                    type="button"
+                    title="Read with the camera"
+                    t-on-click="this.onCameraClick"
+                >
+                    <i class="oi" data-icon="photo_camera" />
+                </button>
+            </div>
+            <div
+                t-if="this.record.data.message"
+                class="alert mb-1 py-1 o_stock_barcodes_message"
+                t-att-class="this.messageClass"
+                role="alert"
+                t-out="this.record.data.message"
+            />
+            <div
+                t-if="this.record.data.step_message"
+                class="text-muted small o_stock_barcodes_step"
+                t-out="this.record.data.step_message"
+            />
+        </div>
+    </t>
+</templates>
