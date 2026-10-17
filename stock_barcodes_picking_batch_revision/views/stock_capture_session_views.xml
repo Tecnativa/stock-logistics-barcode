@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <record id="stock_capture_session_view_form" model="ir.ui.view">
+        <field name="model">stock.capture.session</field>
+        <field name="inherit_id" ref="stock_barcodes.stock_capture_session_view_form" />
+        <field name="arch" type="xml">
+            <button name="action_open_document" position="after">
+                <field name="review_mode" invisible="1" />
+                <field name="barcodes_requested_review" invisible="1" />
+                <button
+                    name="action_request_review"
+                    type="object"
+                    string="Request Review"
+                    invisible="res_model != 'stock.picking.batch' or barcodes_requested_review or review_mode"
+                />
+                <button
+                    name="action_request_review"
+                    type="object"
+                    string="Cancel Review Request"
+                    invisible="res_model != 'stock.picking.batch' or not barcodes_requested_review or review_mode"
+                />
+            </button>
+            <xpath
+                expr="//field[@name='card_line_ids']//button[@name='action_capture_card_skip']"
+                position="after"
+            >
+                <button
+                    name="action_capture_card_review"
+                    type="object"
+                    icon="check"
+                    title="Confirm the review"
+                    class="btn btn-sm btn-link"
+                    invisible="not capture_card_review or barcodes_is_reviewed"
+                />
+            </xpath>
+            <xpath
+                expr="//field[@name='card_line_ids']//button[@name='action_capture_card_undo']"
+                position="attributes"
+            >
+                <attribute
+                    name="invisible"
+                >not picked or capture_card_review</attribute>
+            </xpath>
+            <xpath expr="//field[@name='card_line_ids']/kanban" position="inside">
+                <field name="barcodes_is_reviewed" />
+                <field name="capture_card_review" />
+            </xpath>
+            <field name="card_line_ids" position="attributes">
+                <attribute
+                    name="context"
+                >{'capture_session_id': id, 'capture_review': review_mode}</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
