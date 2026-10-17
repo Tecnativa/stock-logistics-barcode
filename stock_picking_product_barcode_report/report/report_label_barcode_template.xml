@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <template id="report_label_barcode">
         <t t-call="web.basic_layout">
@@ -23,7 +23,7 @@
                                     alt="Barcode"
                                 />
                                 <span
-                                    t-esc="'(02)' + barcode + '(10)' + lot.name"
+                                    t-out="'(02)' + barcode + '(10)' + lot.name"
                                     style="font-size: 6px;"
                                 />
                             </t>
@@ -35,7 +35,7 @@
                                     alt="Barcode"
                                 />
                                 <span
-                                    t-esc="'(02)' + barcode"
+                                    t-out="'(02)' + barcode"
                                     style="font-size: 6px;"
                                 />
                             </t>
@@ -60,7 +60,7 @@
                                 alt="Barcode"
                             />
                             <span
-                                t-esc="doc.product_id.barcode"
+                                t-out="doc.product_id.barcode"
                                 style="font-size: 6px;"
                             />
                         </t>

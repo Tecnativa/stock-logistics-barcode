@@ -104,7 +104,7 @@ class TestStockPickingProductBarcodeReport(BaseCommon):
         )
         quant_wizard = (
             self.env["stock.picking.print"]
-            .with_context(**{"active_ids": quant.ids, "active_model": "stock.quant"})
+            .with_context(active_ids=quant.ids, active_model="stock.quant")
             .create({})
         )
         quant_wizard.barcode_report = self.env.ref(

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <template id="report_label_barcode_quant_package">
         <t t-call="web.basic_layout">
@@ -52,7 +52,7 @@
                             <div name="package">
                                 <span>Quantity: </span>
                                 <span
-                                    t-esc="doc.quantity"
+                                    t-out="doc.quantity"
                                     t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"
                                 />
                             </div>
@@ -61,7 +61,7 @@
                                     <div class="col-6">
                                         <span>Weight:</span>
                                         <span
-                                            t-esc="doc.product_id.weight * doc.quantity"
+                                            t-out="doc.product_id.weight * doc.quantity"
                                             t-options="{'widget': 'float', 'decimal_precision': 'Stock Weight'}"
                                         />
                                     </div>
@@ -69,7 +69,7 @@
                             </div>
                         </div>
                         <div name="barcode" class="text-start mt8">
-                            <span t-esc="barcode" style="font-size: 3em" />
+                            <span t-out="barcode" style="font-size: 3em" />
                             <div>
                                 <img
                                     t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;quiet=0' % ('Code128', barcode, 400, 100)"
