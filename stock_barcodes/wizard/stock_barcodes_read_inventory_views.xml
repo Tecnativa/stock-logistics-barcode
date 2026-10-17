@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="view_stock_barcodes_read_inventory_form" model="ir.ui.view">
         <field name="name">stock.barcodes.read.inventory.form</field>
         <field name="model">wiz.stock.barcodes.read.inventory</field>
         <field name="inherit_id" ref="stock_barcodes.view_stock_barcodes_read_form" />
         <field name="mode">primary</field>
-        <field name="priority">99</field>
+        <field name="priority" eval="99" />
         <field name="arch" type="xml">
             <field name="product_qty" position="after">
                 <field name="inventory_product_qty" invisible="1" />

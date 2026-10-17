@@ -737,7 +737,7 @@ class TestStockBarcodesPicking(TestCommonStockBarcodes):
         self.assertEqual(
             type(
                 self.picking_in_01.picking_type_id.with_context(
-                    **{"operations_mode": True}
+                    operations_mode=True
                 ).get_action_picking_tree_ready()
             ),
             dict,

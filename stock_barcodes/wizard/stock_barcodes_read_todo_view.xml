@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="view_stock_barcodes_todo_kanban" model="ir.ui.view">
         <field name="name">stock.barcodes.todo.kanban</field>
@@ -107,8 +107,8 @@
                                         <field name="uom_id" />
                                     </span>
                                     <strong
-                                        class="bg-danger"
                                         t-if="record.is_extra_line.raw_value == true"
+                                        class="bg-danger"
                                     >NOT AVAILABLE</strong>
                                 </div>
                             </div>
@@ -221,7 +221,7 @@
     <record id="view_stock_barcodes_pending_moves_kanban" model="ir.ui.view">
         <field name="name">stock.barcodes.todo.kanban</field>
         <field name="model">wiz.stock.barcodes.read.todo</field>
-        <field name="priority">99</field>
+        <field name="priority" eval="99" />
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="id" />
@@ -318,11 +318,11 @@
                             </div>
                             <div class="o_stock_barcodes_pending_operation_actions">
                                 <button
+                                    t-if="record.qty_done.raw_value &gt; 0"
+                                    class="btn btn-op-big btn-warning o_stock_barcodes_pending_operation_button"
                                     name="action_reset_lines"
                                     type="object"
-                                    class="btn btn-op-big btn-warning o_stock_barcodes_pending_operation_button"
                                     context="{'wiz_barcode_id': parent.id}"
-                                    t-if="record.qty_done.raw_value &gt; 0"
                                     title="Clean scanned quantity"
                                 >
                                     <i
@@ -342,10 +342,10 @@
                                     />
                                 </button>
                                 <button
+                                    t-if="record.qty_done_rest.raw_value > 0"
+                                    class="btn btn-lg btn-primary btn-op-big o_stock_barcodes_pending_operation_button o_stock_barcodes_pending_operation_todo"
                                     name="operation_quantities"
                                     type="object"
-                                    class="btn btn-lg btn-primary btn-op-big o_stock_barcodes_pending_operation_button o_stock_barcodes_pending_operation_todo"
-                                    t-if="record.qty_done_rest.raw_value > 0"
                                 >
                                     +
                                     <span

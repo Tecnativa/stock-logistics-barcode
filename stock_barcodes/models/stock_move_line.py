@@ -64,8 +64,9 @@ class StockMoveLine(models.Model):
                 line.picking_id = line.move_id.picking_id
             line.qty_picked = line.quantity
             todo_lines = wiz.todo_line_ids.filtered(
-                lambda t, line=line: line.move_id in t.stock_move_ids
-                and line not in t.line_ids
+                lambda t, line=line: (
+                    line.move_id in t.stock_move_ids and line not in t.line_ids
+                )
             )
             todo_lines.line_ids = [(4, line.id)]
 

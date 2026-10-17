@@ -96,9 +96,12 @@ class WizStockBarcodesReadPicking(models.TransientModel):
     def _compute_pending_move_ids(self):
         if self.option_group_id.show_pending_moves == "pending":
             self.pending_move_ids = self.todo_line_ids.filtered(
-                lambda t: t.state == "pending"
-                and any(
-                    sm.barcode_backorder_action == "pending" for sm in t.stock_move_ids
+                lambda t: (
+                    t.state == "pending"
+                    and any(
+                        sm.barcode_backorder_action == "pending"
+                        for sm in t.stock_move_ids
+                    )
                 )
             )
         elif self.option_group_id.show_pending_moves == "all":
@@ -227,8 +230,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
 
     def _get_stock_move_lines_todo(self):
         move_lines = self.picking_id.move_line_ids.filtered(
-            lambda ml: (not ml.barcode_scan_state or ml.barcode_scan_state == "pending")
-            and ml.qty_picked < ml.quantity
+            lambda ml: (
+                (not ml.barcode_scan_state or ml.barcode_scan_state == "pending")
+                and ml.qty_picked < ml.quantity
+            )
         )
         return move_lines
 
@@ -334,8 +339,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             # "all"; the next guided todo must only ever be a pending one, so a
             # finished group is not re-selected instead of advancing.
             self.todo_line_id = self.pending_move_ids.filtered(
-                lambda ln: ln.state == "pending"
-                and str(self._group_key(ln)) == self.forced_todo_key
+                lambda ln: (
+                    ln.state == "pending"
+                    and str(self._group_key(ln)) == self.forced_todo_key
+                )
             )[:1]
             self.selected_pending_move_id = self.todo_line_id
             self.determine_todo_action(self.todo_line_id)
@@ -544,8 +551,10 @@ class WizStockBarcodesReadPicking(models.TransientModel):
             moves_todo = self.todo_line_id.stock_move_ids
         elif self.picking_id:
             moves_todo = self.picking_id.move_ids.filtered(
-                lambda sm: sm.product_id == self.product_id
-                and sm.state not in ("cancel", "done")
+                lambda sm: (
+                    sm.product_id == self.product_id
+                    and sm.state not in ("cancel", "done")
+                )
             )
         else:
             moves_todo = StockMove.search(domain)
@@ -568,10 +577,12 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         if self.product_id.tracking == "serial":
             serial_lines = self.get_moves().move_line_ids.filtered(
                 lambda sml: (
-                    (self.lot_id and sml.lot_id == self.lot_id)
-                    or (self.lot_name and sml.lot_name == self.lot_name)
+                    (
+                        (self.lot_id and sml.lot_id == self.lot_id)
+                        or (self.lot_name and sml.lot_name == self.lot_name)
+                    )
+                    and sml.qty_picked >= 1.0
                 )
-                and sml.qty_picked >= 1.0
             )
             if serial_lines:
                 self.lot_name = False
@@ -595,7 +606,7 @@ class WizStockBarcodesReadPicking(models.TransientModel):
                 self._set_message_info("more_match", _("S/N already created"))
                 return False
             lines = candidate_lines.filtered(
-                lambda line: (not line.lot_id and line.barcode_scan_state == "pending")
+                lambda line: not line.lot_id and line.barcode_scan_state == "pending"
             )
             if lines:
                 sml_vals.update({"lot_id": self.lot_id.id, "lot_name": self.lot_name})
@@ -939,12 +950,14 @@ class WizStockBarcodesReadPicking(models.TransientModel):
 
     def get_lot_by_removal_strategy(self):
         pending_lines = self.get_moves().move_line_ids.filtered(
-            lambda line: line.product_id == self.product_id
-            and line.location_id == self.location_id
-            and line.lot_id
-            and line.quantity > line.qty_picked
-            and (not self.package_id or line.package_id == self.package_id)
-            and line.owner_id == self.owner_id
+            lambda line: (
+                line.product_id == self.product_id
+                and line.location_id == self.location_id
+                and line.lot_id
+                and line.quantity > line.qty_picked
+                and (not self.package_id or line.package_id == self.package_id)
+                and line.owner_id == self.owner_id
+            )
         )
         if pending_lines:
             self.lot_id = pending_lines[:1].lot_id
@@ -957,10 +970,12 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         # has stock, regardless of how its in_date/id happen to sort.
         quants = first(
             all_quants.filtered(
-                lambda q: q.available_quantity > 0
-                and q.lot_id
-                and (not self.package_id or q.package_id == self.package_id)
-                and q.owner_id == self.owner_id
+                lambda q: (
+                    q.available_quantity > 0
+                    and q.lot_id
+                    and (not self.package_id or q.package_id == self.package_id)
+                    and q.owner_id == self.owner_id
+                )
             )
         )
         # TODO: Perhaps update location_id from quant??
@@ -998,9 +1013,11 @@ class WizStockBarcodesReadPicking(models.TransientModel):
         if not self.picking_id or self.picking_type_code == "incoming":
             return
         pending = self.picking_id.move_line_ids.filtered(
-            lambda ml: ml.product_id == product
-            and ml.barcode_scan_state == "pending"
-            and ml.location_id.usage == "internal"
+            lambda ml: (
+                ml.product_id == product
+                and ml.barcode_scan_state == "pending"
+                and ml.location_id.usage == "internal"
+            )
         )
         if not pending or pending.filtered(
             lambda ml: ml.location_id == self.location_id

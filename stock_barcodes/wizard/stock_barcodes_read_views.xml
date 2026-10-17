@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="view_stock_barcodes_read_form" model="ir.ui.view">
         <field name="name">stock.barcodes.read.form</field>
@@ -390,12 +391,12 @@
                              invisible attribute to be allocated by jquery selector
                          -->
                         <button
-                            name="dummy_on_barcode_scanned"
                             id="dummy_on_barcode_scanned"
+                            class="d-none"
+                            name="dummy_on_barcode_scanned"
                             type="object"
                             data-hotkey="99"
                             invisible="0"
-                            class="d-none"
                         />
 
                         <button
@@ -502,8 +503,8 @@
             >
                 <field name="product_packaging_ids" invisible="1" />
                 <div
-                    class="d-flex flex-column"
                     id="packaging_qty_field"
+                    class="d-flex flex-column"
                     invisible="not product_packaging_ids"
                 >
                     <span

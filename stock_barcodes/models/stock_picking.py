@@ -57,8 +57,10 @@ class StockPicking(models.Model):
         if self.env.context.get("stock_barcodes_read_picking_id", False):
             self.set_quantity_from_picked()
         put_in_pack_picks = self.filtered(
-            lambda p: p.picking_type_id.barcode_option_group_id.auto_put_in_pack
-            and not p.move_line_ids.result_package_id
+            lambda p: (
+                p.picking_type_id.barcode_option_group_id.auto_put_in_pack
+                and not p.move_line_ids.result_package_id
+            )
         )
         if put_in_pack_picks:
             put_in_pack_picks.action_put_in_pack()

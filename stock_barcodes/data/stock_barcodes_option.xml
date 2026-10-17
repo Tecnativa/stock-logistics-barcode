@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo noupdate="1">
     <record
         id="stock_barcodes_option_group_picking_out"
@@ -20,7 +20,7 @@
     >
         <field name="name">Package</field>
         <field name="step">1</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">package_id</field>
         <field name="to_scan">True</field>
         <field name="filled_default">False</field>
@@ -38,7 +38,7 @@
     >
         <field name="name">Product</field>
         <field name="step">1</field>
-        <field name="sequence">20</field>
+        <field name="sequence" eval="20" />
         <field name="field_name">product_id</field>
         <field name="to_scan">False</field>
         <field name="filled_default">False</field>
@@ -53,7 +53,7 @@
     <record id="stock_barcodes_option_lot_picking_out" model="stock.barcodes.option">
         <field name="name">Lot</field>
         <field name="step">1</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">lot_id</field>
         <field name="to_scan">False</field>
         <field name="filled_default">False</field>
@@ -71,7 +71,7 @@
     >
         <field name="name">Source</field>
         <field name="step">2</field>
-        <field name="sequence">40</field>
+        <field name="sequence" eval="40" />
         <field name="field_name">location_id</field>
         <field name="to_scan">False</field>
         <field name="filled_default">True</field>
@@ -89,7 +89,7 @@
     >
         <field name="name">Qty.</field>
         <field name="step">3</field>
-        <field name="sequence">50</field>
+        <field name="sequence" eval="50" />
         <field name="field_name">product_qty</field>
         <field name="to_scan">False</field>
         <field name="filled_default">False</field>
@@ -123,7 +123,7 @@
     >
         <field name="name">Dest.</field>
         <field name="step">1</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">location_dest_id</field>
         <field name="to_scan">True</field>
         <field name="filled_default">True</field>
@@ -137,7 +137,7 @@
     </record>
     <record id="stock_barcodes_option_product_picking_in" model="stock.barcodes.option">
         <field name="name">Product</field>
-        <field name="sequence">20</field>
+        <field name="sequence" eval="20" />
         <field name="field_name">product_id</field>
         <field name="filled_default">True</field>
         <field name="forced">True</field>
@@ -149,7 +149,7 @@
     </record>
     <record id="stock_barcodes_option_lot_picking_in" model="stock.barcodes.option">
         <field name="name">Lot</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">lot_id</field>
         <field name="filled_default">True</field>
         <field name="forced">False</field>
@@ -164,7 +164,7 @@
         model="stock.barcodes.option"
     >
         <field name="name">Product Qty</field>
-        <field name="sequence">40</field>
+        <field name="sequence" eval="40" />
         <field name="field_name">product_qty</field>
         <field name="required">True</field>
         <field
@@ -194,7 +194,7 @@
     >
         <field name="name">Source</field>
         <field name="step">1</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">location_id</field>
         <field name="to_scan">False</field>
         <field name="filled_default">True</field>
@@ -212,7 +212,7 @@
     >
         <field name="name">Prod.</field>
         <field name="step">2</field>
-        <field name="sequence">20</field>
+        <field name="sequence" eval="20" />
         <field name="field_name">product_id</field>
         <field name="to_scan">False</field>
         <field name="filled_default">False</field>
@@ -230,7 +230,7 @@
     >
         <field name="name">Package</field>
         <field name="step">2</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">package_id</field>
         <field name="to_scan">True</field>
         <field name="filled_default">False</field>
@@ -248,7 +248,7 @@
     >
         <field name="name">Lot</field>
         <field name="step">2</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">lot_id</field>
         <field name="to_scan">False</field>
         <field name="filled_default">False</field>
@@ -266,7 +266,7 @@
     >
         <field name="name">Dest.</field>
         <field name="step">3</field>
-        <field name="sequence">50</field>
+        <field name="sequence" eval="50" />
         <field name="field_name">location_dest_id</field>
         <field name="to_scan">True</field>
         <field name="filled_default">False</field>
@@ -284,7 +284,7 @@
     >
         <field name="name">Qty</field>
         <field name="step">4</field>
-        <field name="sequence">60</field>
+        <field name="sequence" eval="60" />
         <field name="field_name">product_qty</field>
         <field name="to_scan">False</field>
         <field name="filled_default">False</field>
@@ -319,7 +319,7 @@
     >
         <field name="name">Source</field>
         <field name="step">0</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">location_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -337,7 +337,7 @@
     >
         <field name="name">Product</field>
         <field name="step">1</field>
-        <field name="sequence">20</field>
+        <field name="sequence" eval="20" />
         <field name="field_name">product_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -355,7 +355,7 @@
     >
         <field name="name">Package</field>
         <field name="step">1</field>
-        <field name="sequence">25</field>
+        <field name="sequence" eval="25" />
         <field name="field_name">package_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -372,7 +372,7 @@
     >
         <field name="name">Lot</field>
         <field name="step">1</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">lot_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -390,7 +390,7 @@
     >
         <field name="name">Package Dest.</field>
         <field name="step">2</field>
-        <field name="sequence">35</field>
+        <field name="sequence" eval="35" />
         <field name="field_name">result_package_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -407,7 +407,7 @@
     >
         <field name="name">Dest.</field>
         <field name="step">2</field>
-        <field name="sequence">40</field>
+        <field name="sequence" eval="40" />
         <field name="field_name">location_dest_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -425,7 +425,7 @@
     >
         <field name="name">Product Qty</field>
         <field name="step">3</field>
-        <field name="sequence">50</field>
+        <field name="sequence" eval="50" />
         <field name="field_name">product_qty</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -452,7 +452,7 @@
     >
         <field name="name">Location</field>
         <field name="step">1</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">location_id</field>
         <field name="filled_default">True</field>
         <field name="forced">False</field>
@@ -470,7 +470,7 @@
     >
         <field name="name">Packaging</field>
         <field name="step">2</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">packaging_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -488,7 +488,7 @@
     >
         <field name="name">Product</field>
         <field name="step">2</field>
-        <field name="sequence">20</field>
+        <field name="sequence" eval="20" />
         <field name="field_name">product_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -503,7 +503,7 @@
     <record id="stock_barcodes_option_lot_id_inventory" model="stock.barcodes.option">
         <field name="name">Lot</field>
         <field name="step">2</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">lot_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -521,7 +521,7 @@
     >
         <field name="name">Product Qty</field>
         <field name="step">3</field>
-        <field name="sequence">50</field>
+        <field name="sequence" eval="50" />
         <field name="field_name">product_qty</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -549,7 +549,7 @@
     >
         <field name="name">Location</field>
         <field name="step">1</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">location_id</field>
         <field name="filled_default">True</field>
         <field name="forced">False</field>
@@ -567,7 +567,7 @@
     >
         <field name="name">Packaging</field>
         <field name="step">2</field>
-        <field name="sequence">10</field>
+        <field name="sequence" eval="10" />
         <field name="field_name">packaging_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -585,7 +585,7 @@
     >
         <field name="name">Product</field>
         <field name="step">2</field>
-        <field name="sequence">20</field>
+        <field name="sequence" eval="20" />
         <field name="field_name">product_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -600,7 +600,7 @@
     <record id="stock_barcodes_option_lot_id_operation" model="stock.barcodes.option">
         <field name="name">Lot</field>
         <field name="step">2</field>
-        <field name="sequence">30</field>
+        <field name="sequence" eval="30" />
         <field name="field_name">lot_id</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
@@ -618,7 +618,7 @@
     >
         <field name="name">Product Qty</field>
         <field name="step">3</field>
-        <field name="sequence">50</field>
+        <field name="sequence" eval="50" />
         <field name="field_name">product_qty</field>
         <field name="filled_default">False</field>
         <field name="forced">False</field>
