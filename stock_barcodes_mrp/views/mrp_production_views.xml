@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <record id="mrp_production_form_view" model="ir.ui.view">
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view" />
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button
+                    name="action_capture_open"
+                    string="Scan"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="barcode"
+                    invisible="state not in ('confirmed', 'progress', 'to_close')"
+                />
+            </div>
+        </field>
+    </record>
+</odoo>
