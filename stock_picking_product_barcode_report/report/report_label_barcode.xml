@@ -5,9 +5,6 @@
         <field name="model">stock.picking.line.print</field>
         <field name="report_type">qweb-pdf</field>
         <field
-            name="report_file"
-        >stock_picking_product_barcode_report.label_barcode_report</field>
-        <field
             name="report_name"
         >stock_picking_product_barcode_report.label_barcode_report</field>
         <field
@@ -16,14 +13,10 @@
         />
         <field name="is_barcode_label">True</field>
     </record>
-    <!--  Use distinct report_file because model is taken from first definition  -->
     <record id="action_label_barcode_report_quant_package" model="ir.actions.report">
         <field name="name">Label Quant Package</field>
         <field name="model">stock.picking.line.print</field>
         <field name="report_type">qweb-pdf</field>
-        <field
-            name="report_file"
-        >stock_picking_product_barcode_report.label_barcode_report_quant_package_wiz</field>
         <field
             name="report_name"
         >stock_picking_product_barcode_report.label_barcode_report_quant_package_wiz</field>
@@ -38,9 +31,6 @@
         <field name="model">stock.quant</field>
         <field name="report_type">qweb-pdf</field>
         <field
-            name="report_file"
-        >stock_picking_product_barcode_report.label_barcode_report_quant_package</field>
-        <field
             name="report_name"
         >stock_picking_product_barcode_report.label_barcode_report_quant_package</field>
         <field
@@ -51,11 +41,8 @@
     </record>
     <record id="report_label_barcode_package" model="ir.actions.report">
         <field name="name">Labels package content</field>
-        <field name="model">stock.quant.package</field>
+        <field name="model">stock.package</field>
         <field name="report_type">qweb-pdf</field>
-        <field
-            name="report_file"
-        >stock_picking_product_barcode_report.label_barcode_report_package_content</field>
         <field
             name="report_name"
         >stock_picking_product_barcode_report.label_barcode_report_package_content</field>
@@ -63,15 +50,12 @@
             name="paperformat_id"
             ref="stock_picking_product_barcode_report.paperformat_label_quant_package"
         />
-        <field name="binding_model_id" ref="stock.model_stock_quant_package" />
+        <field name="binding_model_id" ref="stock.model_stock_package" />
     </record>
     <record id="action_label_custom_report" model="ir.actions.report">
         <field name="name">Custom Label Impresion</field>
         <field name="model">stock.picking.print</field>
         <field name="report_type">qweb-pdf</field>
-        <field
-            name="report_file"
-        >stock_picking_product_barcode_report.label_custom_report</field>
         <field
             name="report_name"
         >stock_picking_product_barcode_report.label_custom_report</field>
@@ -88,9 +72,6 @@
         <field name="name">Label report</field>
         <field name="model">stock.picking.line.print</field>
         <field name="report_type">qweb-pdf</field>
-        <field
-            name="report_file"
-        >stock_picking_product_barcode_report.base_label</field>
         <field
             name="report_name"
         >stock_picking_product_barcode_report.base_label</field>

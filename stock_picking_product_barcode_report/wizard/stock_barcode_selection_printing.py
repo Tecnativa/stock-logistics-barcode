@@ -13,11 +13,10 @@ class ProductPrintingQty(models.TransientModel):
 
     product_id = fields.Many2one(
         "product.product",
-        string="Product",
         required=True,
         domain="[('id', '=', product_id)]",
     )
-    quantity = fields.Float(digits="Product Unit of Measure", required=True)
+    quantity = fields.Float(digits="Product Unit", required=True)
     label_qty = fields.Integer(
         "Quantity of Labels", compute="_compute_label_qty", store=True, readonly=False
     )
@@ -27,25 +26,22 @@ class ProductPrintingQty(models.TransientModel):
     )
     lot_id = fields.Many2one("stock.lot", string="Lot/Serial Number")
     result_package_id = fields.Many2one(
-        comodel_name="stock.quant.package", string="Dest. package"
+        comodel_name="stock.package", string="Dest. package"
     )
 
-    wizard_id = fields.Many2one("stock.picking.print", string="Wizard")
+    wizard_id = fields.Many2one("stock.picking.print")
     move_line_id = fields.Many2one("stock.move.line", "Move", readonly=True)
-    product_packaging_id = fields.Many2one(
-        comodel_name="product.packaging",
-        string="Packaging",
-        domain="[('product_id', '=', product_id)]",
-        groups="product.group_stock_packaging",
-        check_company=True,
-    )
+    packaging_uom_id = fields.Many2one(comodel_name="uom.uom", string="Packaging")
     company_id = fields.Many2one(related="wizard_id.company_id")
 
-    @api.depends("product_packaging_id", "quantity")
+    @api.depends("packaging_uom_id", "quantity", "uom_id")
     def _compute_label_qty(self):
         self.label_qty = 1
-        for line in self.filtered("product_packaging_id.print_one_label_by_item"):
-            factor = line.product_packaging_id.qty
+        for line in self.filtered("packaging_uom_id.print_one_label_by_item"):
+            # Units of the line in one package
+            factor = line.packaging_uom_id._compute_quantity(
+                1.0, line.uom_id or line.product_id.uom_id, round=False
+            )
             line.label_qty = ceil(line.quantity / (factor or 1.0))
 
 
@@ -95,7 +91,7 @@ class WizStockBarcodeSelectionPrinting(models.TransientModel):
         comodel_name="ir.actions.report",
         string="Report to print",
         domain=[("is_barcode_label", "=", True)],
-        default=_default_barcode_report,
+        default=lambda self: self._default_barcode_report(),
         required=True,
     )
     is_custom_label = fields.Boolean(compute="_compute_is_custom_label")
@@ -108,7 +104,7 @@ class WizStockBarcodeSelectionPrinting(models.TransientModel):
     @api.onchange("picking_ids", "stock_move_line_ids", "barcode_report")
     def _onchange_picking_ids(self):
         product_print_moves = [(Command.clear())]
-        line_fields = [f for f in self.env["stock.picking.line.print"]._fields.keys()]
+        line_fields = list(self.env["stock.picking.line.print"]._fields)
         product_print_moves_data_tmpl = self.env[
             "stock.picking.line.print"
         ].default_get(line_fields)
@@ -135,7 +131,7 @@ class WizStockBarcodeSelectionPrinting(models.TransientModel):
                         "product_id": quant.product_id.id,
                         "label_qty": 1,
                         "quantity": quant.quantity,
-                        "uom_id": quant.product_uom_id.id,
+                        "uom_id": quant.uom_id.id,
                         "lot_id": quant.lot_id.id,
                         "result_package_id": quant.package_id.id,
                     },
@@ -153,7 +149,7 @@ class WizStockBarcodeSelectionPrinting(models.TransientModel):
                         "product_id": lot.product_id.id,
                         "label_qty": 1,
                         "quantity": lot.product_qty,
-                        "uom_id": lot.product_uom_id.id,
+                        "uom_id": lot.uom_id.id,
                         "lot_id": lot.id,
                     },
                 )
@@ -185,10 +181,10 @@ class WizStockBarcodeSelectionPrinting(models.TransientModel):
             "product_id": move_line.product_id.id,
             "quantity": qty,
             "move_line_id": move_line.id,
-            "uom_id": move_line.product_uom_id.id,
+            "uom_id": move_line.uom_id.id,
             "lot_id": move_line.lot_id.id,
             "result_package_id": move_line.result_package_id.id,
-            "product_packaging_id": move_line.move_id.product_packaging_id.id,
+            "packaging_uom_id": move_line.move_id.packaging_uom_id.id,
         }
 
     def print_labels(self):
@@ -218,11 +214,11 @@ class WizStockBarcodeSelectionPrinting(models.TransientModel):
                                 "force_quantity_line", sml.quantity
                             ),
                             "move_line_id": sml.id,
-                            "uom_id": sml.product_uom_id.id,
+                            "uom_id": sml.uom_id.id,
                             "lot_id": sml.lot_id.id,
                             "result_package_id": sml.result_package_id.id,
-                            "product_packaging_id": self.env.context.get(
-                                "packaging_id", False
+                            "packaging_uom_id": self.env.context.get(
+                                "packaging_uom_id", False
                             ),
                         },
                     )

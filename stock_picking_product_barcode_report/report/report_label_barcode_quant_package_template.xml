@@ -53,7 +53,7 @@
                                 <span>Quantity: </span>
                                 <span
                                     t-out="doc.quantity"
-                                    t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"
+                                    t-options="{'widget': 'float', 'decimal_precision': 'Product Unit'}"
                                 />
                             </div>
                             <div name="Weight" class="mt16">

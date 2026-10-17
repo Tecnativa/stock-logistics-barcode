@@ -66,8 +66,9 @@
                                 groups="uom.group_uom"
                             />
                             <field
-                                name="product_packaging_id"
+                                name="packaging_uom_id"
                                 options="{'no_create': True}"
+                                groups="uom.group_uom"
                             />
                             <field name="label_qty" />
                             <field

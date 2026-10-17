@@ -11,6 +11,8 @@ from ..controllers.main import SVGWitoutTextWriter
 
 
 class TestStockPickingProductBarcodeReport(BaseCommon):
+    _test_user_groups = ("stock.group_stock_manager", "stock.group_tracking_lot")
+
     def setUp(self):
         super().setUp()
         self.supplier_location = self.env.ref("stock.stock_location_suppliers")
@@ -26,7 +28,7 @@ class TestStockPickingProductBarcodeReport(BaseCommon):
         self.product_no_barcode = self.env["product.product"].create(
             {"name": "Test Product 2", "type": "consu", "is_storable": True}
         )
-        self.package = self.env["stock.quant.package"].create({"name": "Pack-Test"})
+        self.package = self.env["stock.package"].create({"name": "Pack-Test"})
         partner = self.env["res.partner"].create({"name": "Test Partner"})
         self.picking = self.env["stock.picking"].create(
             {
@@ -36,23 +38,21 @@ class TestStockPickingProductBarcodeReport(BaseCommon):
                 "picking_type_id": self.env.ref(
                     "stock.picking_type_in"
                 ).id,  # Operation type Receipts
-                "move_ids_without_package": [
+                "move_ids": [
                     Command.create(
                         {
-                            "name": "Test 01",
                             "product_id": self.product_barcode.id,
                             "product_uom_qty": 20,
-                            "product_uom": self.product_barcode.uom_id.id,
+                            "uom_id": self.product_barcode.uom_id.id,
                             "location_id": self.supplier_location.id,
                             "location_dest_id": self.stock_location.id,
                         },
                     ),
                     Command.create(
                         {
-                            "name": "Test 02",
                             "product_id": self.product_no_barcode.id,
                             "product_uom_qty": 10,
-                            "product_uom": self.product_barcode.uom_id.id,
+                            "uom_id": self.product_barcode.uom_id.id,
                             "location_id": self.supplier_location.id,
                             "location_dest_id": self.stock_location.id,
                         },
@@ -142,3 +142,31 @@ class TestStockPickingProductBarcodeReport(BaseCommon):
             any_order=False,
         )
         writer._group.appendChild.assert_called_once_with(element)
+
+    def test_label_qty_by_packaging_unit(self):
+        """One label for each item of a packaging unit set to do so"""
+        units = self.env.ref("uom.product_uom_unit")
+        pack_6 = (
+            self.env["uom.uom"]
+            .sudo()
+            .create(
+                {
+                    "name": "Pack of 6",
+                    "relative_factor": 6,
+                    "relative_uom_id": units.id,
+                    "print_one_label_by_item": True,
+                }
+            )
+        )
+        line = self.env["stock.picking.line.print"].create(
+            {
+                "product_id": self.product_barcode.id,
+                "quantity": 12,
+                "uom_id": units.id,
+                "packaging_uom_id": pack_6.id,
+            }
+        )
+        self.assertEqual(line.label_qty, 2)
+        pack_6.sudo().print_one_label_by_item = False
+        line.quantity = 13
+        self.assertEqual(line.label_qty, 1)

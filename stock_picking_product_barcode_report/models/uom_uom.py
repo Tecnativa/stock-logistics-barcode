@@ -4,10 +4,10 @@
 from odoo import fields, models
 
 
-class ProductPackaging(models.Model):
-    _inherit = "product.packaging"
+class UomUom(models.Model):
+    _inherit = "uom.uom"
 
     print_one_label_by_item = fields.Boolean(
-        help="If checked, Odoo take into account the units included in the packaging "
-        "to compute number of labels"
+        help="If checked, Odoo takes into account the units included in this "
+        "packaging unit to compute the number of labels"
     )

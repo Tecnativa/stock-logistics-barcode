@@ -1,7 +1,7 @@
 # Copyright 2020 Carlos Roca <carlos.roca@tecnativa.com>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
-import barcode  # pylint: disable=missing-manifest-dependency
-from barcode.writer import SVGWriter  # pylint: disable=missing-manifest-dependency
+import barcode
+from barcode.writer import SVGWriter
 
 from odoo import http
 from odoo.http import request
