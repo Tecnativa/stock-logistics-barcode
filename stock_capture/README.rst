@@ -32,30 +32,43 @@ Stock Capture
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-This module is the engine the reading and weighing screens use to record
-the quantities captured by the user on transfers. It has no screen of
-its own.
+This module is the engine of the screens that read barcodes or weigh
+quantities on stock documents. It has no screen of its own:
+``stock_barcodes``, ``stock_weighing`` and other interfaces only add
+views on it, so every feature works the same way on all of them.
 
-A captured quantity is taken from the reservation of the move, the way
-Odoo's own barcode application does it, so reading less than reserved
-does not release the rest:
+**Documents.** A screen works on a document: a transfer, an operation
+type (the transfer to work on is found from the product read), a batch
+transfer, a location being counted (inventory) or, with ``mrp_capture``,
+a manufacturing order. The cards of the screens are the real operations,
+detailed operations or quants of the document.
+
+**Profiles.** A capture profile, set on each operation type, decides how
+the screens behave: the fields read in each step (required, forced in
+guided mode, filled by default, cleaned after each reading), guided or
+free mode, manual quantities and confirmation, cards, stock and demand
+checks, lots, packages and putaway.
+
+**Readings.** The screen sessions interpret barcodes the same way for
+every screen: products, packagings, lots, packages (their content or the
+destination package), locations, weight barcodes and GS1-128 barcodes.
+
+**Captured quantities.** A captured quantity is taken from the
+reservation of the move, the way Odoo's own barcode application does it,
+so reading less than reserved does not release the rest:
 
 - The captured part of a reserved line becomes a picked line and the
   rest stays reserved on an unpicked one. Capturing the same goods again
   adds to that picked line.
 - Capturing a lot, location, package or owner other than the reserved
-  one moves the reservation of the move to it.
+  one moves the reservation of the move to it, and a destination read by
+  the user is set on the captured line.
 - Only the quantity captured over the reservation is reserved anew.
-- A quantity can be captured into a destination package, which keeps a
-  picked line per package.
 - Undoing a captured quantity gives it back to the reservation of the
   move up to its demand.
-- A product captured on a transfer fills its moves in order, and a
-  product without moves gets a new one.
-
-Barcodes read by a screen are interpreted here too, so every screen
-reads products, packagings, lots, packages, locations, weights and GS1
-barcodes the same way.
+- Operations closed from a screen keep what to do with the rest of their
+  demand (backorder or not), so Odoo does not ask again when the
+  transfer is validated.
 
 When the transfer is validated, Odoo drops the unpicked lines, as it
 does with any transfer.
@@ -70,13 +83,63 @@ does with any transfer.
 .. contents::
    :local:
 
+Configuration
+=============
+
+The first task of an implementation is to analyze, with the people doing
+them, the flow of each operation: what is read and in which order, what
+the screen must propose and what it must refuse. Then adjust a profile
+to each flow in *Inventory > Configuration > Capture Profiles* and set
+it on its operation types (*Capture Profile*, and *Capture Profile for
+New Transfers* for the unplanned transfers created from the screens).
+
+The shipped profiles (Delivery, Receipt, Internal Transfer, Relocation,
+Inventory and Operation) are the ones agreed by the profiles used in
+production by several companies. An operation type without profile uses
+the one of its kind: Receipt, Delivery or Internal Transfer.
+
+Each field of a profile has:
+
+- *Step*: order in which the fields are asked. Only the fields to scan
+  of the current step are matched against a barcode, and the current
+  step is the one of the first required field still empty.
+- *To scan*, *Required*, *Filled by default* (from the pending card in
+  guided mode or from the document), *Forced* (guided mode rejects
+  another value) and *Clean after done*.
+
+Barcodes are read on products, product packagings (product units with a
+barcode), locations, lots and packages (their name). The GS1
+nomenclature of the company reads GS1-128 barcodes with several values.
+
+The system parameter ``stock_capture.limit_product_qty`` (999999 by
+default) rejects absurd quantities, e.g. a barcode read into the
+quantity field.
+
 Usage
 =====
 
-Other modules capture quantities through:
+Screens open a session on a document with
+``document.action_capture_open(profile=None)`` and send it the barcodes
+read with ``stock.capture.session.capture_barcode(barcode)``, which
+returns the message, its type, the sound to play, the field to focus and
+an action to execute, if any. Buttons of the screen call the session
+actions (``action_confirm``, ``action_force``, ``action_validate``,
+``action_next_card``...) and the cards call their own
+(``action_capture_card_select``, ``action_capture_remaining``,
+``action_capture_undo``, ``action_capture_close``...) with
+``capture_session_id`` in the context. The session field
+``feedback_seq`` increases on each reading or action, for the screen to
+play the sound, show the notification and move the focus the session
+asks for.
 
-- ``stock.picking._capture_product(product, quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True)``
-- ``stock.move._capture_quantity(quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True)``
+A new kind of document inherits ``stock.capture.document`` and
+implements its ``_capture_*`` methods: profile, operations, locations,
+checks, how a reading is applied and how it is validated.
+
+Other modules capture quantities through the engine:
+
+- ``stock.picking._capture_product(product, quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True, location_dest=None)``
+- ``stock.move._capture_quantity(quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True, location_dest=None)``
 - ``stock.move._capture_spread(quantity, uom=None, **characteristics)``,
   on several moves of a product, filling the pending quantity of each in
   order
@@ -94,19 +157,10 @@ extending
 ``stock.picking.type._capture_result_package(result_package, location_dest)``,
 e.g. ``stock_capture_package`` creates a new package for each capture.
 
-The screens that read barcodes send each barcode to
-``stock.picking.capture_scan(barcode, scan_values)``, which interprets
-it (product, packaging, lot, package, location, weight and GS1
-barcodes), joins it to the values read before and captures the product
-once it is known, with its lot when it needs one. It returns the values
-to send with the next barcode, their names to show, the captured lines
-and a message.
-
-The operations show their progress with ``captured_quantity`` and
-``capture_state``, can be locked by the user capturing them
-(``_capture_lock``, ``is_capture_locked``) and offer
-``action_capture_remaining`` and ``action_capture_undo`` to the cards of
-the screens. The captured lines keep who captured them and when.
+Installed on a database migrated from 18.0, the quantities read on
+pending detailed operations (``qty_picked`` of
+``stock_move_line_qty_picked``) and the backorder decisions of
+``stock_barcodes`` are captured.
 
 Bug Tracker
 ===========

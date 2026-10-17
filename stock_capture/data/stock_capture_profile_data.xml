@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+    <!-- Defaults agreed by the profiles used in production by several projects. Each operation flow of a company has to be analyzed to adjust them. -->
+    <record id="stock_capture_profile_delivery" model="stock.capture.profile">
+        <field name="name">Delivery</field>
+        <field name="sequence" eval="10" />
+        <field name="capture_unreserved" eval="True" />
+        <field name="fill_from_stock" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_delivery_location_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_delivery" />
+        <field name="name">Source</field>
+        <field name="field_name">location_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="10" />
+        <field name="required" eval="True" />
+        <field name="filled_default" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_delivery_package_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_delivery" />
+        <field name="name">Package</field>
+        <field name="field_name">package_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="20" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_delivery_product_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_delivery" />
+        <field name="name">Product</field>
+        <field name="field_name">product_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="30" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_delivery_packaging_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_delivery" />
+        <field name="name">Packaging</field>
+        <field name="field_name">packaging_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="40" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_delivery_lot_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_delivery" />
+        <field name="name">Lot</field>
+        <field name="field_name">lot_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="50" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_delivery_quantity"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_delivery" />
+        <field name="name">Quantity</field>
+        <field name="field_name">quantity</field>
+        <field name="step" eval="3" />
+        <field name="sequence" eval="60" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record id="stock_capture_profile_receipt" model="stock.capture.profile">
+        <field name="name">Receipt</field>
+        <field name="sequence" eval="20" />
+    </record>
+    <record
+        id="stock_capture_profile_receipt_product_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_receipt" />
+        <field name="name">Product</field>
+        <field name="field_name">product_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="10" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_receipt_packaging_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_receipt" />
+        <field name="name">Packaging</field>
+        <field name="field_name">packaging_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="20" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_receipt_lot_name"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_receipt" />
+        <field name="name">Lot</field>
+        <field name="field_name">lot_name</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="30" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_receipt_location_dest_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_receipt" />
+        <field name="name">Destination</field>
+        <field name="field_name">location_dest_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="40" />
+        <field name="to_scan" eval="True" />
+        <field name="filled_default" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_receipt_quantity"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_receipt" />
+        <field name="name">Quantity</field>
+        <field name="field_name">quantity</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="50" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record id="stock_capture_profile_internal" model="stock.capture.profile">
+        <field name="name">Internal Transfer</field>
+        <field name="sequence" eval="30" />
+        <field name="guided" eval="True" />
+        <field name="capture_unreserved" eval="True" />
+        <field name="fill_from_stock" eval="True" />
+        <field name="keep_screen_values" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_location_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Source</field>
+        <field name="field_name">location_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="10" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="filled_default" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_product_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Product</field>
+        <field name="field_name">product_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="20" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="filled_default" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_package_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Package</field>
+        <field name="field_name">package_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="30" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_lot_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Lot</field>
+        <field name="field_name">lot_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="40" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_result_package_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Destination Package</field>
+        <field name="field_name">result_package_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="50" />
+        <field name="filled_default" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_location_dest_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Destination</field>
+        <field name="field_name">location_dest_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="60" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="filled_default" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_internal_quantity"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_internal" />
+        <field name="name">Quantity</field>
+        <field name="field_name">quantity</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="70" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record id="stock_capture_profile_relocation" model="stock.capture.profile">
+        <field name="name">Relocation</field>
+        <field name="sequence" eval="40" />
+        <field name="card_filter">none</field>
+        <field name="fill_from_stock" eval="True" />
+        <field name="allow_over_demand" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_location_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Source</field>
+        <field name="field_name">location_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="10" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_product_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Product</field>
+        <field name="field_name">product_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="20" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_package_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Package</field>
+        <field name="field_name">package_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="30" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_lot_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Lot</field>
+        <field name="field_name">lot_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="40" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_result_package_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Destination Package</field>
+        <field name="field_name">result_package_id</field>
+        <field name="step" eval="3" />
+        <field name="sequence" eval="50" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_location_dest_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Destination</field>
+        <field name="field_name">location_dest_id</field>
+        <field name="step" eval="3" />
+        <field name="sequence" eval="60" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_relocation_quantity"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_relocation" />
+        <field name="name">Quantity</field>
+        <field name="field_name">quantity</field>
+        <field name="step" eval="4" />
+        <field name="sequence" eval="70" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record id="stock_capture_profile_inventory" model="stock.capture.profile">
+        <field name="name">Inventory</field>
+        <field name="sequence" eval="50" />
+        <field name="card_filter">done</field>
+    </record>
+    <record
+        id="stock_capture_profile_inventory_location_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_inventory" />
+        <field name="name">Source</field>
+        <field name="field_name">location_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="10" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="filled_default" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_inventory_packaging_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_inventory" />
+        <field name="name">Packaging</field>
+        <field name="field_name">packaging_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="20" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_inventory_package_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_inventory" />
+        <field name="name">Package</field>
+        <field name="field_name">package_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="30" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_inventory_product_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_inventory" />
+        <field name="name">Product</field>
+        <field name="field_name">product_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="40" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_inventory_lot_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_inventory" />
+        <field name="name">Lot</field>
+        <field name="field_name">lot_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="50" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_inventory_quantity"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_inventory" />
+        <field name="name">Quantity</field>
+        <field name="field_name">quantity</field>
+        <field name="step" eval="3" />
+        <field name="sequence" eval="60" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record id="stock_capture_profile_operation" model="stock.capture.profile">
+        <field name="name">Operation</field>
+        <field name="sequence" eval="60" />
+    </record>
+    <record
+        id="stock_capture_profile_operation_location_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_operation" />
+        <field name="name">Source</field>
+        <field name="field_name">location_id</field>
+        <field name="step" eval="1" />
+        <field name="sequence" eval="10" />
+        <field name="required" eval="True" />
+        <field name="filled_default" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_operation_packaging_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_operation" />
+        <field name="name">Packaging</field>
+        <field name="field_name">packaging_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="20" />
+        <field name="to_scan" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_operation_product_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_operation" />
+        <field name="name">Product</field>
+        <field name="field_name">product_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="30" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_operation_lot_id"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_operation" />
+        <field name="name">Lot</field>
+        <field name="field_name">lot_id</field>
+        <field name="step" eval="2" />
+        <field name="sequence" eval="40" />
+        <field name="to_scan" eval="True" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+    <record
+        id="stock_capture_profile_operation_quantity"
+        model="stock.capture.profile.field"
+    >
+        <field name="profile_id" ref="stock_capture_profile_operation" />
+        <field name="name">Quantity</field>
+        <field name="field_name">quantity</field>
+        <field name="step" eval="3" />
+        <field name="sequence" eval="50" />
+        <field name="required" eval="True" />
+        <field name="clean_after_done" eval="True" />
+    </record>
+</odoo>

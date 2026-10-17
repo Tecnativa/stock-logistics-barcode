@@ -1,0 +1,9 @@
+id,name,model_id,group_id/id,operation,domain
+access_stock_capture_profile_user,stock.capture.profile user,stock.capture.profile,stock.group_stock_user,r,
+access_stock_capture_profile_manager,stock.capture.profile manager,stock.capture.profile,stock.group_stock_manager,crud,
+access_stock_capture_profile_field_user,stock.capture.profile.field user,stock.capture.profile.field,stock.group_stock_user,r,
+access_stock_capture_profile_field_manager,stock.capture.profile.field manager,stock.capture.profile.field,stock.group_stock_manager,crud,
+access_stock_capture_session_user,stock.capture.session user,stock.capture.session,stock.group_stock_user,crud,"[('user_id', '=', user.id)]"
+access_stock_capture_product_info_user,stock.capture.product.info user,stock.capture.product.info,stock.group_stock_user,crud,
+access_stock_capture_product_info_line_user,stock.capture.product.info.line user,stock.capture.product.info.line,stock.group_stock_user,crud,
+access_stock_capture_new_packaging_user,stock.capture.new.packaging user,stock.capture.new.packaging,stock.group_stock_user,crud,

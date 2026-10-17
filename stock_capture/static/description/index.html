@@ -375,29 +375,40 @@ ul.auto-toc {
 !! source digest: sha256:d988d6a4ceefa72ea58da80e1e773bfa1571e14a6b0d5908a62380a8a87dc4b9
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 <p><a class="reference external image-reference" href="https://odoo-community.org/page/development-status"><img alt="Alpha" src="https://img.shields.io/badge/maturity-Alpha-red.png" /></a> <a class="reference external image-reference" href="http://www.gnu.org/licenses/agpl-3.0-standalone.html"><img alt="License: AGPL-3" src="https://img.shields.io/badge/license-AGPL--3-blue.png" /></a> <a class="reference external image-reference" href="https://github.com/OCA/stock-logistics-barcode/tree/20.0/stock_capture"><img alt="OCA/stock-logistics-barcode" src="https://img.shields.io/badge/github-OCA%2Fstock--logistics--barcode-lightgray.png?logo=github" /></a> <a class="reference external image-reference" href="https://translation.odoo-community.org/projects/stock-logistics-barcode-20-0/stock-logistics-barcode-20-0-stock_capture"><img alt="Translate me on Weblate" src="https://img.shields.io/badge/weblate-Translate%20me-F47D42.png" /></a> <a class="reference external image-reference" href="https://runboat.odoo-community.org/builds?repo=OCA/stock-logistics-barcode&amp;target_branch=20.0"><img alt="Try me on Runboat" src="https://img.shields.io/badge/runboat-Try%20me-875A7B.png" /></a></p>
-<p>This module is the engine the reading and weighing screens use to record
-the quantities captured by the user on transfers. It has no screen of
-its own.</p>
-<p>A captured quantity is taken from the reservation of the move, the way
-Odoo’s own barcode application does it, so reading less than reserved
-does not release the rest:</p>
+<p>This module is the engine of the screens that read barcodes or weigh
+quantities on stock documents. It has no screen of its own:
+<tt class="docutils literal">stock_barcodes</tt>, <tt class="docutils literal">stock_weighing</tt> and other interfaces only add
+views on it, so every feature works the same way on all of them.</p>
+<p><strong>Documents.</strong> A screen works on a document: a transfer, an operation
+type (the transfer to work on is found from the product read), a batch
+transfer, a location being counted (inventory) or, with <tt class="docutils literal">mrp_capture</tt>,
+a manufacturing order. The cards of the screens are the real operations,
+detailed operations or quants of the document.</p>
+<p><strong>Profiles.</strong> A capture profile, set on each operation type, decides how
+the screens behave: the fields read in each step (required, forced in
+guided mode, filled by default, cleaned after each reading), guided or
+free mode, manual quantities and confirmation, cards, stock and demand
+checks, lots, packages and putaway.</p>
+<p><strong>Readings.</strong> The screen sessions interpret barcodes the same way for
+every screen: products, packagings, lots, packages (their content or the
+destination package), locations, weight barcodes and GS1-128 barcodes.</p>
+<p><strong>Captured quantities.</strong> A captured quantity is taken from the
+reservation of the move, the way Odoo’s own barcode application does it,
+so reading less than reserved does not release the rest:</p>
 <ul class="simple">
 <li>The captured part of a reserved line becomes a picked line and the
 rest stays reserved on an unpicked one. Capturing the same goods again
 adds to that picked line.</li>
 <li>Capturing a lot, location, package or owner other than the reserved
-one moves the reservation of the move to it.</li>
+one moves the reservation of the move to it, and a destination read by
+the user is set on the captured line.</li>
 <li>Only the quantity captured over the reservation is reserved anew.</li>
-<li>A quantity can be captured into a destination package, which keeps a
-picked line per package.</li>
 <li>Undoing a captured quantity gives it back to the reservation of the
 move up to its demand.</li>
-<li>A product captured on a transfer fills its moves in order, and a
-product without moves gets a new one.</li>
+<li>Operations closed from a screen keep what to do with the rest of their
+demand (backorder or not), so Odoo does not ask again when the
+transfer is validated.</li>
 </ul>
-<p>Barcodes read by a screen are interpreted here too, so every screen
-reads products, packagings, lots, packages, locations, weights and GS1
-barcodes the same way.</p>
 <p>When the transfer is validated, Odoo drops the unpicked lines, as it
 does with any transfer.</p>
 <div class="admonition important">
@@ -409,22 +420,67 @@ Only for development or testing purpose, do not use in production.
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#usage" id="toc-entry-1">Usage</a></li>
-<li><a class="reference internal" href="#bug-tracker" id="toc-entry-2">Bug Tracker</a></li>
-<li><a class="reference internal" href="#credits" id="toc-entry-3">Credits</a><ul>
-<li><a class="reference internal" href="#authors" id="toc-entry-4">Authors</a></li>
-<li><a class="reference internal" href="#contributors" id="toc-entry-5">Contributors</a></li>
-<li><a class="reference internal" href="#maintainers" id="toc-entry-6">Maintainers</a></li>
+<li><a class="reference internal" href="#configuration" id="toc-entry-1">Configuration</a></li>
+<li><a class="reference internal" href="#usage" id="toc-entry-2">Usage</a></li>
+<li><a class="reference internal" href="#bug-tracker" id="toc-entry-3">Bug Tracker</a></li>
+<li><a class="reference internal" href="#credits" id="toc-entry-4">Credits</a><ul>
+<li><a class="reference internal" href="#authors" id="toc-entry-5">Authors</a></li>
+<li><a class="reference internal" href="#contributors" id="toc-entry-6">Contributors</a></li>
+<li><a class="reference internal" href="#maintainers" id="toc-entry-7">Maintainers</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<div class="section" id="usage">
-<h2><a class="toc-backref" href="#toc-entry-1">Usage</a></h2>
-<p>Other modules capture quantities through:</p>
+<div class="section" id="configuration">
+<h2><a class="toc-backref" href="#toc-entry-1">Configuration</a></h2>
+<p>The first task of an implementation is to analyze, with the people doing
+them, the flow of each operation: what is read and in which order, what
+the screen must propose and what it must refuse. Then adjust a profile
+to each flow in <em>Inventory &gt; Configuration &gt; Capture Profiles</em> and set
+it on its operation types (<em>Capture Profile</em>, and <em>Capture Profile for
+New Transfers</em> for the unplanned transfers created from the screens).</p>
+<p>The shipped profiles (Delivery, Receipt, Internal Transfer, Relocation,
+Inventory and Operation) are the ones agreed by the profiles used in
+production by several companies. An operation type without profile uses
+the one of its kind: Receipt, Delivery or Internal Transfer.</p>
+<p>Each field of a profile has:</p>
 <ul class="simple">
-<li><tt class="docutils literal">stock.picking._capture_product(product, quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True)</tt></li>
-<li><tt class="docutils literal">stock.move._capture_quantity(quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True)</tt></li>
+<li><em>Step</em>: order in which the fields are asked. Only the fields to scan
+of the current step are matched against a barcode, and the current
+step is the one of the first required field still empty.</li>
+<li><em>To scan</em>, <em>Required</em>, <em>Filled by default</em> (from the pending card in
+guided mode or from the document), <em>Forced</em> (guided mode rejects
+another value) and <em>Clean after done</em>.</li>
+</ul>
+<p>Barcodes are read on products, product packagings (product units with a
+barcode), locations, lots and packages (their name). The GS1
+nomenclature of the company reads GS1-128 barcodes with several values.</p>
+<p>The system parameter <tt class="docutils literal">stock_capture.limit_product_qty</tt> (999999 by
+default) rejects absurd quantities, e.g. a barcode read into the
+quantity field.</p>
+</div>
+<div class="section" id="usage">
+<h2><a class="toc-backref" href="#toc-entry-2">Usage</a></h2>
+<p>Screens open a session on a document with
+<tt class="docutils literal">document.action_capture_open(profile=None)</tt> and send it the barcodes
+read with <tt class="docutils literal">stock.capture.session.capture_barcode(barcode)</tt>, which
+returns the message, its type, the sound to play, the field to focus and
+an action to execute, if any. Buttons of the screen call the session
+actions (<tt class="docutils literal">action_confirm</tt>, <tt class="docutils literal">action_force</tt>, <tt class="docutils literal">action_validate</tt>,
+<tt class="docutils literal">action_next_card</tt>…) and the cards call their own
+(<tt class="docutils literal">action_capture_card_select</tt>, <tt class="docutils literal">action_capture_remaining</tt>,
+<tt class="docutils literal">action_capture_undo</tt>, <tt class="docutils literal">action_capture_close</tt>…) with
+<tt class="docutils literal">capture_session_id</tt> in the context. The session field
+<tt class="docutils literal">feedback_seq</tt> increases on each reading or action, for the screen to
+play the sound, show the notification and move the focus the session
+asks for.</p>
+<p>A new kind of document inherits <tt class="docutils literal">stock.capture.document</tt> and
+implements its <tt class="docutils literal">_capture_*</tt> methods: profile, operations, locations,
+checks, how a reading is applied and how it is validated.</p>
+<p>Other modules capture quantities through the engine:</p>
+<ul class="simple">
+<li><tt class="docutils literal">stock.picking._capture_product(product, quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True, location_dest=None)</tt></li>
+<li><tt class="docutils literal">stock.move._capture_quantity(quantity, uom=None, lot=None, location=None, package=None, owner=None, result_package=None, merge=True, location_dest=None)</tt></li>
 <li><tt class="docutils literal">stock.move._capture_spread(quantity, uom=None, **characteristics)</tt>,
 on several moves of a product, filling the pending quantity of each in
 order</li>
@@ -440,21 +496,13 @@ capture lines of its own, e.g. one per weighing to label it.</p>
 extending
 <tt class="docutils literal">stock.picking.type._capture_result_package(result_package, location_dest)</tt>,
 e.g. <tt class="docutils literal">stock_capture_package</tt> creates a new package for each capture.</p>
-<p>The screens that read barcodes send each barcode to
-<tt class="docutils literal">stock.picking.capture_scan(barcode, scan_values)</tt>, which interprets
-it (product, packaging, lot, package, location, weight and GS1
-barcodes), joins it to the values read before and captures the product
-once it is known, with its lot when it needs one. It returns the values
-to send with the next barcode, their names to show, the captured lines
-and a message.</p>
-<p>The operations show their progress with <tt class="docutils literal">captured_quantity</tt> and
-<tt class="docutils literal">capture_state</tt>, can be locked by the user capturing them
-(<tt class="docutils literal">_capture_lock</tt>, <tt class="docutils literal">is_capture_locked</tt>) and offer
-<tt class="docutils literal">action_capture_remaining</tt> and <tt class="docutils literal">action_capture_undo</tt> to the cards of
-the screens. The captured lines keep who captured them and when.</p>
+<p>Installed on a database migrated from 18.0, the quantities read on
+pending detailed operations (<tt class="docutils literal">qty_picked</tt> of
+<tt class="docutils literal">stock_move_line_qty_picked</tt>) and the backorder decisions of
+<tt class="docutils literal">stock_barcodes</tt> are captured.</p>
 </div>
 <div class="section" id="bug-tracker">
-<h2><a class="toc-backref" href="#toc-entry-2">Bug Tracker</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-3">Bug Tracker</a></h2>
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/OCA/stock-logistics-barcode/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
@@ -462,15 +510,15 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
-<h2><a class="toc-backref" href="#toc-entry-3">Credits</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-4">Credits</a></h2>
 <div class="section" id="authors">
-<h3><a class="toc-backref" href="#toc-entry-4">Authors</a></h3>
+<h3><a class="toc-backref" href="#toc-entry-5">Authors</a></h3>
 <ul class="simple">
 <li>Tecnativa</li>
 </ul>
 </div>
 <div class="section" id="contributors">
-<h3><a class="toc-backref" href="#toc-entry-5">Contributors</a></h3>
+<h3><a class="toc-backref" href="#toc-entry-6">Contributors</a></h3>
 <ul class="simple">
 <li><a class="reference external" href="https://www.tecnativa.com">Tecnativa</a>:<ul>
 <li>Carlos Dauden</li>
@@ -479,7 +527,7 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="maintainers">
-<h3><a class="toc-backref" href="#toc-entry-6">Maintainers</a></h3>
+<h3><a class="toc-backref" href="#toc-entry-7">Maintainers</a></h3>
 <p>This module is maintained by the OCA.</p>
 <a class="reference external image-reference" href="https://odoo-community.org">
 <img alt="Odoo Community Association" src="https://odoo-community.org/logo.png" />

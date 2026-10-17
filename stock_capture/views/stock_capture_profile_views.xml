@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2026 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+    <record id="stock_capture_profile_view_list" model="ir.ui.view">
+        <field name="model">stock.capture.profile</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="guided" />
+                <field name="manual_confirm" />
+                <field name="card_source" />
+                <field name="card_filter" />
+            </list>
+        </field>
+    </record>
+    <record id="stock_capture_profile_view_form" model="ir.ui.view">
+        <field name="model">stock.capture.profile</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="text-bg-danger"
+                        invisible="active"
+                    />
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Reading" name="reading">
+                            <field name="guided" />
+                            <field name="manual_entry" />
+                            <field name="manual_entry_on_edit" />
+                            <field
+                                name="manual_entry_focus_field"
+                                invisible="not manual_entry and not manual_entry_on_edit"
+                            />
+                            <field name="manual_confirm" />
+                            <field name="manual_quantity" />
+                            <field name="accumulate_read_quantity" />
+                            <field name="replace_quantity" />
+                            <field name="ignore_filled_fields" />
+                            <field name="keep_screen_values" />
+                        </group>
+                        <group string="Stock" name="stock">
+                            <field name="capture_unreserved" />
+                            <field name="allow_negative_quant" />
+                            <field name="allow_over_demand" />
+                            <field name="allow_not_demanded_product" />
+                            <field name="fill_from_stock" />
+                            <field name="quantity_from_stock" />
+                            <field name="ignore_quant_location" />
+                            <field name="search_picking_from_product" />
+                        </group>
+                        <group string="Lots and Packages" name="lots">
+                            <field
+                                name="auto_lot"
+                                groups="stock.group_production_lot"
+                            />
+                            <field
+                                name="create_lot"
+                                groups="stock.group_production_lot"
+                            />
+                            <field
+                                name="auto_put_in_pack"
+                                groups="stock.group_tracking_lot"
+                            />
+                        </group>
+                        <group string="Locations" name="locations">
+                            <field name="propose_location_dest" />
+                            <field name="use_location_dest_putaway" />
+                            <field name="show_fixed_location_dest" />
+                            <field name="location_field_to_sort" />
+                        </group>
+                        <group string="Cards" name="cards">
+                            <field name="card_source" />
+                            <field name="card_group" />
+                            <field
+                                name="card_group_expression"
+                                invisible="card_group != 'expression'"
+                                required="card_group == 'expression'"
+                            />
+                            <field name="card_filter" />
+                            <field name="show_detailed_operations" />
+                        </group>
+                        <group string="Screen" name="screen">
+                            <field name="show_form_scan" />
+                            <field name="show_stock" />
+                            <field
+                                name="show_owner"
+                                groups="stock.group_tracking_owner"
+                            />
+                            <field name="display_notification" />
+                            <field name="active" invisible="1" />
+                        </group>
+                    </group>
+                    <field name="field_ids">
+                        <list editable="bottom">
+                            <field name="step" />
+                            <field name="sequence" widget="handle" />
+                            <field name="name" />
+                            <field name="field_name" />
+                            <field name="to_scan" />
+                            <field name="required" />
+                            <field name="filled_default" />
+                            <field name="forced" />
+                            <field name="clean_after_done" />
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="stock_capture_profile_action" model="ir.actions.act_window">
+        <field name="name">Capture Profiles</field>
+        <field name="res_model">stock.capture.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a capture profile</p>
+            <p>
+                A profile sets how the screens reading or weighing quantities
+                behave on an operation type. Analyze the flow of each operation
+                with the people doing it and adjust a profile to it.
+            </p>
+        </field>
+    </record>
+    <menuitem
+        id="stock_capture_profile_menu"
+        action="stock_capture_profile_action"
+        parent="stock.menu_warehouse_config"
+        sequence="100"
+    />
+    <record id="view_picking_type_form" model="ir.ui.view">
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form" />
+        <field name="arch" type="xml">
+            <group name="locations" position="after">
+                <group string="Capture" name="capture">
+                    <field name="capture_profile_id" />
+                    <field name="capture_new_picking_profile_id" />
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>
