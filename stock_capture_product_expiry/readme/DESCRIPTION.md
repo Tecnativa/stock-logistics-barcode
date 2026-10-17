@@ -1,0 +1,1 @@
+The lots created from the lot names read on the capture screens (`stock_capture`), e.g. a GS1-128 barcode of a receipt, get the expiration date (AI 17) and the best before date (AI 15) read with them. When only the best before date is read, the expiration date is computed with the times of the product, and Odoo computes the removal and alert dates.
