@@ -1,1 +1,2 @@
 odoo-addon-web_widget_numeric_step @ git+https://github.com/Tecnativa/web@20.0-mig-web_widget_numeric_step#subdirectory=web_widget_numeric_step
+odoo-addon-mrp_capture @ git+https://github.com/Tecnativa/manufacture@20.0-ADD-mrp_capture#subdirectory=mrp_capture
