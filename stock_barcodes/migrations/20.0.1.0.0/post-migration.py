@@ -3,7 +3,9 @@
 """The barcode option groups of 18.0 become capture profiles of stock_capture.
 
 Their steps are kept for the fields the screens read in 20.0; fields added by
-other modules (e.g. a secondary unit) are migrated by those modules.
+other modules (e.g. a secondary unit) are migrated by those modules. The old
+table keeps the profile of each group in ``capture_profile_id`` for them, as
+their migrations run after this one.
 """
 
 import logging
@@ -175,6 +177,16 @@ def _migrate_option_groups(env):
         values = _profile_values(group)
         values["field_ids"] = steps
         profiles[group["id"]] = Profile.create(values)
+    cr.execute(
+        """ALTER TABLE stock_barcodes_option_group
+        ADD COLUMN IF NOT EXISTS capture_profile_id INTEGER"""
+    )
+    for group_id, profile in profiles.items():
+        cr.execute(
+            """UPDATE stock_barcodes_option_group SET capture_profile_id = %s
+            WHERE id = %s""",
+            (profile.id, group_id),
+        )
     _logger.info("%s barcode option groups migrated to capture profiles", len(groups))
     return profiles
 

@@ -71,6 +71,12 @@ class TestMigration(TransactionCase):
         self._run_migration()
         profile = picking_type.capture_profile_id
         self.assertEqual(profile.name, "Picking OUT options")
+        # The modules adding options to the groups find their profile
+        cr.execute(
+            "SELECT capture_profile_id FROM stock_barcodes_option_group WHERE id = %s",
+            (group_id,),
+        )
+        self.assertEqual(cr.fetchone()[0], profile.id)
         self.assertTrue(profile.guided)
         self.assertTrue(profile.manual_confirm)
         self.assertTrue(profile.fill_from_stock)
