@@ -210,15 +210,19 @@ class StockMoveLine(models.Model):
         the reservation of the move, as captures do: an unpicked line captured
         for less keeps the rest reserved on an unpicked line, and the quantity
         captured over the line is taken from the other unpicked lines of the
-        move before reserving anew. Setting zero undoes the capture and keeps
-        the line, unpicked.
+        move before reserving anew. What is captured less goes back to the
+        unpicked line of the same goods, as undoing a capture does, so setting
+        zero joins that line again or keeps this one unpicked when there is
+        none.
+
+        :return: the line, or an empty recordset when it joined another one
         """
         self.ensure_one()
         move = self.move_id
         if self.uom_id.is_zero(quantity):
             if self.picked:
-                self._capture_undo(merge=False)
-            return self
+                self._capture_undo()
+            return self.exists()
         if not self.picked:
             if self.uom_id.compare(quantity, self.quantity) < 0:
                 rest = self._split(quantity, self.result_package_id.id)
@@ -227,7 +231,7 @@ class StockMoveLine(models.Model):
                     rest.picked = False
             self.picked = True
         elif self.uom_id.compare(quantity, self.quantity) < 0:
-            self._capture_undo(self.quantity - quantity, merge=False)
+            self._capture_undo(self.quantity - quantity)
             return self
         extra = self.uom_id._compute_quantity(
             quantity - self.quantity, move.uom_id, round=False
@@ -283,6 +287,22 @@ class StockMoveLine(models.Model):
         """Leave the reservation of the card without capturing it"""
         lines = self._capture_card_lines().filtered(lambda ml: not ml.picked)
         lines.unlink()
+        self.env["stock.capture.session"]._capture_refresh_from_context()
+        return True
+
+    def action_capture_undo(self):
+        """Undo what is captured on these detailed operations: what each one
+        holds goes back to the unpicked line of the same goods, e.g. when a
+        weighing is reset"""
+        moves = self.move_id
+        # Setting nothing captured leaves the lines with nothing captured as
+        # they are, and lets other captures undo their own way, e.g. the
+        # finished lines of a manufacturing order
+        for line in self:
+            if line.exists() and line.state not in ("done", "cancel"):
+                line._capture_set_quantity(0)
+        moves.capture_backorder_action = "pending"
+        moves.capture_forced = False
         self.env["stock.capture.session"]._capture_refresh_from_context()
         return True
 

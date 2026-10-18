@@ -235,9 +235,28 @@ class TestStockCapture(TransactionCase):
         self.assertEqual(line.quantity, 7.0)
         self.assertEqual(self._lines(move, False).quantity, 3.0)
         self.assertEqual(self._reserved(self.product), 10.0)
-        line._capture_set_quantity(0.0)
-        # The line is kept, unpicked, with its reservation back
-        self.assertTrue(line.exists())
-        self.assertFalse(line.picked)
-        self.assertEqual(sum(move.move_line_ids.mapped("quantity")), 10.0)
+        self.assertFalse(line._capture_set_quantity(0.0))
+        # The capture goes back to the reservation of the same goods
+        self.assertFalse(line.exists())
+        self.assertEqual(move.move_line_ids.mapped("quantity"), [10.0])
+        self.assertFalse(move.move_line_ids.picked)
         self.assertEqual(self._reserved(self.product), 10.0)
+
+    def test_set_quantity_partially_and_back(self):
+        """A partial capture split from its line joins it again when it is
+        captured for less or undone"""
+        picking = self._create_delivery()
+        move = picking.move_ids
+        line = move.move_line_ids
+        line._capture_set_quantity(4.0)
+        rest = self._lines(move, False)
+        self.assertEqual(rest.quantity, 6.0)
+        line._capture_set_quantity(3.0)
+        self.assertEqual(line.quantity, 3.0)
+        self.assertEqual(rest.quantity, 7.0)
+        self.assertEqual(move.move_line_ids, line | rest)
+        line.action_capture_undo()
+        self.assertFalse(line.exists())
+        self.assertEqual(move.move_line_ids, rest)
+        self.assertEqual(rest.quantity, 10.0)
+        self.assertFalse(rest.picked)
